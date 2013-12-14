@@ -32,7 +32,7 @@ object MacroGLBuild extends Build {
 
   lazy val macrogl = Project(
     "macrogl",
-    file("macrogl"),
+    file("."),
     settings = macroglSettings
   )
 
