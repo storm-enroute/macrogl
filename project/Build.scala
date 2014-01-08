@@ -14,7 +14,7 @@ object MacroGLBuild extends Build {
   val macroglSettings = Defaults.defaultSettings ++ Seq (
     organization := "org.macrogl",
     version := "0.0.1",
-    scalaVersion := "2.10.1",
+    scalaVersion := "2.10.2",
     scalacOptions ++= Seq(
       "-deprecation",
       "-unchecked",
