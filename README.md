@@ -1,3 +1,5 @@
+[![Build Status](https://ci.storm-enroute.com:8080/job/macrogl/badge/icon)](https://ci.storm-enroute.com:8080/job/macrogl/)
+
 MacroGL
 =======
 
