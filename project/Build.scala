@@ -30,7 +30,7 @@ object MacroGLBuild extends Build {
 
   val macroglSettings = Defaults.defaultSettings ++ publishCreds ++ Seq (
     name := "macrogl",
-    organization := "org.stormenroute",
+    organization := "com.storm-enroute",
     version := "0.2",
     scalaVersion := "2.10.2",
     scalacOptions ++= Seq(
