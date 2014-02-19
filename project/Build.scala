@@ -12,7 +12,8 @@ object MacroGLBuild extends Build {
   val lwjglVersion = "2.9.0"
 
   val macroglSettings = Defaults.defaultSettings ++ Seq (
-    organization := "org.macrogl",
+    name := "macrogl",
+    organization := "org.stormenroute",
     version := "0.0.1",
     scalaVersion := "2.10.2",
     scalacOptions ++= Seq(
