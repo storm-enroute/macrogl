@@ -26,8 +26,8 @@ object SingleTriangle {
     def readResource(path: String) = io.Source.fromURL(getClass.getResource(path)).mkString
 
     val pp = new Program("test")(
-      Program.Shader.Vertex(readResource("/vertex.glsl")),
-      Program.Shader.Fragment(readResource("/fragment.glsl"))
+      Program.Shader.Vertex  (readResource("/org/macrogl/examples/SingleTriangle.vert")),
+      Program.Shader.Fragment(readResource("/org/macrogl/examples/SingleTriangle.frag"))
     )
 
     pp.acquire()
