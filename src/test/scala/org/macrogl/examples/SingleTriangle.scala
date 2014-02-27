@@ -6,8 +6,13 @@ import org.macrogl._
 
 object SingleTriangle {
   def main(args: Array[String]) {
+    val contextAttributes = new ContextAttribs(3, 2).withForwardCompatible(true).withProfileCore(true)
+
     Display.setDisplayMode(new DisplayMode(800, 600))
-    Display.create()
+    Display.create(new PixelFormat, contextAttributes)
+
+    val vao = GL30.glGenVertexArrays()
+    GL30.glBindVertexArray(vao)
 
     val vertices = Array(
       -0.5f,  0.5f, 0.0f,  1, 0, 0,
