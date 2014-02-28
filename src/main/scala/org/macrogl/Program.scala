@@ -23,7 +23,7 @@ final class Program(val name: String)(
   object uniform extends Dynamic {
     def location(varname: String) = {
       val loc = glGetUniformLocation(index, varname)
-      if (loc == -1) new Program.Exception("could not send uniform: " + varname)
+      if (loc == -1) throw new Program.Exception("could not send uniform: " + varname)
       loc
     }
     def updateDynamic(varname: String)(v: Any) = {
