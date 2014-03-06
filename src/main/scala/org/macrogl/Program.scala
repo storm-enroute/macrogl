@@ -23,7 +23,7 @@ final class Program(val name: String)(
   object uniform extends Dynamic {
     def location(varname: String) = {
       val loc = glGetUniformLocation(index, varname)
-      if (loc == -1) throw new Program.Exception("could not send uniform: " + varname)
+      if (loc == -1) throw new Program.Exception(Program.this, "could not send uniform: " + varname)
       loc
     }
     def updateDynamic(varname: String)(v: Any) = {
@@ -65,14 +65,14 @@ final class Program(val name: String)(
         try glDispatchCompute(numGroupsX, numGroupsY, numGroupsZ)
         finally if (opidx != index) glUseProgram(opidx)
       case _ =>
-        throw new Program.Exception("Can only dispatch a compute shader.")
+        throw new Program.Exception(this, "Can only dispatch a compute shader.")
     }
   }
 
   def acquire() {
     release()
     pindex = glCreateProgram()
-    for (s <- shaders) s.attach(pindex, name)
+    for (s <- shaders) s.attach(this)
     status.check()
   }
 
@@ -84,30 +84,35 @@ final class Program(val name: String)(
     }
   }
 
+  override def toString = s"Program(name = $name; index = $pindex)"
+
 }
 
 
 object Program {
-  case class Exception(msg: String) extends java.lang.Exception(msg)
+  case class Exception(p: Program, msg: String)
+  extends java.lang.Exception(s"$p: $msg")
 
   sealed trait Shader {
     private var sindex = -1
     private val srcarray = Array[CharSequence](source)
     private val result = new Array[Int](1)
 
-    private def processShaderErrors(shname: String, flag: Int, phase: String, shindex: Int, pname: String) {
+    private def processShaderErrors(shname: String, flag: Int, phase: String, shindex: Int, p: Program) {
+      val pname = p.name
       val res = glGetShaderi(shindex, flag)
       if (res == GL_FALSE) {
         val errormsg = glGetShaderInfoLog(shindex, 512)
-        throw new Program.Exception("error %s %s in shader %s\n%s".format(phase, shname, pname, errormsg))
+        throw new Program.Exception(p, "error %s %s in shader %s\n%s".format(phase, shname, pname, errormsg))
       }
     }
 
-    private def processProgramErrors(pindex: Int, flag: Int, phase: String, pname: String) {
+    private def processProgramErrors(pindex: Int, flag: Int, phase: String, p: Program) {
+      val pname = p.name
       val res = glGetProgrami(pindex, flag)
       if (res == GL_FALSE) {
         val errormsg = glGetProgramInfoLog(pindex, 512)
-        throw new Program.Exception("error %s program %s\n%s".format(phase, pname, errormsg))
+        throw new Program.Exception(p, "error %s program %s\n%s".format(phase, pname, errormsg))
       }
     }
 
@@ -119,17 +124,18 @@ object Program {
 
     def afterAttach: Int => Unit
 
-    def attach(pindex: Int, pname: String) {
+    def attach(p: Program) {
+      val pindex = p.index
       val s = glCreateShader(mode)
       glShaderSource(s, srcarray)
       glCompileShader(s)
-      processShaderErrors(name, GL_COMPILE_STATUS, "compiling", s, pname)
+      processShaderErrors(name, GL_COMPILE_STATUS, "compiling", s, p)
       glAttachShader(pindex, s)
       afterAttach(pindex)
       glLinkProgram(pindex)
-      processProgramErrors(pindex, GL_LINK_STATUS, "linking", pname)
+      processProgramErrors(pindex, GL_LINK_STATUS, "linking", p)
       glValidateProgram(pindex)
-      processProgramErrors(pindex, GL_VALIDATE_STATUS, "validating", pname)
+      processProgramErrors(pindex, GL_VALIDATE_STATUS, "validating", p)
       status.check()
     }
 
