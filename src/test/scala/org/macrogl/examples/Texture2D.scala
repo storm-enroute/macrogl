@@ -35,8 +35,18 @@ object Texture2D {
     mb.acquire()
     mb.send(0, fb)
 
-    val textureData = new Array[Byte](64 * 64 * 3)
-    scala.util.Random.nextBytes(textureData)
+    val textureSize = 16
+
+    val ab = new scala.collection.mutable.ArrayBuilder.ofByte
+    for {
+      i <- 0 until textureSize
+      j <- 0 until textureSize
+    } {
+      val half = textureSize / 2 
+      val black = (i < half && j < half) || (i >= half && j >= half)
+      ab ++= { if (black) Seq(0, 0, 0) else Seq(0xFF.toByte, 0xFF.toByte, 0xFF.toByte) }
+    }
+    val textureData = ab.result
 
     val textureBuffer = BufferUtils.createByteBuffer(textureData.length)
     textureBuffer.put(textureData)
@@ -44,7 +54,7 @@ object Texture2D {
 
     val texture = Texture(GL11.GL_TEXTURE_2D) { tex =>
       for (_ <- using.texture(GL13.GL_TEXTURE0, tex)) {
-        GL11.glTexImage2D(tex.target, 0, GL11.GL_RGB, 64, 64, 0, GL11.GL_RGB, GL11.GL_UNSIGNED_BYTE, textureBuffer)
+        GL11.glTexImage2D(tex.target, 0, GL11.GL_RGB, textureSize, textureSize, 0, GL11.GL_RGB, GL11.GL_UNSIGNED_BYTE, textureBuffer)
 
         tex.wrapS = wrapS
         tex.magFilter = magFilter
@@ -84,7 +94,7 @@ object Texture2D {
         _   <- using.texture(GL13.GL_TEXTURE0, texture)
         acc <- using.attributebuffer(mb)
       } {
-        GL11.glClearColor(1.0f, 1.0f, 1.0f, 1.0f)
+        GL11.glClearColor(0.0f, 0.64f, 0.91f, 1.0f)
         raster.clear(GL11.GL_COLOR_BUFFER_BIT)
 
         pp.uniform.testTexture = 0
