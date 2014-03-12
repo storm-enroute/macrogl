@@ -3,6 +3,8 @@ package org.macrogl.examples
 import org.macrogl._
 
 object Utils {
+  def readResource(path: String) = io.Source.fromURL(getClass.getResource(path)).mkString
+
   def perspectiveProjection(fovDegrees: Double, aspectRatio: Double, nearZ: Double, farZ: Double): Matrix.Plain = {
     val rad = scala.math.toRadians(fovDegrees)
 
@@ -42,8 +44,6 @@ object Utils {
     }
     res
   }
-
-  def readResource(path: String) = io.Source.fromURL(getClass.getResource(path)).mkString
 
   class Camera(x: Double, y: Double, z: Double) {
     val position = Array(x, y, z)

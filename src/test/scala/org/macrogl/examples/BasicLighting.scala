@@ -48,14 +48,48 @@ object BasicLighting {
     val camera = new Utils.Camera(0, 0, 4)
     val cameraSpeed = 5.0
 
-    var dtMillis = 0.0
+    var dtSeconds = 0.0
     var prevTime = System.currentTimeMillis
 
     Mouse.setGrabbed(true)
 
+    val leftTransform = new Matrix.Plain(
+      Array[Double](
+         1, 0,  0, 0,
+         0, 1,  0, 0,
+         0, 0,  1, 0,
+        -3, 0, -5, 1
+      )
+    )
+
+    val rightTransform = new Matrix.Plain(
+      Array[Double](
+        1, 0,  0, 0,
+        0, 1,  0, 0,
+        0, 0,  1, 0,
+        3, 0, -5, 1
+      )
+    )
+
+    for (_ <- using.program(pp)) {
+      def normalize(x: Float, y: Float, z: Float) = {
+        val len = x * x + y * y + z * z
+        (x / len, y / len, z / len)
+      }
+
+      pp.uniform.projection = projectionTransform
+      pp.uniform.lightColor = (1.0f, 1.0f, 1.0f)
+      pp.uniform.lightDirection = normalize(0.0f, -1.0f, -1.0f)
+      pp.uniform.ambient = 0.05f
+      pp.uniform.diffuse = 0.95f
+    }
+
+    GL11.glEnable(GL11.GL_CULL_FACE)
+    GL11.glEnable(GL11.GL_DEPTH_TEST)
+
     while (!Display.isCloseRequested && !closeRequested) {
       val time = System.currentTimeMillis
-      dtMillis = time - prevTime
+      dtSeconds = (time - prevTime) / 1000.0
       prevTime = time
 
       val stateChanged = processInput()
@@ -66,45 +100,56 @@ object BasicLighting {
           camera.position(2) = 4
 
           camera.horizontalAngle = 0
-          camera.verticalAngle = 0
+          camera.verticalAngle   = 0
 
           cameraResetRequested = false
         }
       }
 
-      val dtSeconds = (dtMillis / 1000.0)
-
-      if (movingForward) {
-        camera.moveForward(cameraSpeed * dtSeconds)
-      } else if (movingBackward) {
-        camera.moveBackward(cameraSpeed * dtSeconds)
-      }
-      if (movingLeft) {
-        camera.moveLeft(cameraSpeed * dtSeconds)
-      } else if (movingRight) {
-        camera.moveRight(cameraSpeed * dtSeconds)
-      }
+      // update camera
+      if (movingForward)  camera.moveForward(cameraSpeed * dtSeconds)
+      if (movingBackward) camera.moveBackward(cameraSpeed * dtSeconds)
+      if (movingLeft)     camera.moveLeft(cameraSpeed * dtSeconds)
+      if (movingRight)    camera.moveRight(cameraSpeed * dtSeconds)
 
       val xOffset = 400 - Mouse.getX
       val yOffset = 300 - Mouse.getY
       camera.offsetOrientation(xOffset * 0.1, yOffset * 0.1)
       Mouse.setCursorPosition(400, 300)
 
-      for {
-        _   <- enabling(GL11.GL_CULL_FACE)
-        _   <- using.program(pp)
-      } {
+      // update animations
+      val angle = time / 1000.0
+
+      import scala.math.{sin, cos}
+      val c = cos(angle)
+      val s = sin(angle)
+
+      leftTransform.array(0)  =  c
+      leftTransform.array(2)  =  s
+      leftTransform.array(8)  = -s
+      leftTransform.array(10) =  c
+
+      rightTransform.array(5)  =  c
+      rightTransform.array(6)  =  s
+      rightTransform.array(9)  = -s
+      rightTransform.array(10) =  c
+
+      // draw
+      for (_ <- using.program(pp)) {
         GL11.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
-        raster.clear(GL11.GL_COLOR_BUFFER_BIT)
+        raster.clear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT)
 
         pp.uniform.viewTransform = camera.transform
-        pp.uniform.projection = projectionTransform
 
         GL30.glBindVertexArray(vao)
 
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, indexBuffer)
         vertexBuffer.enableAttributeArrays(attrsCfg)
 
+        pp.uniform.worldTransform = leftTransform
+        GL11.glDrawElements(GL11.GL_TRIANGLES, Cube.indices.length, GL11.GL_UNSIGNED_BYTE, 0)
+
+        pp.uniform.worldTransform = rightTransform
         GL11.glDrawElements(GL11.GL_TRIANGLES, Cube.indices.length, GL11.GL_UNSIGNED_BYTE, 0)
         
         vertexBuffer.disableAttributeArrays(attrsCfg)
