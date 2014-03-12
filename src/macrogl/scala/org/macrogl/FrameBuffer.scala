@@ -62,7 +62,7 @@ object FrameBuffer {
       val t = texture.splice
       val l = level.splice
       glFramebufferTexture2D(GL_FRAMEBUFFER, a, t.target, t.index, l)
-      gl.status.check()
+      glutils.status.check()
       try f.splice(())
       finally glFramebufferTexture2D(GL_FRAMEBUFFER, a, t.target, 0, l)
       ()
@@ -84,7 +84,7 @@ object FrameBuffer {
       val a = attachment.splice
       val rb = rbuff.splice
       glFramebufferRenderbuffer(t, a, GL_RENDERBUFFER, rb.index)
-      gl.status.check()
+      glutils.status.check()
       try f.splice(())
       finally glFramebufferRenderbuffer(t, a, GL_RENDERBUFFER, 0)
       ()

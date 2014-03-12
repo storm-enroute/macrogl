@@ -9,8 +9,7 @@ import org.lwjgl.opengl.GL30._
 
 
 
-object gl {
-  def bytesPerFloat = 4
+object glutils {
   def currentProgram = GL11.glGetInteger(GL_CURRENT_PROGRAM)
   def useProgram(pidx: Int) = glUseProgram(pidx)
   def bindShaderStorageBuffer(layoutIndex: Int, bufferId: Int) = {

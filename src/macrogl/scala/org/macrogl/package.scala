@@ -129,10 +129,10 @@ package object macrogl {
       def foreach[U](f: FrameBuffer.Binding => U): Unit = macro useFrameBuffer[U]
     }
     object AttributeBufferObject {
-      def foreach[U](f: AttributeBuffer.Access => U)(implicit gles: Macrogles): Unit = macro AttributeBuffer.using[U]
+      def foreach[U](f: AttributeBuffer.Access => U)(implicit gl: Macrogl): Unit = macro AttributeBuffer.using[U]
     }
     object MeshBufferObject {
-      def foreach[U](f: MeshBuffer.Access => U): Unit = macro MeshBuffer.using[U]
+      def foreach[U](f: MeshBuffer.Access => U)(implicit gl: Macrogl): Unit = macro MeshBuffer.using[U]
     }
 
     def program(p: Program) = ShaderProgram
@@ -142,18 +142,6 @@ package object macrogl {
     def framebuffer(fb: FrameBuffer) = FrameBufferObject
     def attributebuffer(mesh: AttributeBuffer) = AttributeBufferObject
     def meshbuffer(mesh: MeshBuffer) = MeshBufferObject
-  }
-
-  object computing {
-    object MeshBufferObject {
-      def foreach[U](f: Unit => U): Unit = macro MeshBuffer.computing[U]
-    }
-    object AttributeBufferObject {
-      def foreach[U](f: Unit => U): Unit = macro AttributeBuffer.computing[U]
-    }
-
-    def meshbuffer(mesh: MeshBuffer)(layoutIndex: Int) = MeshBufferObject
-    def attributebuffer(mesh: AttributeBuffer)(layoutIndex: Int) = AttributeBufferObject
   }
 
   /* macros */
@@ -246,13 +234,13 @@ package object macrogl {
 
     val r = reify {
       val p = (c.Expr[Program](pt)).splice
-      val opidx = gl.currentProgram
+      val opidx = glutils.currentProgram
       if (opidx != p.index) {
-        gl.useProgram(p.index)
+        glutils.useProgram(p.index)
       }
       try f.splice(())
       finally if (opidx != p.index) {
-        gl.useProgram(opidx)
+        glutils.useProgram(opidx)
       }
       ()
     }

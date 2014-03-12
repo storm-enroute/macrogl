@@ -6,11 +6,52 @@ import org.lwjgl.opengl._
 
 
 
-class Macrogl private () {
+class Macrogl private[macrogl] () {
 
-  final def bindShaderStorageBuffer(target: Int, layoutIndex: Int, buffer: Token.Buffer) = {
-    import org.lwjgl.opengl.GL43._
-    GL30.glBindBufferBase(target, layoutIndex, buffer.index)
+  final def bytesPerFloat = 4
+
+  final def status = org.macrogl.status
+
+  final def genBuffers(): Token.Buffer = {
+    val index = GL15.glGenBuffers()
+    if (index > 0) new Token.Buffer(index)
+    else throw MacroglException("Buffer could not be created.")
+  }
+
+  final def bindBuffer(target: Int, buffer: Token.Buffer) {
+    GL15.glBindBuffer(target, buffer.index)
+  }
+
+  final def bufferData(target: Int, totalBytes: Long, usage: Int) {
+    GL15.glBufferData(target, totalBytes, usage)
+  }
+
+  final def deleteBuffers(buffer: Token.Buffer) {
+    GL15.glDeleteBuffers(buffer.index)
+  }
+
+  final def bufferSubData(target: Int, offset: Long, data: Buffer.Float) {
+    GL15.glBufferSubData(target, offset, data)
+  }
+
+  final def getBufferSubData(target: Int, offset: Long, data: Buffer.Float) {
+    GL15.glGetBufferSubData(target, offset, data)
+  }
+
+  final def enableVertexAttribArray(index: Int) {
+    GL20.glEnableVertexAttribArray(index)
+  }
+
+  final def disableVertexAttribArray(index: Int) {
+    GL20.glDisableVertexAttribArray(index)
+  }
+
+  final def vertexAttribPointer(index: Int, numComponents: Int, componentType: Int, normalized: Boolean, stride: Int, byteOffset: Long) {
+    GL20.glVertexAttribPointer(index, numComponents, componentType, normalized, stride, byteOffset)
+  }
+
+  final def drawArrays(mode: Int, first: Int, count: Int) {
+    GL11.glDrawArrays(mode, first, count)
   }
 
 }
@@ -18,8 +59,11 @@ class Macrogl private () {
 
 object Macrogl {
 
-  val GL_SHADER_STORAGE_BUFFER = GL43.GL_SHADER_STORAGE_BUFFER
+  val GL_ARRAY_BUFFER = GL15.GL_ARRAY_BUFFER
+
+  val GL_FLOAT = GL11.GL_FLOAT
+
+  implicit val default = new Macrogl()
 
 }
-
 

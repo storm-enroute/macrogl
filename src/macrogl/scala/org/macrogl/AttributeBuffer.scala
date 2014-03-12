@@ -8,7 +8,7 @@ import scala.collection._
 
 
 
-class AttributeBuffer(val usage: Int, val capacity: Int, val attributes: Int)(implicit gles: Macrogles)
+class AttributeBuffer(val usage: Int, val capacity: Int, val attributes: Int)(implicit gl: Macrogl)
 extends Handle {
   private var vtoken = Token.Buffer.invalid
   private var result = new Array[Int](1)
@@ -16,16 +16,16 @@ extends Handle {
 
   def acquire() {
     release()
-    vtoken = gles.genBuffers()
-    gles.bindBuffer(Macrogles.GL_ARRAY_BUFFER, vtoken)
-    gles.bufferData(Macrogles.GL_ARRAY_BUFFER, totalBytes, usage)
-    gles.bindBuffer(Macrogles.GL_ARRAY_BUFFER, Token.Buffer.invalid)
+    vtoken = gl.genBuffers()
+    gl.bindBuffer(Macrogl.GL_ARRAY_BUFFER, vtoken)
+    gl.bufferData(Macrogl.GL_ARRAY_BUFFER, totalBytes, usage)
+    gl.bindBuffer(Macrogl.GL_ARRAY_BUFFER, Token.Buffer.none)
     status.check()
   }
 
   def release() {
-    if (vtoken != Token.Buffer.invalid) {
-      gles.deleteBuffers(vtoken)
+    if (vtoken.valid) {
+      gl.deleteBuffers(vtoken)
       vtoken = Token.Buffer.invalid
     }
   }
@@ -35,15 +35,15 @@ extends Handle {
   def totalBytes = capacity * attributes * gl.bytesPerFloat
 
   def send(offset: Long, data: Buffer.Float) {
-    gles.bindBuffer(Macrogles.GL_ARRAY_BUFFER, vtoken)
-    gles.bufferSubData(Macrogles.GL_ARRAY_BUFFER, offset, data)
-    gles.bindBuffer(Macrogles.GL_ARRAY_BUFFER, Token.Buffer.none)
+    gl.bindBuffer(Macrogl.GL_ARRAY_BUFFER, vtoken)
+    gl.bufferSubData(Macrogl.GL_ARRAY_BUFFER, offset, data)
+    gl.bindBuffer(Macrogl.GL_ARRAY_BUFFER, Token.Buffer.none)
   }
 
   def enableAttributeArrays(attribs: Array[(Int, Int)]) {
     var i = 0
     while (i < attribs.length) {
-      gles.enableVertexAttribArray(i)
+      gl.enableVertexAttribArray(i)
       i += 1
     }
   }
@@ -51,7 +51,7 @@ extends Handle {
   def disableAttributeArrays(attribs: Array[(Int, Int)]) {
     var i = 0
     while (i < attribs.length) {
-      gles.disableVertexAttribArray(i)
+      gl.disableVertexAttribArray(i)
       i += 1
     }
   }
@@ -62,7 +62,7 @@ extends Handle {
     while (i < attribs.length) {
       val byteOffset = attribs(i)._1 * gl.bytesPerFloat
       val num = attribs(i)._2
-      gles.vertexAttribPointer(i, num, Macrogles.GL_FLOAT, false, stride, byteOffset)
+      gl.vertexAttribPointer(i, num, Macrogl.GL_FLOAT, false, stride, byteOffset)
       i += 1
     }
   }
@@ -72,7 +72,7 @@ extends Handle {
       try {
         enableAttributeArrays(attribs)
         setAttributePointers(attribs)
-        gles.drawArrays(mode, 0, capacity)
+        gl.drawArrays(mode, 0, capacity)
       } finally {
         disableAttributeArrays(attribs)
       }
@@ -88,34 +88,17 @@ object AttributeBuffer {
     def render(mode: Int, attribs: Array[(Int, Int)]): Unit
   }
 
-  def using[U: c.WeakTypeTag](c: Context)(f: c.Expr[Access => U])(gles: c.Expr[Macrogles]): c.Expr[Unit] = {
+  def using[U: c.WeakTypeTag](c: Context)(f: c.Expr[Access => U])(gl: c.Expr[Macrogl]): c.Expr[Unit] = {
     import c.universe._
 
-    val Apply(Apply(TypeApply(Select(Apply(_, List(mesh)), _), _), _), List(gles)) = c.macroApplication
+    val Apply(Apply(TypeApply(Select(Apply(_, List(mesh)), _), _), _), _) = c.macroApplication
 
     val r = reify {
       val m = (c.Expr[AttributeBuffer](mesh)).splice
-      val g = (c.Expr[Macrogles](gles)).splice
-      g.bindBuffer(Macrogles.GL_ARRAY_BUFFER, m.token)
+      gl.splice.bindBuffer(Macrogl.GL_ARRAY_BUFFER, m.token)
       try f.splice(m.access)
       finally {
-        g.bindBuffer(Macrogles.GL_ARRAY_BUFFER, Token.Buffer.none)
-      }
-      ()
-    }
-
-    c.inlineAndReset(r)
-  }
-
-  def computing[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U]): c.Expr[Unit] = {
-    import c.universe._
-
-    val Apply(TypeApply(Select(Apply(Apply(_, List(mesh)), List(layoutIndex)), _), _), _) = c.macroApplication
-
-    val r = reify {
-      // TODO Macrogl.bindShaderStorageBuffer((c.Expr[Int](layoutIndex)).splice, (c.Expr[AttributeBuffer](mesh)).splice.token)
-      try f.splice(())
-      finally {
+        gl.splice.bindBuffer(Macrogl.GL_ARRAY_BUFFER, Token.Buffer.none)
       }
       ()
     }

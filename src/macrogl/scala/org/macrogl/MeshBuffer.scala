@@ -10,35 +10,32 @@ import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl.GL15._
 import org.lwjgl.opengl.GL20._
 import org.lwjgl.opengl.GL30._
-import org.lwjgl.opencl._
-import org.lwjgl.opencl.CL10._
-import org.lwjgl.opencl.CL10GL._
 import org.lwjgl.BufferUtils._
 
 
 
-class MeshBuffer(val usage: Int, val capacityVertices: Int)
+class MeshBuffer(val usage: Int, val capacityVertices: Int)(implicit gl: Macrogl)
 extends Handle {
-  private var vindex = -1
+  private var vtoken = Token.Buffer.invalid
   private var result = new Array[Int](2)
 
   def acquire() {
     release()
-    vindex = glGenBuffers()
-    glBindBuffer(GL_ARRAY_BUFFER, vindex)
-    glBufferData(GL_ARRAY_BUFFER, totalBytes, usage)
-    glBindBuffer(GL_ARRAY_BUFFER, 0)
+    vtoken = gl.genBuffers()
+    gl.bindBuffer(GL_ARRAY_BUFFER, vtoken)
+    gl.bufferData(GL_ARRAY_BUFFER, totalBytes, usage)
+    gl.bindBuffer(GL_ARRAY_BUFFER, Token.Buffer.none)
     status.check()
   }
 
   def release() {
-    if (vindex != -1) {
-      glDeleteBuffers(vindex)
-      vindex = -1
+    if (vtoken.valid) {
+      gl.deleteBuffers(vtoken)
+      vtoken = Token.Buffer.invalid
     }
   }
 
-  def index = vindex
+  def token = vtoken
 
   def bytesPerFloat = 4
 
@@ -46,48 +43,48 @@ extends Handle {
 
   def totalBytes = capacityVertices * components * bytesPerFloat
 
-  def send(offset: Long, data: FloatBuffer) {
-    glBindBuffer(GL_ARRAY_BUFFER, vindex)
-    glBufferSubData(GL_ARRAY_BUFFER, offset, data)
-    glBindBuffer(GL_ARRAY_BUFFER, 0)
+  def send(offset: Long, data: Buffer.Float) {
+    gl.bindBuffer(GL_ARRAY_BUFFER, vtoken)
+    gl.bufferSubData(GL_ARRAY_BUFFER, offset, data)
+    gl.bindBuffer(GL_ARRAY_BUFFER, Token.Buffer.none)
   }
 
-  def receive(offset: Long, data: FloatBuffer) {
-    glBindBuffer(GL_ARRAY_BUFFER, vindex)
-    glGetBufferSubData(GL_ARRAY_BUFFER, offset, data)
-    glBindBuffer(GL_ARRAY_BUFFER, 0)
+  def receive(offset: Long, data: Buffer.Float) {
+    gl.bindBuffer(GL_ARRAY_BUFFER, vtoken)
+    gl.getBufferSubData(GL_ARRAY_BUFFER, offset, data)
+    gl.bindBuffer(GL_ARRAY_BUFFER, Token.Buffer.none)
   }
 
   def enableAttributeArrays() {
-    glEnableVertexAttribArray(0)
-    glEnableVertexAttribArray(1)
-    glEnableVertexAttribArray(2)
+    gl.enableVertexAttribArray(0)
+    gl.enableVertexAttribArray(1)
+    gl.enableVertexAttribArray(2)
   }
 
   def disableAttributeArrays() {
-    glDisableVertexAttribArray(0)
-    glDisableVertexAttribArray(1)
-    glDisableVertexAttribArray(2)
+    gl.disableVertexAttribArray(0)
+    gl.disableVertexAttribArray(1)
+    gl.disableVertexAttribArray(2)
   }
 
   def enableVertexArray() {
-    glEnableVertexAttribArray(0)
+    gl.enableVertexAttribArray(0)
   }
 
   def disableVertexArray() {
-    glDisableVertexAttribArray(0)
+    gl.disableVertexAttribArray(0)
   }
 
   def setAttributePointers() {
     val stride = components * bytesPerFloat
-    glVertexAttribPointer(0, 3, GL_FLOAT, false, stride, 0 * bytesPerFloat)
-    glVertexAttribPointer(1, 3, GL_FLOAT, false, stride, 3 * bytesPerFloat)
-    glVertexAttribPointer(2, 2, GL_FLOAT, false, stride, 6 * bytesPerFloat)
+    gl.vertexAttribPointer(0, 3, GL_FLOAT, false, stride, 0 * bytesPerFloat)
+    gl.vertexAttribPointer(1, 3, GL_FLOAT, false, stride, 3 * bytesPerFloat)
+    gl.vertexAttribPointer(2, 2, GL_FLOAT, false, stride, 6 * bytesPerFloat)
   }
 
   def setVertexPointer() {
     val stride = components * bytesPerFloat
-    glVertexAttribPointer(0, 3, GL_FLOAT, false, stride, 0)
+    gl.vertexAttribPointer(0, 3, GL_FLOAT, false, stride, 0)
   }
 
   object access extends MeshBuffer.Access {
@@ -95,7 +92,7 @@ extends Handle {
       try {
         enableAttributeArrays()
         setAttributePointers()
-        glDrawArrays(mode, 0, capacityVertices)
+        gl.drawArrays(mode, 0, capacityVertices)
       } finally {
         disableAttributeArrays()
       }
@@ -104,7 +101,7 @@ extends Handle {
       try {
         enableVertexArray()
         setVertexPointer()
-        glDrawArrays(mode, 0, capacityVertices)
+        gl.drawArrays(mode, 0, capacityVertices)
       } finally {
         disableVertexArray()
       }
@@ -123,33 +120,17 @@ object MeshBuffer {
     def renderVertices(mode: Int): Unit
   }
 
-  def using[U: c.WeakTypeTag](c: Context)(f: c.Expr[Access => U]): c.Expr[Unit] = {
+  def using[U: c.WeakTypeTag](c: Context)(f: c.Expr[Access => U])(gl: c.Expr[Macrogl]): c.Expr[Unit] = {
     import c.universe._
 
     val Apply(TypeApply(Select(Apply(_, List(mesh)), _), _), _) = c.macroApplication
 
     val r = reify {
       val m = (c.Expr[MeshBuffer](mesh)).splice
-      glBindBuffer(GL_ARRAY_BUFFER, m.index)
+      gl.splice.bindBuffer(GL_ARRAY_BUFFER, m.token)
       try f.splice(m.access)
       finally {
-        glBindBuffer(GL_ARRAY_BUFFER, 0)
-      }
-      ()
-    }
-
-    c.inlineAndReset(r)
-  }
-
-  def computing[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U]): c.Expr[Unit] = {
-    import c.universe._
-
-    val Apply(TypeApply(Select(Apply(Apply(_, List(mesh)), List(layoutIndex)), _), _), _) = c.macroApplication
-
-    val r = reify {
-      gl.bindShaderStorageBuffer((c.Expr[Int](layoutIndex)).splice, (c.Expr[MeshBuffer](mesh)).splice.index)
-      try f.splice(())
-      finally {
+        gl.splice.bindBuffer(GL_ARRAY_BUFFER, Token.Buffer.none)
       }
       ()
     }
