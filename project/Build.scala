@@ -28,7 +28,7 @@ object MacroGLBuild extends Build {
 
   val lwjglVersion = "2.9.0"
 
-  val macroglSettings = Defaults.defaultSettings ++ publishCreds ++ Seq (
+  val macroglSettings = Defaults.defaultSettings ++ publishCreds ++ Seq(
     name := "macrogl",
     organization := "com.storm-enroute",
     version := "0.3-SNAPSHOT",
@@ -39,6 +39,9 @@ object MacroGLBuild extends Build {
       "-Xexperimental",
       "-optimise"
     ),
+    scalaSource in Compile := baseDirectory.value / "src" / "macrogl" / "scala",
+    unmanagedSourceDirectories in Compile += baseDirectory.value / "src" / "api-opengl" / "scala",
+    unmanagedSourceDirectories in Compile += baseDirectory.value / "src" / "macrogles" / "scala",
     libraryDependencies <+= scalaVersion { sv =>
       "org.scala-lang" % "scala-compiler" % sv
     },
