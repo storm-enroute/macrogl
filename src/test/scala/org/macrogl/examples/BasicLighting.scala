@@ -1,7 +1,7 @@
 package org.macrogl.examples
 
 import org.lwjgl.opengl._
-import org.lwjgl.input.Keyboard
+import org.lwjgl.input.{Keyboard, Mouse}
 import org.lwjgl.BufferUtils
 import org.macrogl._
 
@@ -45,9 +45,50 @@ object BasicLighting {
 
     val projectionTransform = Utils.perspectiveProjection(50, 800.0 / 600.0, 0.1, 100.0)
 
-    while (!Display.isCloseRequested) {
+    val camera = new Utils.Camera(0, 0, 4)
+    val cameraSpeed = 5.0
+
+    var dtMillis = 0.0
+    var prevTime = System.currentTimeMillis
+
+    Mouse.setGrabbed(true)
+
+    while (!Display.isCloseRequested && !closeRequested) {
+      val time = System.currentTimeMillis
+      dtMillis = time - prevTime
+      prevTime = time
+
       val stateChanged = processInput()
-      if (stateChanged) {}
+      if (stateChanged) {
+        if (cameraResetRequested) {
+          camera.position(0) = 0
+          camera.position(1) = 0
+          camera.position(2) = 4
+
+          camera.horizontalAngle = 0
+          camera.verticalAngle = 0
+
+          cameraResetRequested = false
+        }
+      }
+
+      val dtSeconds = (dtMillis / 1000.0)
+
+      if (movingForward) {
+        camera.moveForward(cameraSpeed * dtSeconds)
+      } else if (movingBackward) {
+        camera.moveBackward(cameraSpeed * dtSeconds)
+      }
+      if (movingLeft) {
+        camera.moveLeft(cameraSpeed * dtSeconds)
+      } else if (movingRight) {
+        camera.moveRight(cameraSpeed * dtSeconds)
+      }
+
+      val xOffset = 400 - Mouse.getX
+      val yOffset = 300 - Mouse.getY
+      camera.offsetOrientation(xOffset * 0.1, yOffset * 0.1)
+      Mouse.setCursorPosition(400, 300)
 
       for {
         _   <- enabling(GL11.GL_CULL_FACE)
@@ -56,6 +97,7 @@ object BasicLighting {
         GL11.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
         raster.clear(GL11.GL_COLOR_BUFFER_BIT)
 
+        pp.uniform.viewTransform = camera.transform
         pp.uniform.projection = projectionTransform
 
         GL30.glBindVertexArray(vao)
@@ -81,13 +123,31 @@ object BasicLighting {
     Display.destroy()
   }
 
+  var movingForward  = false
+  var movingBackward = false
+  var movingLeft  = false
+  var movingRight = false
+
+  var closeRequested = false
+  var cameraResetRequested = false
+
   def processInput(): Boolean = {
     var stateChanged = false
 
     while (Keyboard.next()) {
-      if (!Keyboard.getEventKeyState()) {
+      movingForward  = Keyboard.isKeyDown(Keyboard.KEY_W)
+      movingBackward = !movingForward && Keyboard.isKeyDown(Keyboard.KEY_S)
+
+      movingLeft  = Keyboard.isKeyDown(Keyboard.KEY_A)
+      movingRight = !movingLeft && Keyboard.isKeyDown(Keyboard.KEY_D)
+
+      if (Keyboard.getEventKeyState()) {
         stateChanged ||= {
           Keyboard.getEventKey() match {
+            case Keyboard.KEY_ESCAPE => closeRequested = true; false
+
+            case Keyboard.KEY_F5 => cameraResetRequested = true; true
+
             case _ => false
           }
         }

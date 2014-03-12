@@ -7,14 +7,9 @@ layout (location = 2) in vec3 color;
 out vec3 fragmentColor;
 
 uniform mat4 projection;
-
-const mat4 transform = mat4(
-    vec4(0.5, 0.0, 0.0, 0.0),
-    vec4(0.0, 0.5, 0.0, 0.0),
-    vec4(0.0, 0.0, 0.5, 0.0),
-    vec4(1.0, -0.7, -4.0, 1.0));
+uniform mat4 viewTransform;
 
 void main() {
-    gl_Position = projection * transform * vec4(position, 1.0);
+    gl_Position = projection * viewTransform * vec4(position, 1.0);
     fragmentColor = color;
 }
