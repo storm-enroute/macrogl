@@ -73,25 +73,6 @@ package object macrogl {
     def apply(settings: Int*) = Disable
   }
 
-  object status {
-    def check(): Unit = {
-      val code = glGetError()
-      if (code != GL_NO_ERROR) {
-        val msg = GLU.gluErrorString(code)
-        throw new Exception(s"error: $code - $msg")
-      }
-    }
-    def error: String = {
-      val code = glGetError()
-      val msg = GLU.gluErrorString(code)
-      s"error: $code - $msg"
-    }
-    def framebuffer(target: Int): String = {
-      val code = glCheckFramebufferStatus(target)
-      s"status: $code"
-    }
-  }
-
   object setting {
     object Color {
       def foreach[U](f: Unit => U): Unit = macro setColor[U]
@@ -114,7 +95,7 @@ package object macrogl {
 
   object using {
     object ShaderProgram {
-      def foreach[U](f: Unit => U): Unit = macro useProgram[U]
+      def foreach[U](f: Unit => U)(implicit gl: Macrogl): Unit = macro useProgram[U]
     }
     object TransformationMatrix {
       def foreach[U](f: Unit => U): Unit = macro useMatrix[U]
@@ -126,7 +107,7 @@ package object macrogl {
       def foreach[U](f: Unit => U): Unit = macro useRenderBuffer[U]
     }
     object FrameBufferObject {
-      def foreach[U](f: FrameBuffer.Binding => U): Unit = macro useFrameBuffer[U]
+      def foreach[U](f: FrameBuffer.Binding => U)(implicit gl: Macrogl): Unit = macro useFrameBuffer[U]
     }
     object AttributeBufferObject {
       def foreach[U](f: AttributeBuffer.Access => U)(implicit gl: Macrogl): Unit = macro AttributeBuffer.using[U]
@@ -148,17 +129,17 @@ package object macrogl {
 
   implicit def c2utils(c: Context) = new Util[c.type](c)
 
-  def useFrameBuffer[U: c.WeakTypeTag](c: Context)(f: c.Expr[FrameBuffer.Binding => U]): c.Expr[Unit] = {
+  def useFrameBuffer[U: c.WeakTypeTag](c: Context)(f: c.Expr[FrameBuffer.Binding => U])(gl: c.Expr[Macrogl]): c.Expr[Unit] = {
     import c.universe._
 
-    val Apply(TypeApply(Select(Apply(_, List(fbt)), _), _), _) = c.macroApplication
+    val Apply(Apply(TypeApply(Select(Apply(_, List(fbt)), _), _), _), _) = c.macroApplication
 
     val r = reify {
       val fb = (c.Expr[FrameBuffer](fbt)).splice
-      val oldbinding = GL11.glGetInteger(GL_FRAMEBUFFER_BINDING)
-      glBindFramebuffer(GL_FRAMEBUFFER, fb.index)
+      val oldbinding = gl.splice.getInteger(Macrogl.GL_FRAMEBUFFER_BINDING)
+      gl.splice.bindFrameBuffer(Macrogl.GL_FRAMEBUFFER, fb.token)
       try f.splice(fb.binding)
-      finally glBindFramebuffer(GL_FRAMEBUFFER, oldbinding)
+      finally gl.splice.bindFrameBuffer(Macrogl.GL_FRAMEBUFFER, oldbinding)
       ()
     }
 
@@ -227,20 +208,20 @@ package object macrogl {
     c.inlineAndReset(r)
   }
 
-  def useProgram[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U]): c.Expr[Unit] = {
+  def useProgram[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U])(gl: c.Expr[Macrogl]): c.Expr[Unit] = {
     import c.universe._
 
-    val Apply(TypeApply(Select(Apply(_, List(pt)), _), _), _) = c.macroApplication
+    val Apply(Apply(TypeApply(Select(Apply(_, List(pt)), _), _), _), _) = c.macroApplication
 
     val r = reify {
       val p = (c.Expr[Program](pt)).splice
-      val opidx = glutils.currentProgram
-      if (opidx != p.index) {
-        glutils.useProgram(p.index)
+      val opidx = gl.splice.getCurrentProgram()
+      if (gl.splice.differentPrograms(opidx, p.token)) {
+        gl.splice.useProgram(p.token)
       }
       try f.splice(())
-      finally if (opidx != p.index) {
-        glutils.useProgram(opidx)
+      finally if (gl.splice.differentPrograms(opidx, p.token)) {
+        gl.splice.useProgram(opidx)
       }
       ()
     }

@@ -3,23 +3,24 @@ package org.macrogl
 
 
 import org.lwjgl.opengl._
+import org.lwjgl.util.glu._
 
 
 
 class Macrogl private[macrogl] () {
 
-  final def bytesPerFloat = 4
+  /* public API */
 
-  final def status = org.macrogl.status
+  final def bytesPerFloat = 4
 
   final def genBuffers(): Token.Buffer = {
     val index = GL15.glGenBuffers()
-    if (index > 0) new Token.Buffer(index)
-    else throw MacroglException("Buffer could not be created.")
+    if (index > 0) index
+    else throw MacroglException(s"Buffer could not be created: $index")
   }
 
   final def bindBuffer(target: Int, buffer: Token.Buffer) {
-    GL15.glBindBuffer(target, buffer.index)
+    GL15.glBindBuffer(target, buffer)
   }
 
   final def bufferData(target: Int, totalBytes: Long, usage: Int) {
@@ -27,7 +28,7 @@ class Macrogl private[macrogl] () {
   }
 
   final def deleteBuffers(buffer: Token.Buffer) {
-    GL15.glDeleteBuffers(buffer.index)
+    GL15.glDeleteBuffers(buffer)
   }
 
   final def bufferSubData(target: Int, offset: Long, data: Buffer.Float) {
@@ -54,16 +55,187 @@ class Macrogl private[macrogl] () {
     GL11.glDrawArrays(mode, first, count)
   }
 
+  final def getCurrentProgram(): Token.Program = {
+    GL11.glGetInteger(Macrogl.GL_CURRENT_PROGRAM)
+  }
+
+  final def useProgram(program: Token.Program) {
+    GL20.glUseProgram(program)
+  }
+
+  final def getUniformLocation(program: Token.Program, varname: String): Token.UniformLocation = {
+    GL20.glGetUniformLocation(program, varname)
+  }
+
+  final def createProgram(): Token.Program = {
+    val index = GL20.glCreateProgram()
+    if (index > 0) index
+    else throw new MacroglException(s"Program could not be created: $index")
+  }
+
+  final def deleteProgram(program: Token.Program) {
+    GL20.glDeleteProgram(program)
+  }
+
+  final def getProgrami(program: Token.Program, parameterName: Int): Int = {
+    GL20.glGetProgrami(program, parameterName)
+  }
+
+  final def getProgramInfoLog(program: Token.Program, maxLength: Int) {
+    GL20.glGetShaderInfoLog(program, maxLength)
+  }
+
+  final def linkProgram(program: Token.Program) {
+    GL20.glLinkProgram(program)
+  }
+
+  final def validateProgram(program: Token.Program) {
+    GL20.glValidateProgram(program)
+  }
+
+  final def createShader(mode: Int): Token.Shader = {
+    val index = GL20.glCreateShader(mode)
+    if (index > 0) index
+    else throw new MacroglException(s"Shader could not be created: $index")
+  }
+
+  final def deleteShader(shader: Token.Shader) {
+    GL20.glDeleteShader(shader)
+  }
+
+  final def shaderSource(shader: Token.Shader, srcarray: Array[CharSequence]) {
+    GL20.glShaderSource(shader, srcarray)
+  }
+
+  final def compileShader(shader: Token.Shader) {
+    GL20.glCompileShader(shader)
+  }
+
+  final def getShaderi(shader: Token.Shader, parameterName: Int): Int = {
+    GL20.glGetShaderi(shader, parameterName)
+  }
+
+  final def getShaderInfoLog(shader: Token.Shader, maxLength: Int) {
+    GL20.glGetShaderInfoLog(shader, maxLength)
+  }
+
+  final def attachShader(program: Token.Program, s: Token.Shader) {
+    GL20.glAttachShader(program, s)
+  }
+
+  final def genFrameBuffers(): Token.FrameBuffer = {
+    val index = GL30.glGenFramebuffers()
+    if (index > 0) index
+    else throw new MacroglException(s"Frame buffer could not be created: $index")
+  }
+
+  final def deleteFrameBuffers(fb: Token.FrameBuffer) {
+    GL30.glDeleteFramebuffers(fb)
+  }
+
+  final def bindFrameBuffer(target: Int, fb: Token.FrameBuffer) {
+    GL30.glBindFramebuffer(target, fb)
+  }
+
+  final def frameBufferTexture2D(target: Int, attachment: Int, textarget: Int, texture: Int, level: Int) {
+    GL30.glFramebufferTexture2D(target, attachment, textarget, texture, level)
+  }
+
+  final def frameBufferRenderBuffer(target: Int, attachment: Int, renderbuffertarget: Int, renderbuffer: Int) {
+    GL30.glFramebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer)
+  }
+
+  final def getInteger(flag: Int): Int = {
+    GL11.glGetInteger(flag)
+  }
+
+  final def validProgram(program: Token.Program): Boolean = {
+    program > 0
+  }
+
+  final def validShader(shader: Token.Shader): Boolean = {
+    shader > 0
+  }
+
+  final def validBuffer(buffer: Token.Buffer): Boolean = {
+    buffer > 0
+  }
+
+  final def validUniformLocation(uloc: Token.UniformLocation): Boolean = {
+    uloc > 0
+  }
+
+  final def validFrameBuffer(fb: Token.FrameBuffer): Boolean = {
+    fb > 0
+  }
+
+  final def differentPrograms(p1: Token.Program, p2: Token.Program): Boolean = {
+    p1 != p2
+  }
+
+  final def checkError() {
+    val code = GL11.glGetError()
+    if (code != Macrogl.GL_NO_ERROR) {
+      val msg = GLU.gluErrorString(code)
+      throw new Exception(s"error: $code - $msg")
+    }
+  }
+
+  final def errorMessage(): String = {
+    val code = GL11.glGetError()
+    val msg = GLU.gluErrorString(code)
+    s"error: $code - $msg"
+  }
+
+  final def framebufferStatus(target: Int): String = {
+    val code = GL30.glCheckFramebufferStatus(target)
+    s"status: $code"
+  }
+
 }
 
 
 object Macrogl {
 
+  /* public API - constants */
+
+  val GL_FALSE = GL11.GL_FALSE
+
   val GL_ARRAY_BUFFER = GL15.GL_ARRAY_BUFFER
 
   val GL_FLOAT = GL11.GL_FLOAT
 
+  val GL_CURRENT_PROGRAM = GL20.GL_CURRENT_PROGRAM
+
+  val GL_NO_ERROR = GL11.GL_NO_ERROR
+
+  val GL_FRAMEBUFFER = GL30.GL_FRAMEBUFFER
+
+  val GL_VERTEX_SHADER = GL20.GL_VERTEX_SHADER
+
+  val GL_FRAGMENT_SHADER = GL20.GL_FRAGMENT_SHADER
+
+  val GL_FRAMEBUFFER_BINDING = GL30.GL_FRAMEBUFFER_BINDING
+
+  /* public API - methods */
+
+  /* public API - implicits */
+
   implicit val default = new Macrogl()
 
+  /* implementation-specific methods */
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
 

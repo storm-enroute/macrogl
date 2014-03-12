@@ -20,11 +20,11 @@ extends Handle {
     gl.bindBuffer(Macrogl.GL_ARRAY_BUFFER, vtoken)
     gl.bufferData(Macrogl.GL_ARRAY_BUFFER, totalBytes, usage)
     gl.bindBuffer(Macrogl.GL_ARRAY_BUFFER, Token.Buffer.none)
-    status.check()
+    gl.checkError()
   }
 
   def release() {
-    if (vtoken.valid) {
+    if (gl.validBuffer(vtoken)) {
       gl.deleteBuffers(vtoken)
       vtoken = Token.Buffer.invalid
     }

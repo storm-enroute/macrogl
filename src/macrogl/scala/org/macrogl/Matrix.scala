@@ -191,7 +191,7 @@ object Matrix {
     } finally {
       glPopMatrix()
       glMatrixMode(oldmode)
-      status.check()
+      Macrogl.default.checkError()
     }
   }
 
@@ -208,7 +208,7 @@ object Matrix {
     } finally {
       glPopMatrix()
       glMatrixMode(oldmode)
-      status.check()
+      Macrogl.default.checkError()
     }
   }
 
@@ -225,7 +225,7 @@ object Matrix {
     } finally {
       glPopMatrix()
       glMatrixMode(oldmode)
-      status.check()
+      Macrogl.default.checkError()
     }
   }
 

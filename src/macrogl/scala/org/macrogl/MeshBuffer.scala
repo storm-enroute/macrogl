@@ -25,11 +25,11 @@ extends Handle {
     gl.bindBuffer(GL_ARRAY_BUFFER, vtoken)
     gl.bufferData(GL_ARRAY_BUFFER, totalBytes, usage)
     gl.bindBuffer(GL_ARRAY_BUFFER, Token.Buffer.none)
-    status.check()
+    gl.checkError()
   }
 
   def release() {
-    if (vtoken.valid) {
+    if (gl.validBuffer(vtoken)) {
       gl.deleteBuffers(vtoken)
       vtoken = Token.Buffer.invalid
     }

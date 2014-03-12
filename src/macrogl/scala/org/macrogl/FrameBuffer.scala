@@ -11,23 +11,23 @@ import org.lwjgl.opengl.GL30._
 
 
 
-final class FrameBuffer extends Handle {
-  private var fbindex = -1
+final class FrameBuffer(implicit gl: Macrogl) extends Handle {
+  private var fbtoken = Token.FrameBuffer.invalid
   private val result = new Array[Int](1)
 
-  def index = fbindex
+  def token = fbtoken
 
   val binding = new FrameBuffer.Binding
 
   def acquire() {
     release()
-    fbindex = glGenFramebuffers()
+    fbtoken = gl.genFrameBuffers()
   }
 
   def release() {
-    if (fbindex != -1) {
-      glDeleteFramebuffers(fbindex)
-      fbindex = -1
+    if (!gl.validFrameBuffer(fbtoken)) {
+      gl.deleteFrameBuffers(fbtoken)
+      fbtoken = Token.FrameBuffer.invalid
     }
   }
 
@@ -38,21 +38,21 @@ object FrameBuffer {
 
   class Binding private[FrameBuffer] () {
     object AttachTexture2D {
-      def foreach[U](f: Unit => U) = macro FrameBuffer.bindTexture[U]
+      def foreach[U](f: Unit => U)(implicit gl: Macrogl) = macro FrameBuffer.bindTexture[U]
     }
 
     object AttachRenderBuffer {
-      def foreach[U](f: Unit => U) = macro FrameBuffer.bindRenderBuffer[U]
+      def foreach[U](f: Unit => U)(implicit gl: Macrogl) = macro FrameBuffer.bindRenderBuffer[U]
     }
 
     def attachTexture2D(attachment: Int, t: Texture, level: Int) = AttachTexture2D
     def attachRenderBuffer(target: Int, attachment: Int, rb: RenderBuffer) = AttachRenderBuffer
   }
 
-  def bindTexture[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U]): c.Expr[Unit] = {
+  def bindTexture[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U])(gl: c.Expr[Macrogl]): c.Expr[Unit] = {
     import c.universe._
 
-    val Apply(TypeApply(Select(Apply(_, List(tattachment, ttexture, tlevel)), _), _), _) = c.macroApplication
+    val Apply(Apply(TypeApply(Select(Apply(_, List(tattachment, ttexture, tlevel)), _), _), _), _) = c.macroApplication
 
     val attachment = c.Expr[Int](tattachment)
     val texture = c.Expr[Texture](ttexture)
@@ -61,20 +61,20 @@ object FrameBuffer {
       val a = attachment.splice
       val t = texture.splice
       val l = level.splice
-      glFramebufferTexture2D(GL_FRAMEBUFFER, a, t.target, t.index, l)
-      glutils.status.check()
+      gl.splice.frameBufferTexture2D(GL_FRAMEBUFFER, a, t.target, t.index, l)
+      gl.splice.checkError()
       try f.splice(())
-      finally glFramebufferTexture2D(GL_FRAMEBUFFER, a, t.target, 0, l)
+      finally gl.splice.frameBufferTexture2D(GL_FRAMEBUFFER, a, t.target, 0, l)
       ()
     }
 
     c.inlineAndReset(r)
   }
 
-  def bindRenderBuffer[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U]): c.Expr[Unit] = {
+  def bindRenderBuffer[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U])(gl: c.Expr[Macrogl]): c.Expr[Unit] = {
     import c.universe._
 
-    val Apply(TypeApply(Select(Apply(_, List(ttarget, tattachment, trbuff)), _), _), _) = c.macroApplication
+    val Apply(Apply(TypeApply(Select(Apply(_, List(ttarget, tattachment, trbuff)), _), _), _), _) = c.macroApplication
 
     val target = c.Expr[Int](ttarget)
     val attachment = c.Expr[Int](tattachment)
@@ -83,10 +83,10 @@ object FrameBuffer {
       val t = target.splice
       val a = attachment.splice
       val rb = rbuff.splice
-      glFramebufferRenderbuffer(t, a, GL_RENDERBUFFER, rb.index)
-      glutils.status.check()
+      gl.splice.frameBufferRenderBuffer(t, a, GL_RENDERBUFFER, rb.index)
+      gl.splice.checkError()
       try f.splice(())
-      finally glFramebufferRenderbuffer(t, a, GL_RENDERBUFFER, 0)
+      finally gl.splice.frameBufferRenderBuffer(t, a, GL_RENDERBUFFER, 0)
       ()
     }
 
