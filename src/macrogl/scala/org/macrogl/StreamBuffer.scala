@@ -14,7 +14,7 @@ import org.lwjgl.opengl.GL15._
 
 
 
-class StreamBuffer(val copies: Int, val attributes: Int, val size: Int)
+class StreamBuffer(val copies: Int, val attributes: Int, val size: Int)(implicit gles: Macrogles)
 extends Handle {
   private val buffers = new Array[AttributeBuffer](copies)
   for (i <- 0 until buffers.length) buffers(i) = new AttributeBuffer(GL_STREAM_COPY, size, attributes)

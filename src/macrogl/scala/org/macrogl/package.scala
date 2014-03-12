@@ -129,7 +129,7 @@ package object macrogl {
       def foreach[U](f: FrameBuffer.Binding => U): Unit = macro useFrameBuffer[U]
     }
     object AttributeBufferObject {
-      def foreach[U](f: AttributeBuffer.Access => U): Unit = macro AttributeBuffer.using[U]
+      def foreach[U](f: AttributeBuffer.Access => U)(implicit gles: Macrogles): Unit = macro AttributeBuffer.using[U]
     }
     object MeshBufferObject {
       def foreach[U](f: MeshBuffer.Access => U): Unit = macro MeshBuffer.using[U]
