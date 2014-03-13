@@ -44,5 +44,11 @@ object Token {
     val invalid: RenderBuffer = -1
   }
 
+  type Texture = Int
+
+  object Texture {
+    val invalid: Texture = -1
+  }
+
 }
 

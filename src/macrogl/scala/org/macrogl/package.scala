@@ -26,10 +26,10 @@ package object macrogl {
   def timed(f: Double => Any)(thunk: Any) = macro timedThunk
   
   object raster {
-    def clear(bits: Int) {
-      glClear(bits)
+    def clear(bits: Int)(implicit gl: Macrogl) {
+      gl.clear(bits)
     }
-    def drawbuffers(b0: Int, b1: Int, b2: Int) {
+    def drawbuffers(b0: Int, b1: Int, b2: Int)(implicit gl: Macrogl) {
       val ib = Results.intResult
       ib.clear()
       ib.put(0, b0)
@@ -37,23 +37,23 @@ package object macrogl {
       ib.put(2, b2)
       ib.rewind()
       ib.limit(3)
-      glDrawBuffers(ib)
+      gl.drawBuffers(ib)
     }
-    def drawbuffer(b: Int) {
+    def drawbuffer(b: Int)(implicit gl: Macrogl) {
       val ib = Results.intResult
       ib.clear()
       ib.put(0, b)
       ib.rewind()
       ib.limit(1)
-      glDrawBuffers(ib)
+      gl.drawBuffers(ib)
     }
-    def readbuffer(b: Int) {
-      glReadBuffer(b)
+    def readbuffer(b: Int)(implicit gl: Macrogl) {
+      gl.readBuffer(b)
     }
-    def draw(mode: Int)(body: =>Unit) {
-      glBegin(mode)
+    def draw(mode: Int)(body: =>Unit)(implicit gl: Macrogl) {
+      gl.begin(mode)
       body
-      glEnd()
+      gl.end()
     }
   }
 
@@ -98,10 +98,10 @@ package object macrogl {
       def foreach[U](f: Unit => U)(implicit gl: Macrogl): Unit = macro useProgram[U]
     }
     object TransformationMatrix {
-      def foreach[U](f: Unit => U): Unit = macro useMatrix[U]
+      def foreach[U](f: Unit => U)(implicit gl: Macrogl): Unit = macro useMatrix[U]
     }
     object TextureObject {
-      def foreach[U](f: Unit => U): Unit = macro useTexture[U]
+      def foreach[U](f: Unit => U)(implicit gl: Macrogl): Unit = macro useTexture[U]
     }
     object RenderBufferObject {
       def foreach[U](f: Unit => U)(implicit gl: Macrogl): Unit = macro useRenderBuffer[U]
@@ -163,44 +163,44 @@ package object macrogl {
     c.inlineAndReset(r)
   }
 
-  def useTexture[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U]): c.Expr[Unit] = {
+  def useTexture[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U])(gl: c.Expr[Macrogl]): c.Expr[Unit] = {
     import c.universe._
 
-    val Apply(TypeApply(Select(Apply(_, List(texnum, tt)), _), _), _) = c.macroApplication
+    val Apply(Apply(TypeApply(Select(Apply(_, List(texnum, tt)), _), _), _), _) = c.macroApplication
 
     val r = reify {
       val t = (c.Expr[Texture](tt)).splice
-      val oldbinding = GL11.glGetInteger(t.binding)
-      glActiveTexture((c.Expr[Int](texnum)).splice)
-      glBindTexture(t.target, t.index)
+      val oldbinding = gl.splice.getInteger(t.binding)
+      gl.splice.activeTexture((c.Expr[Int](texnum)).splice)
+      gl.splice.bindTexture(t.target, t.token)
       try f.splice(())
-      finally glBindTexture(t.target, oldbinding)
+      finally gl.splice.bindTexture(t.target, oldbinding)
       ()
     }
 
     c.inlineAndReset(r)
   }
 
-  def useMatrix[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U]): c.Expr[Unit] = {
+  def useMatrix[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U])(gl: c.Expr[Macrogl]): c.Expr[Unit] = {
     import c.universe._
 
-    val Apply(TypeApply(Select(Apply(_, List(mt)), _), _), _) = c.macroApplication
+    val Apply(Apply(TypeApply(Select(Apply(_, List(mt)), _), _), _), _) = c.macroApplication
 
     val r = reify {
       val m = (c.Expr[Matrix](mt)).splice
       val oldmode = GL11.glGetInteger(GL_MATRIX_MODE)
       val dr = Results.doubleResult
-      glMatrixMode(m.mode)
-      glPushMatrix()
+      gl.splice.matrixMode(m.mode)
+      gl.splice.pushMatrix()
       dr.rewind()
       dr.put(m.array, 0, 16)
       dr.rewind()
-      glLoadMatrix(dr)
+      gl.splice.loadMatrix(dr)
       try f.splice(())
       finally {
-        glMatrixMode(m.mode)
-        glPopMatrix()
-        glMatrixMode(oldmode)
+        gl.splice.matrixMode(m.mode)
+        gl.splice.popMatrix()
+        gl.splice.matrixMode(oldmode)
       }
       ()
     }

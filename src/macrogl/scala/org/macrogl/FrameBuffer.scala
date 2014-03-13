@@ -58,7 +58,7 @@ object FrameBuffer {
       val a = attachment.splice
       val t = texture.splice
       val l = level.splice
-      gl.splice.frameBufferTexture2D(Macrogl.GL_FRAMEBUFFER, a, t.target, t.index, l)
+      gl.splice.frameBufferTexture2D(Macrogl.GL_FRAMEBUFFER, a, t.target, t.token, l)
       gl.splice.checkError()
       try f.splice(())
       finally gl.splice.frameBufferTexture2D(Macrogl.GL_FRAMEBUFFER, a, t.target, 0, l)

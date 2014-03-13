@@ -173,7 +173,7 @@ class Macrogl private[macrogl] () {
     GL30.glBindFramebuffer(target, fb)
   }
 
-  final def frameBufferTexture2D(target: Int, attachment: Int, textarget: Int, texture: Int, level: Int) {
+  final def frameBufferTexture2D(target: Int, attachment: Int, textarget: Int, texture: Token.Texture, level: Int) {
     GL30.glFramebufferTexture2D(target, attachment, textarget, texture, level)
   }
 
@@ -211,6 +211,44 @@ class Macrogl private[macrogl] () {
     GL30.glRenderbufferStorage(target, format, width, height)
   }
 
+  final def genTextures(): Token.Texture = {
+    val index = GL11.glGenTextures()
+    if (index > 0) index
+    else throw new MacroglException(s"Texture could not be created: $index")
+  }
+
+  final def deleteTextures(t: Token.Texture) {
+    GL11.glDeleteTextures(t)
+  }
+
+  final def activeTexture(num: Int) {
+    GL13.glActiveTexture(num)
+  }
+
+  final def bindTexture(target: Int, texture: Token.Texture) {
+    GL11.glBindTexture(target, texture)
+  }
+
+  final def texParameterf(target: Int, name: Int, v: Float) {
+    GL11.glTexParameterf(target, name, v)
+  }
+
+  final def texParameteri(target: Int, name: Int, v: Int) {
+    GL11.glTexParameteri(target, name, v)
+  }
+
+  final def getTexParameteri(target: Int, name: Int): Int = {
+    GL11.glGetTexParameteri(target, name)
+  }
+
+  final def texImage1D(target: Int, level: Int, internalFormat: Int, wdt: Int, border: Int, format: Int, dataType: Int, data: Buffer.Int) {
+    GL11.glTexImage1D(target, level, internalFormat, wdt, border, format, dataType, data)
+  }
+
+  final def texImage2D(target: Int, level: Int, internalFormat: Int, wdt: Int, hgt: Int, border: Int, format: Int, dataType: Int, data: Buffer.Int) {
+    GL11.glTexImage2D(target, level, internalFormat, wdt, hgt, border, format, dataType, data)
+  }
+
   final def validProgram(program: Token.Program): Boolean = {
     program > 0
   }
@@ -239,6 +277,26 @@ class Macrogl private[macrogl] () {
     p1 != p2
   }
 
+  final def clear(bits: Int) {
+    GL11.glClear(bits)
+  }
+
+  final def drawBuffers(ib: Buffer.Int) {
+    GL20.glDrawBuffers(ib)
+  }
+
+  final def readBuffer(b: Int) {
+    GL11.glReadBuffer(b)
+  }
+
+  final def begin(mode: Int) {
+    GL11.glBegin(mode)
+  }
+
+  final def end() {
+    GL11.glEnd()
+  }
+
   final def matrixMode(mode: Int) {
     GL11.glMatrixMode(mode)
   }
@@ -249,6 +307,10 @@ class Macrogl private[macrogl] () {
 
   final def popMatrix() {
     GL11.glPopMatrix()
+  }
+
+  final def loadMatrix(data: Buffer.Double) {
+    GL11.glLoadMatrix(data)
   }
 
   final def loadIdentity() {
@@ -337,10 +399,40 @@ object Macrogl {
 
   val GL_STREAM_COPY = GL15.GL_STREAM_COPY
 
+  val GL_TEXTURE_1D = GL11.GL_TEXTURE_1D
+
+  val GL_TEXTURE_BINDING_1D = GL11.GL_TEXTURE_BINDING_1D
+
+  val GL_TEXTURE_2D = GL11.GL_TEXTURE_2D
+
+  val GL_TEXTURE_BINDING_2D = GL11.GL_TEXTURE_BINDING_2D
+
+  val GL_TEXTURE_MIN_FILTER = GL11.GL_TEXTURE_MIN_FILTER
+
+  val GL_TEXTURE_MAG_FILTER = GL11.GL_TEXTURE_MAG_FILTER
+
+  val GL_TEXTURE_WRAP_S = GL11.GL_TEXTURE_WRAP_S
+
+  val GL_TEXTURE_WRAP_T = GL11.GL_TEXTURE_WRAP_T
+
+  val GL_TEXTURE_COMPARE_MODE = GL14.GL_TEXTURE_COMPARE_MODE
+
+  val GL_TEXTURE_COMPARE_FUNC = GL14.GL_TEXTURE_COMPARE_FUNC
+
+  val GL_DEPTH_TEXTURE_MODE = GL14.GL_DEPTH_TEXTURE_MODE
+
   /* public API - methods */
 
   final def createFloatBuffer(sz: Int): Buffer.Float = {
     org.lwjgl.BufferUtils.createFloatBuffer(sz)
+  }
+
+  final def createIntBuffer(sz: Int): Buffer.Int = {
+    org.lwjgl.BufferUtils.createIntBuffer(sz)
+  }
+
+  final def createDoubleBuffer(sz: Int): Buffer.Double = {
+    org.lwjgl.BufferUtils.createDoubleBuffer(sz)
   }
 
   /* public API - implicits */
