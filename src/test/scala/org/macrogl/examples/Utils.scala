@@ -23,28 +23,6 @@ object Utils {
     new Matrix.Plain(arr)
   }
 
-  // copypasted from Matrix.scala
-  def mult(a1: Array[Double], a2: Array[Double]): Array[Double] = {
-    val res = new Array[Double](16)
-    val resarr = res.array
-    var y = 0
-    while (y < 4) {
-      var x = 0
-      while (x < 4) {
-        var sum = 0.0
-        var i = 0
-        while (i < 4) {
-          sum += a1(i * 4 + y) * a2(x * 4 + i)
-          i += 1
-        }
-        resarr(x * 4 + y) = sum
-        x += 1
-      }
-      y += 1
-    }
-    res
-  }
-
   class Camera(x: Double, y: Double, z: Double) {
     val position = Array(x, y, z)
     var horizontalAngle = 0.0
@@ -71,7 +49,7 @@ object Utils {
            0,  0, 0,  1
         )
 
-      mult(vRotate, hRotate)
+      Matrix.multiply[Matrix.Plain](new Matrix.Plain(vRotate), new Matrix.Plain(hRotate))
     }
 
     def invertedOrientation = new Matrix.Plain(orientation.array.grouped(4).toArray.transpose.flatten)
@@ -111,13 +89,15 @@ object Utils {
     def moveBackward(distance: Double): Unit = moveForward(-distance)
 
     def transform = {
-      val translation = Array[Double](
-        1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, 1, 0,
-        -position(0), -position(1), -position(2), 1
+      val translation = new Matrix.Plain(
+        Array[Double](
+          1, 0, 0, 0,
+          0, 1, 0, 0,
+          0, 0, 1, 0,
+          -position(0), -position(1), -position(2), 1
+        )
       )
-      new Matrix.Plain(mult(orientation, translation))
+      Matrix.multiply[Matrix.Plain](orientation, translation)
     }
 
     def offsetOrientation(h: Double, v: Double): Unit = {
