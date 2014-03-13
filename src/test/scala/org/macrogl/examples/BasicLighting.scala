@@ -6,11 +6,17 @@ import org.lwjgl.BufferUtils
 import org.macrogl._
 
 object BasicLighting {
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = scala.util.continuations.reset {
     val contextAttributes = new ContextAttribs(3, 2).withForwardCompatible(true).withProfileCore(true)
 
     Display.setDisplayMode(new DisplayMode(800, 600))
     Display.create(new PixelFormat, contextAttributes)
+
+    val dummyDisplayHandle = Handle.manage(new Handle {
+      def acquire {}
+      def release { Display.destroy() }
+      override def toString = "dummy Display handle"
+    })
 
     val ibb = BufferUtils.createByteBuffer(Cube.indices.length)
     ibb.put(Cube.indices)
@@ -21,28 +27,43 @@ object BasicLighting {
     GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, ibb, GL15.GL_STATIC_DRAW)
     GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0)
 
+    val dummyIndexBufferHandle = Handle.manage(new Handle {
+      def acquire {}
+      def release { GL15.glDeleteBuffers(indexBuffer) }
+      override def toString = "dummy indexBuffer handle"
+    })
+
     val vao = GL30.glGenVertexArrays()
     GL30.glBindVertexArray(vao)
+
+    val dummyVaoHandle = Handle.manage(new Handle {
+      def acquire {}
+      def release { GL15.glDeleteBuffers(indexBuffer) }
+      override def toString = "dummy vao handle"
+    })
 
     val cfb = BufferUtils.createFloatBuffer(Cube.vertices.length)
     cfb.put(Cube.vertices)
     cfb.flip()
 
-    val vertexBuffer = new AttributeBuffer(GL15.GL_STATIC_DRAW, Cube.vertices.length / Cube.components, Cube.components)
-    vertexBuffer.acquire()
+    val vertexBuffer = Handle.manage(new AttributeBuffer(GL15.GL_STATIC_DRAW, Cube.vertices.length / Cube.components, Cube.components))
     vertexBuffer.send(0, cfb)
     val attrsCfg = Array((0, 3), (3, 3), (6, 3))
+
+    // ugliness
+    (() =>
     for (_ <- using.attributebuffer(vertexBuffer)) vertexBuffer.setAttributePointers(attrsCfg)
+    )()
 
     GL30.glBindVertexArray(0)
 
-    val pp = new Program("test")(
+    val pp = Handle.manage(new Program("test")(
       Program.Shader.Vertex  (Utils.readResource("/org/macrogl/examples/BasicLighting.vert")),
       Program.Shader.Fragment(Utils.readResource("/org/macrogl/examples/BasicLighting.frag"))
-    )
+    ))
 
-    pp.acquire()
-
+    // argh
+    (() => {
     val projectionTransform = Utils.perspectiveProjection(50, 800.0 / 600.0, 0.1, 100.0)
 
     val camera = new Utils.Camera(0, 0, 4)
@@ -160,12 +181,7 @@ object BasicLighting {
 
       Display.update()
     }
-
-    pp.release()
-    vertexBuffer.release()
-    GL30.glDeleteVertexArrays(vao)
-    GL15.glDeleteBuffers(indexBuffer)
-    Display.destroy()
+    })()
   }
 
   var movingForward  = false
