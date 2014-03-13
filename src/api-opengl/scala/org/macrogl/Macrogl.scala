@@ -185,6 +185,10 @@ class Macrogl private[macrogl] () {
     GL11.glGetInteger(flag)
   }
 
+  final def getDouble(flag: Int, data: Buffer.Double) {
+    GL11.glGetDouble(flag, data)
+  }
+
   final def validProgram(program: Token.Program): Boolean = {
     program > 0
   }
@@ -207,6 +211,34 @@ class Macrogl private[macrogl] () {
 
   final def differentPrograms(p1: Token.Program, p2: Token.Program): Boolean = {
     p1 != p2
+  }
+
+  final def matrixMode(mode: Int) {
+    GL11.glMatrixMode(mode)
+  }
+
+  final def pushMatrix() {
+    GL11.glPushMatrix()
+  }
+
+  final def popMatrix() {
+    GL11.glPopMatrix()
+  }
+
+  final def loadIdentity() {
+    GL11.glLoadIdentity()
+  }
+
+  final def frustum(left: Double, right: Double, bottom: Double, top: Double, nearPlane: Double, farPlane: Double) {
+    GL11.glFrustum(left, right, bottom, top, nearPlane, farPlane)
+  }
+
+  final def ortho(left: Double, right: Double, bottom: Double, top: Double, nearPlane: Double, farPlane: Double) {
+    GL11.glOrtho(left, right, bottom, top, nearPlane, farPlane)
+  }
+
+  final def lookAt(xfrom: Float, yfrom: Float, zfrom: Float, xto: Float, yto: Float, zto: Float, xup: Float, yup: Float, zup: Float) {
+    GLU.gluLookAt(xfrom, yfrom, zfrom, xto, yto, zto, xup, yup, zup)
   }
 
   final def checkError() {
@@ -237,6 +269,20 @@ object Macrogl {
 
   val GL_FALSE = GL11.GL_FALSE
 
+  val GL_MATRIX_MODE = GL11.GL_MATRIX_MODE
+
+  val GL_PROJECTION = GL11.GL_PROJECTION
+
+  val GL_PROJECTION_MATRIX = GL11.GL_PROJECTION_MATRIX
+
+  val GL_MODELVIEW = GL11.GL_MODELVIEW
+
+  val GL_MODELVIEW_MATRIX = GL11.GL_MODELVIEW_MATRIX
+
+  val GL_TEXTURE = GL11.GL_TEXTURE
+
+  val GL_TEXTURE_MATRIX = GL11.GL_TEXTURE_MATRIX
+
   val GL_ARRAY_BUFFER = GL15.GL_ARRAY_BUFFER
 
   val GL_FLOAT = GL11.GL_FLOAT
@@ -260,6 +306,8 @@ object Macrogl {
   val GL_LINK_STATUS = GL20.GL_LINK_STATUS
 
   val GL_VALIDATE_STATUS = GL20.GL_VALIDATE_STATUS
+
+  val GL_STREAM_COPY = GL15.GL_STREAM_COPY
 
   /* public API - methods */
 
