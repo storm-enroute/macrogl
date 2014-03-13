@@ -4,14 +4,13 @@ package org.macrogl
 
 import scala.language.dynamics
 import scala.collection._
-import org.lwjgl.BufferUtils._
 
 
 
 class Program(val name: String)(val shaders: Program.Shader*)(implicit val gl: Macrogl) extends Handle {
   private var ptoken = Token.Program.invalid
   private val result = new Array[Int](1)
-  private val floatArray = createFloatBuffer(16)
+  private val floatArray = Macrogl.createFloatBuffer(16)
 
   object uniform extends Dynamic {
     def location(varname: String) = {

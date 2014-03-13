@@ -5,12 +5,6 @@ package org.macrogl
 import language.experimental.macros
 import scala.reflect.macros.Context
 import scala.collection._
-import java.nio.FloatBuffer
-import org.lwjgl.opengl.GL11._
-import org.lwjgl.opengl.GL15._
-import org.lwjgl.opengl.GL20._
-import org.lwjgl.opengl.GL30._
-import org.lwjgl.BufferUtils._
 
 
 
@@ -22,9 +16,9 @@ extends Handle {
   def acquire() {
     release()
     vtoken = gl.genBuffers()
-    gl.bindBuffer(GL_ARRAY_BUFFER, vtoken)
-    gl.bufferData(GL_ARRAY_BUFFER, totalBytes, usage)
-    gl.bindBuffer(GL_ARRAY_BUFFER, Token.Buffer.none)
+    gl.bindBuffer(Macrogl.GL_ARRAY_BUFFER, vtoken)
+    gl.bufferData(Macrogl.GL_ARRAY_BUFFER, totalBytes, usage)
+    gl.bindBuffer(Macrogl.GL_ARRAY_BUFFER, Token.Buffer.none)
     gl.checkError()
   }
 
@@ -44,15 +38,15 @@ extends Handle {
   def totalBytes = capacityVertices * components * bytesPerFloat
 
   def send(offset: Long, data: Buffer.Float) {
-    gl.bindBuffer(GL_ARRAY_BUFFER, vtoken)
-    gl.bufferSubData(GL_ARRAY_BUFFER, offset, data)
-    gl.bindBuffer(GL_ARRAY_BUFFER, Token.Buffer.none)
+    gl.bindBuffer(Macrogl.GL_ARRAY_BUFFER, vtoken)
+    gl.bufferSubData(Macrogl.GL_ARRAY_BUFFER, offset, data)
+    gl.bindBuffer(Macrogl.GL_ARRAY_BUFFER, Token.Buffer.none)
   }
 
   def receive(offset: Long, data: Buffer.Float) {
-    gl.bindBuffer(GL_ARRAY_BUFFER, vtoken)
-    gl.getBufferSubData(GL_ARRAY_BUFFER, offset, data)
-    gl.bindBuffer(GL_ARRAY_BUFFER, Token.Buffer.none)
+    gl.bindBuffer(Macrogl.GL_ARRAY_BUFFER, vtoken)
+    gl.getBufferSubData(Macrogl.GL_ARRAY_BUFFER, offset, data)
+    gl.bindBuffer(Macrogl.GL_ARRAY_BUFFER, Token.Buffer.none)
   }
 
   def enableAttributeArrays() {
@@ -77,14 +71,14 @@ extends Handle {
 
   def setAttributePointers() {
     val stride = components * bytesPerFloat
-    gl.vertexAttribPointer(0, 3, GL_FLOAT, false, stride, 0 * bytesPerFloat)
-    gl.vertexAttribPointer(1, 3, GL_FLOAT, false, stride, 3 * bytesPerFloat)
-    gl.vertexAttribPointer(2, 2, GL_FLOAT, false, stride, 6 * bytesPerFloat)
+    gl.vertexAttribPointer(0, 3, Macrogl.GL_FLOAT, false, stride, 0 * bytesPerFloat)
+    gl.vertexAttribPointer(1, 3, Macrogl.GL_FLOAT, false, stride, 3 * bytesPerFloat)
+    gl.vertexAttribPointer(2, 2, Macrogl.GL_FLOAT, false, stride, 6 * bytesPerFloat)
   }
 
   def setVertexPointer() {
     val stride = components * bytesPerFloat
-    gl.vertexAttribPointer(0, 3, GL_FLOAT, false, stride, 0)
+    gl.vertexAttribPointer(0, 3, Macrogl.GL_FLOAT, false, stride, 0)
   }
 
   object access extends MeshBuffer.Access {
@@ -127,10 +121,10 @@ object MeshBuffer {
 
     val r = reify {
       val m = (c.Expr[MeshBuffer](mesh)).splice
-      gl.splice.bindBuffer(GL_ARRAY_BUFFER, m.token)
+      gl.splice.bindBuffer(Macrogl.GL_ARRAY_BUFFER, m.token)
       try f.splice(m.access)
       finally {
-        gl.splice.bindBuffer(GL_ARRAY_BUFFER, Token.Buffer.none)
+        gl.splice.bindBuffer(Macrogl.GL_ARRAY_BUFFER, Token.Buffer.none)
       }
       ()
     }

@@ -177,7 +177,7 @@ class Macrogl private[macrogl] () {
     GL30.glFramebufferTexture2D(target, attachment, textarget, texture, level)
   }
 
-  final def frameBufferRenderBuffer(target: Int, attachment: Int, renderbuffertarget: Int, renderbuffer: Int) {
+  final def frameBufferRenderBuffer(target: Int, attachment: Int, renderbuffertarget: Int, renderbuffer: Token.RenderBuffer) {
     GL30.glFramebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer)
   }
 
@@ -187,6 +187,28 @@ class Macrogl private[macrogl] () {
 
   final def getDouble(flag: Int, data: Buffer.Double) {
     GL11.glGetDouble(flag, data)
+  }
+
+  final def getRenderBufferBinding(): Int = {
+    GL11.glGetInteger(Macrogl.GL_RENDERBUFFER_BINDING)
+  }
+
+  final def genRenderBuffers(): Token.RenderBuffer = {
+    val index = GL30.glGenRenderbuffers()
+    if (index > 0) index
+    else throw new MacroglException(s"Render buffer could not be created: $index")
+  }
+
+  final def deleteRenderBuffers(rb: Token.RenderBuffer) {
+    GL30.glDeleteRenderbuffers(rb)
+  }
+
+  final def bindRenderBuffer(target: Int, rb: Token.RenderBuffer) {
+    GL30.glBindRenderbuffer(target, rb)
+  }
+
+  final def renderBufferStorage(target: Int, format: Int, width: Int, height: Int) {
+    GL30.glRenderbufferStorage(target, format, width, height)
   }
 
   final def validProgram(program: Token.Program): Boolean = {
@@ -207,6 +229,10 @@ class Macrogl private[macrogl] () {
 
   final def validFrameBuffer(fb: Token.FrameBuffer): Boolean = {
     fb > 0
+  }
+
+  final def validRenderBuffer(rb: Token.RenderBuffer): Boolean = {
+    rb > 0
   }
 
   final def differentPrograms(p1: Token.Program, p2: Token.Program): Boolean = {
@@ -301,6 +327,8 @@ object Macrogl {
 
   val GL_RENDERBUFFER = GL30.GL_RENDERBUFFER
 
+  val GL_RENDERBUFFER_BINDING = GL30.GL_RENDERBUFFER_BINDING
+
   val GL_COMPILE_STATUS = GL20.GL_COMPILE_STATUS
 
   val GL_LINK_STATUS = GL20.GL_LINK_STATUS
@@ -310,6 +338,10 @@ object Macrogl {
   val GL_STREAM_COPY = GL15.GL_STREAM_COPY
 
   /* public API - methods */
+
+  final def createFloatBuffer(sz: Int): Buffer.Float = {
+    org.lwjgl.BufferUtils.createFloatBuffer(sz)
+  }
 
   /* public API - implicits */
 

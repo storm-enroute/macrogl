@@ -51,7 +51,7 @@ package object macrogl {
       glReadBuffer(b)
     }
     def draw(mode: Int)(body: =>Unit) {
-      glBegin(GL_QUADS)
+      glBegin(mode)
       body
       glEnd()
     }
@@ -104,7 +104,7 @@ package object macrogl {
       def foreach[U](f: Unit => U): Unit = macro useTexture[U]
     }
     object RenderBufferObject {
-      def foreach[U](f: Unit => U): Unit = macro useRenderBuffer[U]
+      def foreach[U](f: Unit => U)(implicit gl: Macrogl): Unit = macro useRenderBuffer[U]
     }
     object FrameBufferObject {
       def foreach[U](f: FrameBuffer.Binding => U)(implicit gl: Macrogl): Unit = macro useFrameBuffer[U]
@@ -146,17 +146,17 @@ package object macrogl {
     c.inlineAndReset(r)
   }
 
-  def useRenderBuffer[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U]): c.Expr[Unit] = {
+  def useRenderBuffer[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U])(gl: c.Expr[Macrogl]): c.Expr[Unit] = {
     import c.universe._
 
-    val Apply(TypeApply(Select(Apply(_, List(rbt)), _), _), _) = c.macroApplication
+    val Apply(Apply(TypeApply(Select(Apply(_, List(rbt)), _), _), _), _) = c.macroApplication
 
     val r = reify {
       val rb = (c.Expr[RenderBuffer](rbt)).splice
       val oldbinding = GL11.glGetInteger(GL_RENDERBUFFER_BINDING)
-      glBindRenderbuffer(GL_RENDERBUFFER, rb.index)
+      gl.splice.bindRenderBuffer(GL_RENDERBUFFER, rb.token)
       try f.splice(())
-      finally glBindRenderbuffer(GL_RENDERBUFFER, oldbinding)
+      finally gl.splice.bindRenderBuffer(GL_RENDERBUFFER, oldbinding)
       ()
     }
 

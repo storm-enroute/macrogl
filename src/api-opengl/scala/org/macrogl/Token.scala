@@ -38,5 +38,11 @@ object Token {
     val invalid: FrameBuffer = -1
   }
 
+  type RenderBuffer = Int
+
+  object RenderBuffer {
+    val invalid: RenderBuffer = -1
+  }
+
 }
 

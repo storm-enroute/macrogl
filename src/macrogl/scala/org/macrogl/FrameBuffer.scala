@@ -80,7 +80,7 @@ object FrameBuffer {
       val t = target.splice
       val a = attachment.splice
       val rb = rbuff.splice
-      gl.splice.frameBufferRenderBuffer(t, a, Macrogl.GL_RENDERBUFFER, rb.index)
+      gl.splice.frameBufferRenderBuffer(t, a, Macrogl.GL_RENDERBUFFER, rb.token)
       gl.splice.checkError()
       try f.splice(())
       finally gl.splice.frameBufferRenderBuffer(t, a, Macrogl.GL_RENDERBUFFER, 0)
