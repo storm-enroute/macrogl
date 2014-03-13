@@ -3,35 +3,33 @@ package org.macrogl
 
 
 import scala.collection._
-import org.lwjgl.opengl.GL20._
-import org.lwjgl.opengl.GL30._
 
 
 
-final class RenderBuffer(val format: Int, val width: Int, val height: Int)
+final class RenderBuffer(val format: Int, val width: Int, val height: Int)(implicit gl: Macrogl)
 extends Handle {
-  private var rbindex = -1
+  private var rbtoken = Token.RenderBuffer.invalid
   private val result = new Array[Int](1)
 
-  def index = rbindex
+  def token = rbtoken
 
   def acquire() {
     release()
-    rbindex = glGenRenderbuffers()
+    rbtoken = gl.genRenderBuffers()
     allocateStorage()
   }
 
   private def allocateStorage() {
-    val oldbinding = org.lwjgl.opengl.GL11.glGetInteger(GL_RENDERBUFFER_BINDING)
-    glBindRenderbuffer(GL_RENDERBUFFER, this.index)
-    glRenderbufferStorage(GL_RENDERBUFFER, format, width, height)
-    glBindFramebuffer(GL_RENDERBUFFER, oldbinding)
+    val oldbinding = gl.getRenderBufferBinding()
+    gl.bindRenderBuffer(Macrogl.GL_RENDERBUFFER, this.token)
+    gl.renderBufferStorage(Macrogl.GL_RENDERBUFFER, format, width, height)
+    gl.bindRenderBuffer(Macrogl.GL_RENDERBUFFER, oldbinding)
   }
 
   def release() {
-    if (rbindex != -1) {
-      glDeleteRenderbuffers(rbindex)
-      rbindex = -1
+    if (!gl.validRenderBuffer(rbtoken)) {
+      gl.deleteRenderBuffers(rbtoken)
+      rbtoken = Token.RenderBuffer.invalid
     }
   }
 

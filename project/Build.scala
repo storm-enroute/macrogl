@@ -41,7 +41,7 @@ object MacroGLBuild extends Build {
     ),
     scalaSource in Compile := baseDirectory.value / "src" / "macrogl" / "scala",
     unmanagedSourceDirectories in Compile += baseDirectory.value / "src" / "api-opengl" / "scala",
-    unmanagedSourceDirectories in Compile += baseDirectory.value / "src" / "macrogles" / "scala",
+    unmanagedSourceDirectories in Compile += baseDirectory.value / "src" / "macroglex" / "scala",
     libraryDependencies <+= scalaVersion { sv =>
       "org.scala-lang" % "scala-compiler" % sv
     },

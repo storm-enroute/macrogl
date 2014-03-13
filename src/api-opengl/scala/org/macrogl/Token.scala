@@ -5,22 +5,49 @@ package org.macrogl
 
 
 
-abstract class Token {
-
-  def index: Int
-
-  def webGLObject: Any = throw new UnsupportedOperationException("Not a WebGL implementation.")
-
-}
-
-
 object Token {
 
-  case class Buffer private[macrogl] (val index: Int) extends Token
+  type Buffer = Int
 
   object Buffer {
-    val invalid: Buffer = Buffer(-1)
-    val none: Buffer = Buffer(0)
+    val invalid: Buffer = -1
+    val none: Buffer = 0
+  }
+
+  type Program = Int
+
+  object Program {
+    val invalid: Program = 0
+  }
+
+  type Shader = Int
+
+  object Shader {
+    val invalid: Shader = 0
+  }
+
+  type UniformLocation = Int
+
+  object UniformLocation {
+    val invalid: UniformLocation = -1
+  }
+
+  type FrameBuffer = Int
+
+  object FrameBuffer {
+    val invalid: FrameBuffer = -1
+  }
+
+  type RenderBuffer = Int
+
+  object RenderBuffer {
+    val invalid: RenderBuffer = -1
+  }
+
+  type Texture = Int
+
+  object Texture {
+    val invalid: Texture = -1
   }
 
 }
