@@ -30,19 +30,19 @@ abstract class Matrix(val array: Array[Double]) {
 
 object Matrix {
 
-  val defaultModelview = {
+  lazy val defaultModelview = {
     val m = new Modelview
     view(m)(0, 0, -1, 0, 0, 0, 0, 1, 0)
     m
   }
 
-  val defaultProjection = {
+  lazy val defaultProjection = {
     val p = new Projection
     orthoProjection(p)(-1, 1, -1, 1, 1, -1)
     p
   }
 
-  val defaultSpace = {
+  lazy val defaultSpace = {
     val s = new Plain
     multiply(defaultProjection, defaultModelview, s)
     s
