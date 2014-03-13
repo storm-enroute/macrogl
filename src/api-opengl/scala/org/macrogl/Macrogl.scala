@@ -185,6 +185,14 @@ class Macrogl private[macrogl] () {
     GL11.glGetInteger(flag)
   }
 
+  final def getInteger(flag: Int, data: Buffer.Int) {
+    GL11.glGetInteger(flag, data)
+  }
+
+  final def getFloat(flag: Int, data: Buffer.Float) {
+    GL11.glGetFloat(flag, data)
+  }
+
   final def getDouble(flag: Int, data: Buffer.Double) {
     GL11.glGetDouble(flag, data)
   }
@@ -249,6 +257,22 @@ class Macrogl private[macrogl] () {
     GL11.glTexImage2D(target, level, internalFormat, wdt, hgt, border, format, dataType, data)
   }
 
+  final def viewport(x: Int, y: Int, w: Int, h: Int) {
+    GL11.glViewport(x, y, w, h)
+  }
+
+  final def enable(flag: Int) {
+    GL11.glEnable(flag)
+  }
+
+  final def disable(flag: Int) {
+    GL11.glDisable(flag)
+  }
+
+  final def isEnabled(flag: Int): Boolean = {
+    GL11.glIsEnabled(flag)
+  }
+
   final def validProgram(program: Token.Program): Boolean = {
     program > 0
   }
@@ -279,6 +303,14 @@ class Macrogl private[macrogl] () {
 
   final def clear(bits: Int) {
     GL11.glClear(bits)
+  }
+
+  final def color4f(r: Float, g: Float, b: Float, a: Float) {
+    GL11.glColor4f(r, g, b, a)
+  }
+
+  final def cullFace(flag: Int) {
+    GL11.glCullFace(flag)
   }
 
   final def drawBuffers(ib: Buffer.Int) {
@@ -327,6 +359,10 @@ class Macrogl private[macrogl] () {
 
   final def lookAt(xfrom: Float, yfrom: Float, zfrom: Float, xto: Float, yto: Float, zto: Float, xup: Float, yup: Float, zup: Float) {
     GLU.gluLookAt(xfrom, yfrom, zfrom, xto, yto, zto, xup, yup, zup)
+  }
+
+  final def blendFunc(srcFactor: Int, dstFactor: Int) {
+    GL11.glBlendFunc(srcFactor, dstFactor)
   }
 
   final def checkError() {
@@ -420,6 +456,16 @@ object Macrogl {
   val GL_TEXTURE_COMPARE_FUNC = GL14.GL_TEXTURE_COMPARE_FUNC
 
   val GL_DEPTH_TEXTURE_MODE = GL14.GL_DEPTH_TEXTURE_MODE
+
+  val GL_CURRENT_COLOR = GL11.GL_CURRENT_COLOR
+
+  val GL_CULL_FACE_MODE = GL11.GL_CULL_FACE_MODE
+
+  val GL_VIEWPORT = GL11.GL_VIEWPORT
+
+  val GL_BLEND_SRC = GL11.GL_BLEND_SRC
+
+  val GL_BLEND_DST = GL11.GL_BLEND_DST
 
   /* public API - methods */
 

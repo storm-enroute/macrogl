@@ -4,12 +4,6 @@ package org
 
 import language.experimental.macros
 import scala.reflect.macros.Context
-import org.lwjgl.opengl.GL11
-import org.lwjgl.opengl.GL11._
-import org.lwjgl.opengl.GL13._
-import org.lwjgl.opengl.GL20._
-import org.lwjgl.opengl.GL30._
-import org.lwjgl.util.glu.GLU
 
 
 
@@ -59,7 +53,7 @@ package object macrogl {
 
   object enabling {
     object Enable {
-      def foreach[U](f: Unit => U): Unit = macro enableSettings[U]
+      def foreach[U](f: Unit => U)(implicit gl: Macrogl): Unit = macro enableSettings[U]
     }
 
     def apply(settings: Int*) = Enable
@@ -67,7 +61,7 @@ package object macrogl {
 
   object disabling {
     object Disable {
-      def foreach[U](f: Unit => U): Unit = macro disableSettings[U]
+      def foreach[U](f: Unit => U)(implicit gl: Macrogl): Unit = macro disableSettings[U]
     }
 
     def apply(settings: Int*) = Disable
@@ -75,16 +69,16 @@ package object macrogl {
 
   object setting {
     object Color {
-      def foreach[U](f: Unit => U): Unit = macro setColor[U]
+      def foreach[U](f: Unit => U)(implicit gl: Macrogl): Unit = macro setColor[U]
     }
     object CullFace {
-      def foreach[U](f: Unit => U): Unit = macro setCullFace[U]
+      def foreach[U](f: Unit => U)(implicit gl: Macrogl): Unit = macro setCullFace[U]
     }
     object Viewport {
-      def foreach[U](f: Unit => U): Unit = macro setViewport[U]
+      def foreach[U](f: Unit => U)(implicit gl: Macrogl): Unit = macro setViewport[U]
     }
     object BlendFunc {
-      def foreach[U](f: Unit => U): Unit = macro setBlendFunc[U]
+      def foreach[U](f: Unit => U)(implicit gl: Macrogl): Unit = macro setBlendFunc[U]
     }
 
     def color(r: Float, g: Float, b: Float, a: Float) = Color
@@ -153,10 +147,10 @@ package object macrogl {
 
     val r = reify {
       val rb = (c.Expr[RenderBuffer](rbt)).splice
-      val oldbinding = GL11.glGetInteger(GL_RENDERBUFFER_BINDING)
-      gl.splice.bindRenderBuffer(GL_RENDERBUFFER, rb.token)
+      val oldbinding = gl.splice.getInteger(Macrogl.GL_RENDERBUFFER_BINDING)
+      gl.splice.bindRenderBuffer(Macrogl.GL_RENDERBUFFER, rb.token)
       try f.splice(())
-      finally gl.splice.bindRenderBuffer(GL_RENDERBUFFER, oldbinding)
+      finally gl.splice.bindRenderBuffer(Macrogl.GL_RENDERBUFFER, oldbinding)
       ()
     }
 
@@ -188,7 +182,7 @@ package object macrogl {
 
     val r = reify {
       val m = (c.Expr[Matrix](mt)).splice
-      val oldmode = GL11.glGetInteger(GL_MATRIX_MODE)
+      val oldmode = gl.splice.getInteger(Macrogl.GL_MATRIX_MODE)
       val dr = Results.doubleResult
       gl.splice.matrixMode(m.mode)
       gl.splice.pushMatrix()
@@ -229,10 +223,10 @@ package object macrogl {
     c.inlineAndReset(r)
   }
 
-  def setColor[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U]): c.Expr[Unit] = {
+  def setColor[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U])(gl: c.Expr[Macrogl]): c.Expr[Unit] = {
     import c.universe._
 
-    val Apply(TypeApply(Select(Apply(_, List(rt, gt, bt, at)), _), _), _) = c.macroApplication
+    val Apply(Apply(TypeApply(Select(Apply(_, List(rt, gt, bt, at)), _), _), _), _) = c.macroApplication
 
     val r = reify {
       val r = (c.Expr[Float](rt)).splice
@@ -240,41 +234,41 @@ package object macrogl {
       val b = (c.Expr[Float](bt)).splice
       val a = (c.Expr[Float](at)).splice
       Results.floatResult.rewind()
-      glGetFloat(GL_CURRENT_COLOR, Results.floatResult)
+      gl.splice.getFloat(Macrogl.GL_CURRENT_COLOR, Results.floatResult)
       val or = Results.floatResult.get(0)
       val og = Results.floatResult.get(1)
       val ob = Results.floatResult.get(2)
       val oa = Results.floatResult.get(3)
-      glColor4f(r, g, b, a)
+      gl.splice.color4f(r, g, b, a)
       try f.splice(())
-      finally glColor4f(or, og, ob, oa)
+      finally gl.splice.color4f(or, og, ob, oa)
       ()
     }
 
     c.inlineAndReset(r)
   }
 
-  def setCullFace[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U]): c.Expr[Unit] = {
+  def setCullFace[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U])(gl: c.Expr[Macrogl]): c.Expr[Unit] = {
     import c.universe._
 
     val Apply(Apply(TypeApply(Select(Apply(_, List(vt)), _), _), _), _) = c.macroApplication
 
     val r = reify {
       val v = (c.Expr[Int](vt)).splice
-      val ov = GL11.glGetInteger(GL_CULL_FACE_MODE)
-      glCullFace(v)
+      val ov = gl.splice.getInteger(Macrogl.GL_CULL_FACE_MODE)
+      gl.splice.cullFace(v)
       try f.splice(())
-      finally glCullFace(ov)
+      finally gl.splice.cullFace(ov)
       ()
     }
 
     c.inlineAndReset(r)
   }
 
-  def setViewport[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U]): c.Expr[Unit] = {
+  def setViewport[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U])(gl: c.Expr[Macrogl]): c.Expr[Unit] = {
     import c.universe._
 
-    val Apply(TypeApply(Select(Apply(_, List(rt, gt, bt, at)), _), _), _) = c.macroApplication
+    val Apply(Apply(TypeApply(Select(Apply(_, List(rt, gt, bt, at)), _), _), _), _) = c.macroApplication
 
     val r = reify {
       val x = (c.Expr[Int](rt)).splice
@@ -282,51 +276,51 @@ package object macrogl {
       val w = (c.Expr[Int](bt)).splice
       val h = (c.Expr[Int](at)).splice
       Results.intResult.clear()
-      GL11.glGetInteger(GL_VIEWPORT, Results.intResult)
+      gl.splice.getInteger(Macrogl.GL_VIEWPORT, Results.intResult)
       val ox = Results.intResult.get(0)
       val oy = Results.intResult.get(1)
       val ow = Results.intResult.get(2)
       val oh = Results.intResult.get(3)
-      glViewport(x, y, w, h)
+      gl.splice.viewport(x, y, w, h)
       try f.splice(())
-      finally glViewport(ox, oy, ow, oh)
+      finally gl.splice.viewport(ox, oy, ow, oh)
       ()
     }
 
     c.inlineAndReset(r)
   }
 
-  def setBlendFunc[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U]): c.Expr[Unit] = {
+  def setBlendFunc[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U])(gl: c.Expr[Macrogl]): c.Expr[Unit] = {
     import c.universe._
 
     val Apply(Apply(TypeApply(Select(Apply(_, List(sfactor, dfactor)), _), _), _), _) = c.macroApplication
 
     val r = reify {
-      val osrc = GL11.glGetInteger(GL_BLEND_SRC)
-      val odst = GL11.glGetInteger(GL_BLEND_DST)
-      glBlendFunc((c.Expr[Int](sfactor)).splice, c.Expr[Int](dfactor).splice)
+      val osrc = gl.splice.getInteger(Macrogl.GL_BLEND_SRC)
+      val odst = gl.splice.getInteger(Macrogl.GL_BLEND_DST)
+      gl.splice.blendFunc((c.Expr[Int](sfactor)).splice, c.Expr[Int](dfactor).splice)
       try f.splice(())
-      finally glBlendFunc(osrc, odst)
+      finally gl.splice.blendFunc(osrc, odst)
       ()
     }
 
     c.inlineAndReset(r)
   }
 
-  def enableSettings[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U]): c.Expr[Unit] = {
+  def enableSettings[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U])(gl: c.Expr[Macrogl]): c.Expr[Unit] = {
     import c.universe._
 
-    val Apply(TypeApply(Select(Apply(_, settings), _), _), _) = c.macroApplication
+    val Apply(Apply(TypeApply(Select(Apply(_, settings), _), _), _), _) = c.macroApplication
 
     val stats = for {
       (s, idx) <- settings.zipWithIndex
       sx = c.Expr[Int](s)
       localName = newTermName("s$" + idx)
       valexpr = reify {
-        if (!glIsEnabled(sx.splice)) { glEnable(sx.splice); true } else false
+        if (!gl.splice.isEnabled(sx.splice)) { gl.splice.enable(sx.splice); true } else false
       }
       disexpr = reify {
-        glDisable(sx.splice)
+        gl.splice.disable(sx.splice)
       }
     } yield (
       ValDef(Modifiers(), localName, TypeTree(), valexpr.tree),
@@ -344,20 +338,20 @@ package object macrogl {
     c.inlineAndReset(r)
   }
 
-  def disableSettings[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U]): c.Expr[Unit] = {
+  def disableSettings[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U])(gl: c.Expr[Macrogl]): c.Expr[Unit] = {
     import c.universe._
 
-    val Apply(TypeApply(Select(Apply(_, settings), _), _), _) = c.macroApplication
+    val Apply(Apply(TypeApply(Select(Apply(_, settings), _), _), _), _) = c.macroApplication
 
     val stats = for {
       (s, idx) <- settings.zipWithIndex
       sx = c.Expr[Int](s)
       localName = newTermName("s$" + idx)
       valexpr = reify {
-        if (glIsEnabled(sx.splice)) { glDisable(sx.splice); true } else false
+        if (gl.splice.isEnabled(sx.splice)) { gl.splice.disable(sx.splice); true } else false
       }
       disexpr = reify {
-        glEnable(sx.splice)
+        gl.splice.enable(sx.splice)
       }
     } yield (
       ValDef(Modifiers(), localName, TypeTree(), valexpr.tree),
