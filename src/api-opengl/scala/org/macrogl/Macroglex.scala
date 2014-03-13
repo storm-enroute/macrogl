@@ -13,6 +13,10 @@ class Macroglex private[macrogl] () extends Macrogl() {
     GL30.glBindBufferBase(target, layoutIndex, buffer)
   }
 
+  final def dispatchCompute(numGroupsX: Int, numGroupsY: Int, numGroupsZ: Int) {
+    GL43.glDispatchCompute(numGroupsX, numGroupsY, numGroupsZ)
+  }
+
 }
 
 

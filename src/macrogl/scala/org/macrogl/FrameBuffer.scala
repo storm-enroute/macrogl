@@ -5,9 +5,6 @@ package org.macrogl
 import language.experimental.macros
 import scala.reflect.macros.Context
 import scala.collection._
-import org.lwjgl.opengl.GL11._
-import org.lwjgl.opengl.GL20._
-import org.lwjgl.opengl.GL30._
 
 
 
@@ -61,10 +58,10 @@ object FrameBuffer {
       val a = attachment.splice
       val t = texture.splice
       val l = level.splice
-      gl.splice.frameBufferTexture2D(GL_FRAMEBUFFER, a, t.target, t.index, l)
+      gl.splice.frameBufferTexture2D(Macrogl.GL_FRAMEBUFFER, a, t.target, t.index, l)
       gl.splice.checkError()
       try f.splice(())
-      finally gl.splice.frameBufferTexture2D(GL_FRAMEBUFFER, a, t.target, 0, l)
+      finally gl.splice.frameBufferTexture2D(Macrogl.GL_FRAMEBUFFER, a, t.target, 0, l)
       ()
     }
 
@@ -83,10 +80,10 @@ object FrameBuffer {
       val t = target.splice
       val a = attachment.splice
       val rb = rbuff.splice
-      gl.splice.frameBufferRenderBuffer(t, a, GL_RENDERBUFFER, rb.index)
+      gl.splice.frameBufferRenderBuffer(t, a, Macrogl.GL_RENDERBUFFER, rb.index)
       gl.splice.checkError()
       try f.splice(())
-      finally gl.splice.frameBufferRenderBuffer(t, a, GL_RENDERBUFFER, 0)
+      finally gl.splice.frameBufferRenderBuffer(t, a, Macrogl.GL_RENDERBUFFER, 0)
       ()
     }
 

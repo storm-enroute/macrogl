@@ -67,6 +67,42 @@ class Macrogl private[macrogl] () {
     GL20.glGetUniformLocation(program, varname)
   }
 
+  final def uniform1f(loc: Token.UniformLocation, v: Float) {
+    GL20.glUniform1f(loc, v)
+  }
+
+  final def uniform2f(loc: Token.UniformLocation, x: Float, y: Float) {
+    GL20.glUniform2f(loc, x, y)
+  }
+
+  final def uniform3f(loc: Token.UniformLocation, x: Float, y: Float, z: Float) {
+    GL20.glUniform3f(loc, x, y, z)
+  }
+
+  final def uniform4f(loc: Token.UniformLocation, x: Float, y: Float, z: Float, w: Float) {
+    GL20.glUniform4f(loc, x, y, z, w)
+  }
+
+  final def uniform1i(loc: Token.UniformLocation, v: Int) {
+    GL20.glUniform1i(loc, v)
+  }
+
+  final def uniform2i(loc: Token.UniformLocation, x: Int, y: Int) {
+    GL20.glUniform2i(loc, x, y)
+  }
+
+  final def uniform3i(loc: Token.UniformLocation, x: Int, y: Int, z: Int) {
+    GL20.glUniform3i(loc, x, y, z)
+  }
+
+  final def uniform4i(loc: Token.UniformLocation, x: Int, y: Int, z: Int, w: Int) {
+    GL20.glUniform4i(loc, x, y, z, w)
+  }
+
+  final def uniformMatrix4(loc: Token.UniformLocation, transpose: Boolean, matrix: Buffer.Float) {
+    GL20.glUniformMatrix4(loc, transpose, matrix)
+  }
+
   final def createProgram(): Token.Program = {
     val index = GL20.glCreateProgram()
     if (index > 0) index
@@ -209,13 +245,21 @@ object Macrogl {
 
   val GL_NO_ERROR = GL11.GL_NO_ERROR
 
-  val GL_FRAMEBUFFER = GL30.GL_FRAMEBUFFER
-
   val GL_VERTEX_SHADER = GL20.GL_VERTEX_SHADER
 
   val GL_FRAGMENT_SHADER = GL20.GL_FRAGMENT_SHADER
 
+  val GL_FRAMEBUFFER = GL30.GL_FRAMEBUFFER
+
   val GL_FRAMEBUFFER_BINDING = GL30.GL_FRAMEBUFFER_BINDING
+
+  val GL_RENDERBUFFER = GL30.GL_RENDERBUFFER
+
+  val GL_COMPILE_STATUS = GL20.GL_COMPILE_STATUS
+
+  val GL_LINK_STATUS = GL20.GL_LINK_STATUS
+
+  val GL_VALIDATE_STATUS = GL20.GL_VALIDATE_STATUS
 
   /* public API - methods */
 
