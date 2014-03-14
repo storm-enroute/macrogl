@@ -6,20 +6,20 @@ package org.macrogl
 
 
 object Results {
-  private val intResultT = new ThreadLocal[Buffer.Int] {
-    override def initialValue = Macrogl.createIntBuffer(16)
+  private val intResultT = new ThreadLocal[Data.Int] {
+    override def initialValue = Macrogl.createIntData(16)
   }
   
   def intResult = intResultT.get
 
-  private val floatResultT = new ThreadLocal[Buffer.Float] {
-    override def initialValue = Macrogl.createFloatBuffer(16)
+  private val floatResultT = new ThreadLocal[Data.Float] {
+    override def initialValue = Macrogl.createFloatData(16)
   }
 
   def floatResult = floatResultT.get
 
-  private val doubleResultT = new ThreadLocal[Buffer.Double] {
-    override def initialValue = Macrogl.createDoubleBuffer(16)
+  private val doubleResultT = new ThreadLocal[Data.Double] {
+    override def initialValue = Macrogl.createDoubleData(16)
   }
   
   def doubleResult = doubleResultT.get

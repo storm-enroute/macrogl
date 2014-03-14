@@ -33,6 +33,8 @@ final class FrameBuffer(implicit gl: Macrogl) extends Handle {
 
 object FrameBuffer {
 
+  import Macros._
+
   class Binding private[FrameBuffer] () {
     object AttachTexture2D {
       def foreach[U](f: Unit => U)(implicit gl: Macrogl) = macro FrameBuffer.bindTexture[U]

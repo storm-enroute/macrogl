@@ -48,6 +48,7 @@ object Token {
 
   object Texture {
     val invalid: Texture = -1
+    val none: Texture = 0
   }
 
 }
