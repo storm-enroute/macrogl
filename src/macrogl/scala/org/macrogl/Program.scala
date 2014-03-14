@@ -15,7 +15,7 @@ class Program(val name: String)(val shaders: Program.Shader*)(implicit val gl: M
   object uniform extends Dynamic {
     def location(varname: String) = {
       val loc = gl.getUniformLocation(token, varname)
-      if (!gl.validUniformLocation(loc)) throw new Program.Exception(Program.this, "could not send uniform: " + varname)
+      if (!gl.validUniformLocation(loc)) throw new Program.Exception(Program.this, s"Could not send uniform: $varname, location: $loc")
       loc
     }
     def updateDynamic(varname: String)(v: Any) = {

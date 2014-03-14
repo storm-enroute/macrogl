@@ -71,6 +71,7 @@ final class Texture(val target: Int)(val init: Texture => Unit)(implicit gl: Mac
   def allocateImage1D(level: Int, internalFormat: Int, wdt: Int, border: Int, format: Int, dataType: Int, data: Data = null) {
     target match {
       case Macrogl.GL_TEXTURE_1D => data match {
+        case null           => gl.texImage1D(target, level, internalFormat, wdt, border, format, dataType, null: Data.Int)
         case data: Data.Int => gl.texImage1D(target, level, internalFormat, wdt, border, format, dataType, data)
         case _ => throw new UnsupportedOperationException(s"Unknown data format: ${data.getClass}")
       }
@@ -81,6 +82,7 @@ final class Texture(val target: Int)(val init: Texture => Unit)(implicit gl: Mac
   def allocateImage2D(level: Int, internalFormat: Int, wdt: Int, hgt: Int, border: Int, format: Int, dataType: Int, data: Data = null) {
     target match {
       case Macrogl.GL_TEXTURE_2D => data match {
+        case null            => gl.texImage2D(target, level, internalFormat, wdt, hgt, border, format, dataType, null: Data.Int)
         case data: Data.Int  => gl.texImage2D(target, level, internalFormat, wdt, hgt, border, format, dataType, data)
         case data: Data.Byte => gl.texImage2D(target, level, internalFormat, wdt, hgt, border, format, dataType, data)
         case _ => throw new UnsupportedOperationException(s"Unknown data format: ${data.getClass}")

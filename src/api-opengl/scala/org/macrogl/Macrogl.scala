@@ -290,7 +290,7 @@ class Macrogl private[macrogl] () {
   }
 
   final def validUniformLocation(uloc: Token.UniformLocation): Boolean = {
-    uloc > 0
+    uloc != -1
   }
 
   final def validFrameBuffer(fb: Token.FrameBuffer): Boolean = {
