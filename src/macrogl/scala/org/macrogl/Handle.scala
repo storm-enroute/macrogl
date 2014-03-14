@@ -10,12 +10,29 @@ trait Handle {
   def release(): Unit
 }
 
-object Handle {
-  def manage[T <: Handle](handle: T) = scala.util.continuations.shift { k: (T => Unit) =>
+class HandleStorage {
+  val handles = new scala.collection.mutable.Stack[Handle]()
+
+  def manage[T <: Handle](handle: T): T = {
     println("acquiring " + handle)
     handle.acquire()
-    k(handle)
-    println("releasing " + handle)
-    handle.release()
+    handles.push(handle)
+    handle
+  }
+
+  def clear(): Unit = {
+    for (h <- handles) {
+      println("releasing " + h)
+      h.release()
+    }
+    handles.clear()
+  }
+}
+
+object HandleStorage {
+  def foreach(f: HandleStorage => Unit): Unit = {
+    val storage = new HandleStorage
+    f(storage)
+    storage.clear()
   }
 }
