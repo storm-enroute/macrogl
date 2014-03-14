@@ -1,6 +1,6 @@
 <img src='macrogl-title-96.png'></img>
 
-[![Build Status](https://ci.storm-enroute.com:8080/job/public-macrogl/badge/icon)](https://ci.storm-enroute.com:8080/job/public-macrogl/)
+[![Build Status](https://ci.storm-enroute.com:8080/buildStatus/icon?job=public-macrogl)](https://ci.storm-enroute.com:8080/job/public-macrogl/)
 
 
 MacroGL
