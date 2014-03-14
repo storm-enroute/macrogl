@@ -10,7 +10,7 @@ import scala.collection._
 class Program(val name: String)(val shaders: Program.Shader*)(implicit val gl: Macrogl) extends Handle {
   private var ptoken = Token.Program.invalid
   private val result = new Array[Int](1)
-  private val floatArray = Macrogl.createFloatBuffer(16)
+  private val floatData = Macrogl.createFloatData(16)
 
   object uniform extends Dynamic {
     def location(varname: String) = {
@@ -37,11 +37,11 @@ class Program(val name: String)(val shaders: Program.Shader*)(implicit val gl: M
         case m: Matrix =>
           var i = 0
           while (i < 16) {
-            floatArray.put(i, m.array(i).toFloat)
+            floatData.put(i, m.array(i).toFloat)
             i += 1
           }
-          floatArray.clear()
-          gl.uniformMatrix4(l, false, floatArray)
+          floatData.clear()
+          gl.uniformMatrix4(l, false, floatData)
       }
     }
   }

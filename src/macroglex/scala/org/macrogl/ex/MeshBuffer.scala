@@ -11,6 +11,8 @@ import scala.collection._
 
 object MeshBuffer {
 
+  import Macros._
+
   def computing[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U])(glex: c.Expr[Macroglex]): c.Expr[Unit] = {
     import c.universe._
 

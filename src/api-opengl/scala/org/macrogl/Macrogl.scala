@@ -31,11 +31,11 @@ class Macrogl private[macrogl] () {
     GL15.glDeleteBuffers(buffer)
   }
 
-  final def bufferSubData(target: Int, offset: Long, data: Buffer.Float) {
+  final def bufferSubData(target: Int, offset: Long, data: Data.Float) {
     GL15.glBufferSubData(target, offset, data)
   }
 
-  final def getBufferSubData(target: Int, offset: Long, data: Buffer.Float) {
+  final def getBufferSubData(target: Int, offset: Long, data: Data.Float) {
     GL15.glGetBufferSubData(target, offset, data)
   }
 
@@ -99,7 +99,7 @@ class Macrogl private[macrogl] () {
     GL20.glUniform4i(loc, x, y, z, w)
   }
 
-  final def uniformMatrix4(loc: Token.UniformLocation, transpose: Boolean, matrix: Buffer.Float) {
+  final def uniformMatrix4(loc: Token.UniformLocation, transpose: Boolean, matrix: Data.Float) {
     GL20.glUniformMatrix4(loc, transpose, matrix)
   }
 
@@ -185,15 +185,15 @@ class Macrogl private[macrogl] () {
     GL11.glGetInteger(flag)
   }
 
-  final def getInteger(flag: Int, data: Buffer.Int) {
+  final def getInteger(flag: Int, data: Data.Int) {
     GL11.glGetInteger(flag, data)
   }
 
-  final def getFloat(flag: Int, data: Buffer.Float) {
+  final def getFloat(flag: Int, data: Data.Float) {
     GL11.glGetFloat(flag, data)
   }
 
-  final def getDouble(flag: Int, data: Buffer.Double) {
+  final def getDouble(flag: Int, data: Data.Double) {
     GL11.glGetDouble(flag, data)
   }
 
@@ -249,11 +249,15 @@ class Macrogl private[macrogl] () {
     GL11.glGetTexParameteri(target, name)
   }
 
-  final def texImage1D(target: Int, level: Int, internalFormat: Int, wdt: Int, border: Int, format: Int, dataType: Int, data: Buffer.Int) {
+  final def texImage1D(target: Int, level: Int, internalFormat: Int, wdt: Int, border: Int, format: Int, dataType: Int, data: Data.Int) {
     GL11.glTexImage1D(target, level, internalFormat, wdt, border, format, dataType, data)
   }
 
-  final def texImage2D(target: Int, level: Int, internalFormat: Int, wdt: Int, hgt: Int, border: Int, format: Int, dataType: Int, data: Buffer.Int) {
+  final def texImage2D(target: Int, level: Int, internalFormat: Int, wdt: Int, hgt: Int, border: Int, format: Int, dataType: Int, data: Data.Int) {
+    GL11.glTexImage2D(target, level, internalFormat, wdt, hgt, border, format, dataType, data)
+  }
+
+  final def texImage2D(target: Int, level: Int, internalFormat: Int, wdt: Int, hgt: Int, border: Int, format: Int, dataType: Int, data: Data.Byte) {
     GL11.glTexImage2D(target, level, internalFormat, wdt, hgt, border, format, dataType, data)
   }
 
@@ -313,7 +317,7 @@ class Macrogl private[macrogl] () {
     GL11.glCullFace(flag)
   }
 
-  final def drawBuffers(ib: Buffer.Int) {
+  final def drawBuffers(ib: Data.Int) {
     GL20.glDrawBuffers(ib)
   }
 
@@ -341,7 +345,7 @@ class Macrogl private[macrogl] () {
     GL11.glPopMatrix()
   }
 
-  final def loadMatrix(data: Buffer.Double) {
+  final def loadMatrix(data: Data.Double) {
     GL11.glLoadMatrix(data)
   }
 
@@ -469,15 +473,15 @@ object Macrogl {
 
   /* public API - methods */
 
-  final def createFloatBuffer(sz: Int): Buffer.Float = {
+  final def createFloatData(sz: Int): Data.Float = {
     org.lwjgl.BufferUtils.createFloatBuffer(sz)
   }
 
-  final def createIntBuffer(sz: Int): Buffer.Int = {
+  final def createIntData(sz: Int): Data.Int = {
     org.lwjgl.BufferUtils.createIntBuffer(sz)
   }
 
-  final def createDoubleBuffer(sz: Int): Buffer.Double = {
+  final def createDoubleData(sz: Int): Data.Double = {
     org.lwjgl.BufferUtils.createDoubleBuffer(sz)
   }
 

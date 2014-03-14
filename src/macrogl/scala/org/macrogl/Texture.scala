@@ -20,18 +20,18 @@ final class Texture(val target: Int)(val init: Texture => Unit)(implicit gl: Mac
   def acquire() {
     release()
     ttoken = gl.genTextures()
+    gl.bindTexture(target, ttoken)
     init(this)
+    gl.bindTexture(target, Token.Texture.none)
   }
 
   object param {
 
     def update(name: Int, v: Float) {
-      gl.bindTexture(Macrogl.GL_TEXTURE_2D, ttoken)
       gl.texParameterf(target, name, v)
     }
   
     def update(name: Int, v: Int) {
-      gl.bindTexture(Macrogl.GL_TEXTURE_2D, ttoken)
       gl.texParameteri(target, name, v)
     }
   
@@ -68,17 +68,24 @@ final class Texture(val target: Int)(val init: Texture => Unit)(implicit gl: Mac
 
   def depthTextureMode_=(v: Int) = param(Macrogl.GL_DEPTH_TEXTURE_MODE) = v
 
-  def allocateImage1D(level: Int, internalFormat: Int, wdt: Int, border: Int, format: Int, dataType: Int) {
+  def allocateImage1D(level: Int, internalFormat: Int, wdt: Int, border: Int, format: Int, dataType: Int, data: Data = null) {
     target match {
-      case Macrogl.GL_TEXTURE_1D => gl.texImage1D(target, level, internalFormat, wdt, border, format, dataType, null: Buffer.Int)
-      case _ => throw new UnsupportedOperationException
+      case Macrogl.GL_TEXTURE_1D => data match {
+        case data: Data.Int => gl.texImage1D(target, level, internalFormat, wdt, border, format, dataType, data)
+        case _ => throw new UnsupportedOperationException(s"Unknown data format: ${data.getClass}")
+      }
+      case _ => throw new UnsupportedOperationException("Texture is not 1D.")
     }
   }
 
-  def allocateImage2D(level: Int, internalFormat: Int, wdt: Int, hgt: Int, border: Int, format: Int, dataType: Int) {
+  def allocateImage2D(level: Int, internalFormat: Int, wdt: Int, hgt: Int, border: Int, format: Int, dataType: Int, data: Data = null) {
     target match {
-      case Macrogl.GL_TEXTURE_2D => gl.texImage2D(target, level, internalFormat, wdt, hgt, border, format, dataType, null: Buffer.Int)
-      case _ => throw new UnsupportedOperationException
+      case Macrogl.GL_TEXTURE_2D => data match {
+        case data: Data.Int  => gl.texImage2D(target, level, internalFormat, wdt, hgt, border, format, dataType, data)
+        case data: Data.Byte => gl.texImage2D(target, level, internalFormat, wdt, hgt, border, format, dataType, data)
+        case _ => throw new UnsupportedOperationException(s"Unknown data format: ${data.getClass}")
+      }
+      case _ => throw new UnsupportedOperationException("Texture is not 2D.")
     }
   }
 

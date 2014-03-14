@@ -53,13 +53,11 @@ object Texture2D {
     textureBuffer.flip()
 
     val texture = Texture(GL11.GL_TEXTURE_2D) { tex =>
-      for (_ <- using.texture(GL13.GL_TEXTURE0, tex)) {
-        GL11.glTexImage2D(tex.target, 0, GL11.GL_RGB, textureSize, textureSize, 0, GL11.GL_RGB, GL11.GL_UNSIGNED_BYTE, textureBuffer)
+      tex.allocateImage2D(0, GL11.GL_RGB, textureSize, textureSize, 0, GL11.GL_RGB, GL11.GL_UNSIGNED_BYTE, textureBuffer)
 
-        tex.wrapS = wrapS
-        tex.magFilter = magFilter
-        tex.minFilter = minFilter
-      }
+      tex.wrapS = wrapS
+      tex.magFilter = magFilter
+      tex.minFilter = minFilter
     }
 
     texture.acquire()

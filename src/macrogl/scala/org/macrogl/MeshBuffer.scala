@@ -37,13 +37,13 @@ extends Handle {
 
   def totalBytes = capacityVertices * components * bytesPerFloat
 
-  def send(offset: Long, data: Buffer.Float) {
+  def send(offset: Long, data: Data.Float) {
     gl.bindBuffer(Macrogl.GL_ARRAY_BUFFER, vtoken)
     gl.bufferSubData(Macrogl.GL_ARRAY_BUFFER, offset, data)
     gl.bindBuffer(Macrogl.GL_ARRAY_BUFFER, Token.Buffer.none)
   }
 
-  def receive(offset: Long, data: Buffer.Float) {
+  def receive(offset: Long, data: Data.Float) {
     gl.bindBuffer(Macrogl.GL_ARRAY_BUFFER, vtoken)
     gl.getBufferSubData(Macrogl.GL_ARRAY_BUFFER, offset, data)
     gl.bindBuffer(Macrogl.GL_ARRAY_BUFFER, Token.Buffer.none)
@@ -113,6 +113,8 @@ object MeshBuffer {
     def render(mode: Int): Unit
     def renderVertices(mode: Int): Unit
   }
+
+  import Macros._
 
   def using[U: c.WeakTypeTag](c: Context)(f: c.Expr[Access => U])(gl: c.Expr[Macrogl]): c.Expr[Unit] = {
     import c.universe._

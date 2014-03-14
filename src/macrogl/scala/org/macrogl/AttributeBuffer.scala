@@ -34,7 +34,7 @@ extends Handle {
 
   def totalBytes = capacity * attributes * gl.bytesPerFloat
 
-  def send(offset: Long, data: Buffer.Float) {
+  def send(offset: Long, data: Data.Float) {
     gl.bindBuffer(Macrogl.GL_ARRAY_BUFFER, vtoken)
     gl.bufferSubData(Macrogl.GL_ARRAY_BUFFER, offset, data)
     gl.bindBuffer(Macrogl.GL_ARRAY_BUFFER, Token.Buffer.none)
@@ -87,6 +87,8 @@ object AttributeBuffer {
   trait Access {
     def render(mode: Int, attribs: Array[(Int, Int)]): Unit
   }
+
+  import Macros._
 
   def using[U: c.WeakTypeTag](c: Context)(f: c.Expr[Access => U])(gl: c.Expr[Macrogl]): c.Expr[Unit] = {
     import c.universe._
