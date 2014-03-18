@@ -5,7 +5,7 @@ import org.lwjgl.input.Keyboard
 import org.lwjgl.BufferUtils
 import org.macrogl._
 
-object FeedbackTransform {
+object TransformFeedback {
   def main(args: Array[String]) {
     val contextAttributes = new ContextAttribs(3, 2).withForwardCompatible(true).withProfileCore(true)
 
@@ -15,13 +15,25 @@ object FeedbackTransform {
     val vao = GL30.glGenVertexArrays()
     GL30.glBindVertexArray(vao)
 
-    val drawParticles = new Program("draw")(
+    val drawTriangle = new Program("triangle")(
+      Program.Shader.Vertex  (Utils.readResource("/org/macrogl/examples/TransformFeedbackTriangle.vert")),
+      Program.Shader.Fragment(Utils.readResource("/org/macrogl/examples/SingleTriangle.frag"))
+    )
+    drawTriangle.acquire()
+
+    GL30.glTransformFeedbackVaryings(drawTriangle.token, Array("gl_Position"), GL30.GL_INTERLEAVED_ATTRIBS)
+
+    GL20.glLinkProgram(drawTriangle.token)
+    GL20.glValidateProgram(drawTriangle.token)
+    Macrogl.default.checkError()
+
+    val drawParticles = new Program("draw-particles")(
       Program.Shader.Vertex  (Utils.readResource("/org/macrogl/examples/SingleTriangle.vert")),
       Program.Shader.Fragment(Utils.readResource("/org/macrogl/examples/SingleTriangle.frag"))
     )
     drawParticles.acquire()
 
-    val updateParticles = new Program("update")(
+    val updateParticles = new Program("update-particles")(
       Program.Shader.Vertex(Utils.readResource("/org/macrogl/examples/TransformFeedback.vert"))
     )
     updateParticles.acquire()
@@ -38,18 +50,49 @@ object FeedbackTransform {
     fb.put(Particles.vertices)
     fb.flip()
 
-    val evenBuffer = new AttributeBuffer(GL15.GL_STATIC_DRAW, Particles.count, Particles.components)
+    val evenBuffer = new AttributeBuffer(GL15.GL_STREAM_DRAW, Particles.count, Particles.components)
     evenBuffer.acquire()
     evenBuffer.send(0, fb)
 
     val oddBuffer = new AttributeBuffer(GL15.GL_STREAM_DRAW, Particles.count, Particles.components)
     oddBuffer.acquire()
 
+    val triangleFeedback = new AttributeBuffer(GL15.GL_STREAM_DRAW, Triangle.count, Triangle.components + 1)
+    triangleFeedback.acquire()
+
+    GL13.glActiveTexture(GL13.GL_TEXTURE0)
+    GL15.glBindBuffer(GL31.GL_TEXTURE_BUFFER, triangleFeedback.token)
+
+    val triangleTexture = GL11.glGenTextures()
+    GL11.glBindTexture(GL31.GL_TEXTURE_BUFFER, triangleTexture)
+    GL31.glTexBuffer(GL31.GL_TEXTURE_BUFFER, GL30.GL_RGBA32F, triangleFeedback.token)
+
+    val tb = BufferUtils.createFloatBuffer(Triangle.vertices.length)
+    tb.put(Triangle.vertices)
+    tb.flip()
+
+    val triangleBuffer = new AttributeBuffer(GL15.GL_STATIC_DRAW, Triangle.count, Triangle.components)
+    triangleBuffer.acquire()
+    triangleBuffer.send(0, tb)
+
     val updateAttr = Array((0, 3), (3, 3), (6, 3))
     val drawAttr   = Array((0, 3), (3, 3))
 
     var prevTime = System.currentTimeMillis
     var frame = 0
+
+    val transform = new Matrix.Plain(
+      Array[Double](
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+      )
+    )
+
+    val rotationSpeed = 2.0f
+
+    GL11.glPointSize(2.0f)
 
     while (!Display.isCloseRequested && !closeRequested) {
       val time = System.currentTimeMillis
@@ -59,7 +102,38 @@ object FeedbackTransform {
       val stateChanged = processInput()
       if (stateChanged) {}
 
-      val (input, output)= if (frame % 2 == 0) (evenBuffer, oddBuffer) else (oddBuffer, evenBuffer)
+      if (left || right) {
+        angle += (if (left) rotationSpeed * dtSeconds else - rotationSpeed * dtSeconds).toFloat
+
+        import scala.math.{sin, cos}
+        val c = cos(angle)
+        val s = sin(angle)
+
+        transform.array(0) =  c
+        transform.array(1) =  s
+        transform.array(4) = -s
+        transform.array(5) =  c
+      }
+
+      for {
+        _   <- using.program(drawTriangle)
+        acc <- using.attributebuffer(triangleBuffer)
+      } {
+        drawTriangle.uniform.transform = transform
+
+        GL11.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
+        raster.clear(GL11.GL_COLOR_BUFFER_BIT)
+
+        GL30.glBindBufferBase(GL30.GL_TRANSFORM_FEEDBACK_BUFFER, 0, triangleFeedback.token)
+        GL30.glBeginTransformFeedback(GL11.GL_TRIANGLES)
+
+        acc.render(GL11.GL_TRIANGLES, drawAttr)
+
+        GL30.glEndTransformFeedback()
+        GL15.glBindBuffer(GL30.GL_TRANSFORM_FEEDBACK_BUFFER, 0)
+      }
+
+      val (input, output) = if (frame % 2 == 0) (evenBuffer, oddBuffer) else (oddBuffer, evenBuffer)
       frame += 1
 
       for {
@@ -67,43 +141,61 @@ object FeedbackTransform {
         acc <- using.attributebuffer(input)
         _   <- enabling(GL30.GL_RASTERIZER_DISCARD)
       } {
+        GL13.glActiveTexture(GL13.GL_TEXTURE0)
+        GL15.glBindBuffer(GL31.GL_TEXTURE_BUFFER, triangleFeedback.token)
+
         updateParticles.uniform.dtSeconds = dtSeconds
+        updateParticles.uniform.triangleVertices = 0
 
         GL30.glBindBufferBase(GL30.GL_TRANSFORM_FEEDBACK_BUFFER, 0, output.token)
-        GL30.glBeginTransformFeedback(GL11.GL_POINTS)
+
         GL15.glBeginQuery(GL30.GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, query)
+        GL30.glBeginTransformFeedback(GL11.GL_POINTS)
+
         acc.render(GL11.GL_POINTS, updateAttr)
+
         GL30.glEndTransformFeedback()
-        GL15.glBindBuffer(GL30.GL_TRANSFORM_FEEDBACK_BUFFER, 0)
         GL15.glEndQuery(GL30.GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN)
 
+        GL15.glBindBuffer(GL30.GL_TRANSFORM_FEEDBACK_BUFFER, 0)
+
         val written = GL15.glGetQueryObjectui(query, GL15.GL_QUERY_RESULT)
+
+        GL15.glBindBuffer(GL31.GL_TEXTURE_BUFFER, 0)
       }
 
       for {
         _   <- using.program(drawParticles)
         acc <- using.attributebuffer(output)
-      } {
-        GL11.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
-        raster.clear(GL11.GL_COLOR_BUFFER_BIT)
-
-        acc.render(GL11.GL_POINTS, drawAttr)
-      }
+      } acc.render(GL11.GL_POINTS, drawAttr)
 
       Display.update()
     }
 
+    drawTriangle.release()
+    updateParticles.release()
+    drawParticles.release()
+
     oddBuffer.release()
     evenBuffer.release()
+    triangleBuffer.release()
+    triangleFeedback.release()
+
     Display.destroy()
   }
 
   var closeRequested = false
+  var angle = 0.0f
+  var left = false
+  var right = false
 
   def processInput(): Boolean = {
     var stateChanged = false
 
     while (Keyboard.next()) {
+      left  = Keyboard.isKeyDown(Keyboard.KEY_A)
+      right = !left && Keyboard.isKeyDown(Keyboard.KEY_D)
+
       if (Keyboard.getEventKeyState()) {
         stateChanged ||= {
           Keyboard.getEventKey() match {
@@ -125,7 +217,7 @@ object FeedbackTransform {
     def genParticle() = {
       import util.Random.{nextFloat => nf}
       Array[Float](
-        0, 0, 0,
+        0, 0.75f, 0,
         nf, nf, nf,
         nf - 0.5f, nf - 0.5f, nf - 0.5f
       )
@@ -136,6 +228,15 @@ object FeedbackTransform {
       for (i <- 1 to count) ab ++= genParticle()
       ab.result()
     }
+  }
 
+  object Triangle {
+    val count = 3
+    val components = 6
+    val vertices = Array(
+      -0.5f,  0.5f, 0.0f,  1, 0, 0,
+       0.0f, -0.5f, 0.0f,  0, 1, 0,
+       0.5f,  0.5f, 0.0f,  0, 0, 1
+    )
   }
 }
