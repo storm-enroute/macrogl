@@ -21,14 +21,14 @@ object TransformFeedback {
     )
     drawTriangle.acquire()
 
-    GL30.glTransformFeedbackVaryings(drawTriangle.token, Array("gl_Position"), GL30.GL_INTERLEAVED_ATTRIBS)
+    GL30.glTransformFeedbackVaryings(drawTriangle.token, Array("worldPosition"), GL30.GL_INTERLEAVED_ATTRIBS)
 
     GL20.glLinkProgram(drawTriangle.token)
     GL20.glValidateProgram(drawTriangle.token)
     Macrogl.default.checkError()
 
     val drawParticles = new Program("draw-particles")(
-      Program.Shader.Vertex  (Utils.readResource("/org/macrogl/examples/SingleTriangle.vert")),
+      Program.Shader.Vertex  (Utils.readResource("/org/macrogl/examples/TransformFeedbackTriangle.vert")),
       Program.Shader.Fragment(Utils.readResource("/org/macrogl/examples/SingleTriangle.frag"))
     )
     drawParticles.acquire()
@@ -81,18 +81,19 @@ object TransformFeedback {
     var prevTime = System.currentTimeMillis
     var frame = 0
 
-    val transform = new Matrix.Plain(
-      Array[Double](
-        1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, 1, 0,
-        0, 0, 0, 1
-      )
-    )
+    val triangleTransform  = Matrix.identity[Matrix.Plain]
 
     val rotationSpeed = 2.0f
 
     GL11.glPointSize(2.0f)
+
+    val aspectRatio = 800.0 / 600.0
+    val projectionTransform = Utils.orthoProjection(-aspectRatio, aspectRatio, -1, 1, -1, 1)
+
+    for (_ <- using.program(drawParticles)) {
+      drawParticles.uniform.transform  = Matrix.identity[Matrix.Plain]
+      drawParticles.uniform.projection = projectionTransform
+    }
 
     while (!Display.isCloseRequested && !closeRequested) {
       val time = System.currentTimeMillis
@@ -109,17 +110,18 @@ object TransformFeedback {
         val c = cos(angle)
         val s = sin(angle)
 
-        transform.array(0) =  c
-        transform.array(1) =  s
-        transform.array(4) = -s
-        transform.array(5) =  c
+        triangleTransform.array(0) =  c
+        triangleTransform.array(1) =  s
+        triangleTransform.array(4) = -s
+        triangleTransform.array(5) =  c
       }
 
       for {
         _   <- using.program(drawTriangle)
         acc <- using.attributebuffer(triangleBuffer)
       } {
-        drawTriangle.uniform.transform = transform
+        drawTriangle.uniform.transform = triangleTransform
+        drawTriangle.uniform.projection = projectionTransform
 
         GL11.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
         raster.clear(GL11.GL_COLOR_BUFFER_BIT)
@@ -210,7 +212,7 @@ object TransformFeedback {
   }
 
   object Particles {
-    val count = 3000
+    val count = 10000
     val vertices = genParticles(count)
     val components = vertices.length / count
 
@@ -233,10 +235,10 @@ object TransformFeedback {
   object Triangle {
     val count = 3
     val components = 6
-    val vertices = Array(
-      -0.5f,  0.5f, 0.0f,  1, 0, 0,
-       0.0f, -0.5f, 0.0f,  0, 1, 0,
-       0.5f,  0.5f, 0.0f,  0, 0, 1
+    val vertices = Array[Float](
+      -0.433f,  0.25f, 0,  1, 0, 0,
+       0,      -0.5f,  0,  0, 1, 0,
+       0.433f,  0.25f, 0,  0, 0, 1
     )
   }
 }

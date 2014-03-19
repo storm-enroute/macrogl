@@ -49,9 +49,12 @@ void main() {
         }
     }
 
-    newPosition += vec3(1);
-    newPosition = mod(newPosition, 2);
-    newPosition -= vec3(1);
+    newPosition.y = mod(newPosition.y + 1, 2) - 1;
+    
+    if (newPosition.x > 1.4 || newPosition.x < -1.4) {
+        newVelocity.x = -newVelocity.x;
+        newPosition.x = position.x;
+    }
     
     gl_Position = vec4(newPosition, 1);
 }
