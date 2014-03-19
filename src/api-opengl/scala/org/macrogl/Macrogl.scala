@@ -117,7 +117,7 @@ class Macrogl private[macrogl] () {
     GL20.glGetProgrami(program, parameterName)
   }
 
-  final def getProgramInfoLog(program: Token.Program, maxLength: Int) {
+  final def getProgramInfoLog(program: Token.Program, maxLength: Int) = {
     GL20.glGetShaderInfoLog(program, maxLength)
   }
 
@@ -151,7 +151,7 @@ class Macrogl private[macrogl] () {
     GL20.glGetShaderi(shader, parameterName)
   }
 
-  final def getShaderInfoLog(shader: Token.Shader, maxLength: Int) {
+  final def getShaderInfoLog(shader: Token.Shader, maxLength: Int) = {
     GL20.glGetShaderInfoLog(shader, maxLength)
   }
 
