@@ -23,6 +23,24 @@ object Utils {
     new Matrix.Plain(arr)
   }
 
+  def orthoProjection(left: Double, right: Double, bottom: Double, top: Double, near: Double, far: Double): Matrix.Plain = {
+    val x =  2 / (right - left)
+    val y =  2 / (top - bottom)
+    val z = -2 / (far - near)
+    val tx = - (right + left) / (right - left)
+    val ty = - (top + bottom) / (top - bottom)
+    val tz = - (far + near)   / (far - near)
+
+    new Matrix.Plain(
+      Array(
+        x,  0,  0,  0,
+        0,  y,  0,  0,
+        0,  0,  z,  0,
+        tx, ty, tz, 1
+      )
+    )
+  }
+
   class Camera(x: Double, y: Double, z: Double) {
     val position = Array(x, y, z)
     var horizontalAngle = 0.0
