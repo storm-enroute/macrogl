@@ -30,8 +30,8 @@ abstract class DoubleBuffer(cMark: Int, cPosition: Int, cLimit: Int, cCapacity: 
 }
 
 object DoubleBuffer {
-  def allocate(capacity: Int): DoubleBuffer = ???
+  def allocate(capacity: Int): DoubleBuffer = NativeDoubleBuffer.allocate(capacity)
 
-  def wrap(array: Array[Double]): DoubleBuffer = ???
-  def wrap(array: Array[Double], offset: Int, length: Int): DoubleBuffer = ???
+  def wrap(array: Array[Double]): DoubleBuffer = NativeDoubleBuffer.wrap(array)
+  def wrap(array: Array[Double], offset: Int, length: Int): DoubleBuffer = NativeDoubleBuffer.wrap(array, offset, length)
 }

@@ -30,8 +30,8 @@ abstract class IntBuffer(cMark: Int, cPosition: Int, cLimit: Int, cCapacity: Int
 }
 
 object IntBuffer {
-  def allocate(capacity: Int): IntBuffer = ???
+  def allocate(capacity: Int): IntBuffer = NativeIntBuffer.allocate(capacity)
 
-  def wrap(array: Array[Int]): IntBuffer = ???
-  def wrap(array: Array[Int], offset: Int, length: Int): IntBuffer = ???
+  def wrap(array: Array[Int]): IntBuffer = NativeIntBuffer.wrap(array)
+  def wrap(array: Array[Int], offset: Int, length: Int): IntBuffer = NativeIntBuffer.wrap(array, offset, length)
 }

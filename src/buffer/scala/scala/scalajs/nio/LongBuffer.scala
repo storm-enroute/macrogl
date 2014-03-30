@@ -30,8 +30,8 @@ abstract class LongBuffer(cMark: Int, cPosition: Int, cLimit: Int, cCapacity: In
 }
 
 object LongBuffer {
-  def allocate(capacity: Int): LongBuffer = ???
+  def allocate(capacity: Int): LongBuffer = NativeLongBuffer.allocate(capacity)
 
-  def wrap(array: Array[Long]): LongBuffer = ???
-  def wrap(array: Array[Long], offset: Int, length: Int): LongBuffer = ???
+  def wrap(array: Array[Long]): LongBuffer = NativeLongBuffer.wrap(array)
+  def wrap(array: Array[Long], offset: Int, length: Int): LongBuffer = NativeLongBuffer.wrap(array, offset, length)
 }

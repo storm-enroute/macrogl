@@ -30,8 +30,8 @@ abstract class ShortBuffer(cMark: Int, cPosition: Int, cLimit: Int, cCapacity: I
 }
 
 object ShortBuffer {
-  def allocate(capacity: Int): ShortBuffer = ???
+  def allocate(capacity: Int): ShortBuffer = NativeShortBuffer.allocate(capacity)
 
-  def wrap(array: Array[Short]): ShortBuffer = ???
-  def wrap(array: Array[Short], offset: Int, length: Int): ShortBuffer = ???
+  def wrap(array: Array[Short]): ShortBuffer = NativeShortBuffer.wrap(array)
+  def wrap(array: Array[Short], offset: Int, length: Int): ShortBuffer = NativeShortBuffer.wrap(array, offset, length)
 }
