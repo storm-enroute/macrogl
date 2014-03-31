@@ -471,6 +471,8 @@ object Macrogl {
 
   val GL_BLEND_DST = GL11.GL_BLEND_DST
 
+  val GL_INFO_LOG_LENGTH = GL20.GL_INFO_LOG_LENGTH
+
   /* public API - methods */
 
   final def createFloatData(sz: Int): Data.Float = {

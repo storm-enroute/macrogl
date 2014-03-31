@@ -81,7 +81,7 @@ object Program {
       val pname = p.name
       val res = gl.getShaderi(stoken, flag)
       if (res == Macrogl.GL_FALSE) {
-        val len = gl.getShaderi(stoken, org.lwjgl.opengl.GL20.GL_INFO_LOG_LENGTH)
+        val len = gl.getShaderi(stoken, Macrogl.GL_INFO_LOG_LENGTH)
         val errormsg = gl.getShaderInfoLog(stoken, len)
         throw new Program.Exception(p, "error %s %s in shader %s\n%s".format(phase, shname, pname, errormsg))
       }
@@ -91,7 +91,7 @@ object Program {
       val pname = p.name
       val res = gl.getProgrami(p.token, flag)
       if (res == Macrogl.GL_FALSE) {
-        val len = gl.getProgrami(p.token, org.lwjgl.opengl.GL20.GL_INFO_LOG_LENGTH)
+        val len = gl.getProgrami(p.token, Macrogl.GL_INFO_LOG_LENGTH)
         val errormsg = gl.getProgramInfoLog(p.token, len)
         throw new Program.Exception(p, "error %s program %s\n%s".format(phase, pname, errormsg))
       }
