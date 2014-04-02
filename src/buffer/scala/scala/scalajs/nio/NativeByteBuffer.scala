@@ -3,167 +3,157 @@ package scala.scalajs.nio
 import scala.scalajs.js
 import js.Dynamic.{ global => g }
 
-class NativeByteBuffer(cMark: Int, cPosition: Int, cLimit: Int, cCapacity: Int, cBuffer: js.Dynamic, cBufferOffset: Int, cByteOrder: ByteOrder) extends ByteBuffer(cMark, cPosition, cLimit, cCapacity) with JsNativeBuffer[Byte] {
-  order(cByteOrder)
+class NativeByteBuffer(protected var mCapacity: Int, protected var mLimit: Int, protected var mPosition: Int,
+    protected var mMark: Int, mBuffer: js.Dynamic, mBufferOffset: Int, cByteOrder: ByteOrder) extends ByteBuffer
+    with TypedBufferBehaviour[Byte, ByteBuffer] with JsNativeBuffer[Byte] {
   
-  // java.nio.NativeByteBuffer shared methods
+  protected var littleEndian: Boolean = _
+  order(cByteOrder)
 
-  def asCharBuffer(): Nothing = ??? // CharBuffer not implemented
-  def asDoubleBuffer(): DoubleBuffer = {
-    val doubleCapacity = this.capacity / NativeDoubleBuffer.BYTES_PER_ELEMENT
-    
-    if(this.order == ByteOrder.nativeOrder)
-      new NativeDoubleBuffer(-1, 0, doubleCapacity, doubleCapacity, this.jsBuffer, this.jsBufferOffset)
-    else
-      new AdaptiveDoubleBuffer(-1, 0, doubleCapacity, doubleCapacity, this.jsBuffer, this.jsBufferOffset, this.order)
+  // Completing internal implementation of TypedBufferBehaviour
+  protected def iGet(index: Int): Byte = {
+    typedArray(index).toByte
   }
-  def asFloatBuffer(): NativeFloatBuffer = {
-    val floatCapacity = this.capacity / NativeFloatBuffer.BYTES_PER_ELEMENT
-    
-    if(this.order == ByteOrder.nativeOrder)
-      new NativeFloatBuffer(-1, 0, floatCapacity, floatCapacity, this.jsBuffer, this.jsBufferOffset)
+  protected def iSet(index: Int, value: Byte): Unit = {
+    typedArray(index) = value
+  }
+  protected def iCmpElements(v1: Byte, v2: Byte): Int = {
+    if (v1 > v2) {
+      +1
+    } else if (v1 < v2) {
+      -1
+    } else {
+      0
+    }
+  }
+  protected def toBufferType(ob: Any): Option[ByteBuffer] = {
+    ob match {
+      case bb: ByteBuffer => Some(bb)
+      case _ => None
+    }
+  }
+  protected def contentTypeToInt(value: Byte): Int = value.toInt
+
+  // Completing public methods of TypedBufferBehaviour
+  def duplicate(): ByteBuffer = new NativeByteBuffer(this.mCapacity, this.mLimit, this.mPosition, this.mMark,
+      this.mBuffer, this.mBufferOffset, this.order)
+  def slice(): ByteBuffer = new NativeByteBuffer(this.remaining, this.remaining, 0, -1,
+      this.mBuffer, this.mBufferOffset + (this.mPosition * this.bytes_per_element), this.order)
+  def asReadOnlyBuffer(): ByteBuffer = new ReadOnlyByteBuffer(this.duplicate)
+
+  def order(): ByteOrder = {
+    if (this.littleEndian)
+      LittleEndian
     else
-      new AdaptiveFloatBuffer(-1, 0, floatCapacity, floatCapacity, this.jsBuffer, this.jsBufferOffset, this.order)
+      BigEndian
+  }
+  def order(bo: ByteOrder): ByteBuffer = {
+    this.littleEndian = bo match {
+      case LittleEndian => true
+      case BigEndian => false
+    }
+    this
+  }
+
+  override def toString = "NativeByteBuffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
+
+  // Completing public methods of ByteBuffer
+  def asCharBuffer(): Nothing = throw new NotImplementedError // CharBuffer not implemented
+  def asShortBuffer(): ShortBuffer = {
+    val shortCapacity = this.capacity / NativeShortBuffer.BYTES_PER_ELEMENT
+
+    if (this.order == ByteOrder.nativeOrder)
+      new NativeShortBuffer(shortCapacity, shortCapacity, 0, -1, this.jsBuffer, this.jsBufferOffset)
+    else
+      new AdaptiveShortBuffer(shortCapacity, shortCapacity, 0, -1, this.jsBuffer, this.jsBufferOffset, this.order)
   }
   def asIntBuffer(): IntBuffer = {
     val intCapacity = this.capacity / NativeIntBuffer.BYTES_PER_ELEMENT
-    
-    if(this.order == ByteOrder.nativeOrder)
-      new NativeIntBuffer(-1, 0, intCapacity, intCapacity, this.jsBuffer, this.jsBufferOffset)
+
+    if (this.order == ByteOrder.nativeOrder)
+      new NativeIntBuffer(intCapacity, intCapacity, 0, -1, this.jsBuffer, this.jsBufferOffset)
     else
-      new AdaptiveIntBuffer(-1, 0, intCapacity, intCapacity, this.jsBuffer, this.jsBufferOffset, this.order)
+      new AdaptiveIntBuffer(intCapacity, intCapacity, 0, -1, this.jsBuffer, this.jsBufferOffset, this.order)
   }
   def asLongBuffer(): LongBuffer = {
     val longCapacity = this.capacity / NativeLongBuffer.BYTES_PER_ELEMENT
-    
-    if(this.order == ByteOrder.nativeOrder)
-      new NativeLongBuffer(-1, 0, longCapacity, longCapacity, this.jsBuffer, this.jsBufferOffset)
-    else
-      new AdaptiveLongBuffer(-1, 0, longCapacity, longCapacity, this.jsBuffer, this.jsBufferOffset, this.order)
-  }
-  def asReadOnlyBuffer(): NativeByteBuffer = throw new NotImplementedError // Not sure how we could implement this without condition everywhere or more duplicated code
-  def asShortBuffer(): ShortBuffer = {
-    val shortCapacity = this.capacity / NativeShortBuffer.BYTES_PER_ELEMENT
-    
-    if(this.order == ByteOrder.nativeOrder)
-      new NativeShortBuffer(-1, 0, shortCapacity, shortCapacity, this.jsBuffer, this.jsBufferOffset)
-    else
-      new AdaptiveShortBuffer(-1, 0, shortCapacity, shortCapacity, this.jsBuffer, this.jsBufferOffset, this.order)
-  }
-  def compact(): NativeByteBuffer = {
-    for (i <- 0 until this.remaining) {
-      this.typedArray(0 + i) = this.typedArray(this.position + i)
-    }
-    this.position(this.remaining)
-    this.limit(this.capacity)
-    this.discardMark()
-    this
-  }
-  def duplicate(): NativeByteBuffer = new NativeByteBuffer(this.markValue, this.position, this.limit, this.capacity, this.jsBuffer, this.jsBufferOffset, this.order)
 
-  def get(): Byte = this.typedArray(this.nextGetIndex).byteValue
-  def get(dst: Array[Byte]): NativeByteBuffer = this.get(dst, 0, dst.length)
-  def get(dst: Array[Byte], offset: Int, length: Int): NativeByteBuffer = {
-    this.checkBounds(offset, length, dst.length)
-    if (length > this.remaining)
-      throw new BufferUnderflowException
-    for (i <- 0 until length) {
-      dst(offset + i) = this.typedArray(this.position + i).byteValue
-    }
-    this.position(this.position + length)
-    this
+    if (this.order == ByteOrder.nativeOrder)
+      new NativeLongBuffer(longCapacity, longCapacity, 0, -1, this.jsBuffer, this.jsBufferOffset)
+    else
+      new AdaptiveLongBuffer(longCapacity, longCapacity, 0, -1, this.jsBuffer, this.jsBufferOffset, this.order)
   }
-  def get(index: Int): Byte = {
-    this.typedArray(this.checkIndex(index)).byteValue
+  def asFloatBuffer(): FloatBuffer = {
+    val floatCapacity = this.capacity / NativeFloatBuffer.BYTES_PER_ELEMENT
+
+    if (this.order == ByteOrder.nativeOrder)
+      new NativeFloatBuffer(floatCapacity, floatCapacity, 0, -1, this.jsBuffer, this.jsBufferOffset)
+    else
+      new AdaptiveFloatBuffer(floatCapacity, floatCapacity, 0, -1, this.jsBuffer, this.jsBufferOffset, this.order)
   }
-  def getChar(): Char = ??? // Char?
-  def getChar(index: Int): Char = ??? // Char?
-  def getDouble(): Double = this.getDouble(this.nextGetIndex(NativeDoubleBuffer.BYTES_PER_ELEMENT))
-  def getDouble(index: Int): Double = this.dataView.getFloat64(this.checkIndex(index, NativeDoubleBuffer.BYTES_PER_ELEMENT), this.littleEndian).asInstanceOf[js.Number].doubleValue
-  def getFloat(): Float = this.getFloat(this.nextGetIndex(NativeFloatBuffer.BYTES_PER_ELEMENT))
-  def getFloat(index: Int): Float = this.dataView.getFloat32(this.checkIndex(index, NativeFloatBuffer.BYTES_PER_ELEMENT), this.littleEndian).asInstanceOf[js.Number].floatValue
-  def getInt(): Int = this.getInt(this.nextGetIndex(NativeIntBuffer.BYTES_PER_ELEMENT))
-  def getInt(index: Int) = this.dataView.getInt32(this.checkIndex(index, NativeIntBuffer.BYTES_PER_ELEMENT), this.littleEndian).asInstanceOf[js.Number].intValue
-  def getLong(): Long = this.getLong(this.nextGetIndex(NativeLongBuffer.BYTES_PER_ELEMENT))
+  def asDoubleBuffer(): DoubleBuffer = {
+    val doubleCapacity = this.capacity / NativeDoubleBuffer.BYTES_PER_ELEMENT
+
+    if (this.order == ByteOrder.nativeOrder)
+      new NativeDoubleBuffer(doubleCapacity, doubleCapacity, 0, -1, this.jsBuffer, this.jsBufferOffset)
+    else
+      new AdaptiveDoubleBuffer(doubleCapacity, doubleCapacity, 0, -1, this.jsBuffer, this.jsBufferOffset, this.order)
+  }
+
+  def getChar(): Char = throw new NotImplementedError // Char?
+  def getChar(index: Int): Char = throw new NotImplementedError // Char?
+  def getShort(): Short = this.getShort(this.nextIndex(true, NativeShortBuffer.BYTES_PER_ELEMENT))
+  def getShort(index: Int): Short = {
+    this.checkIndex(index, NativeShortBuffer.BYTES_PER_ELEMENT)
+    this.dataView.getInt16(index, this.littleEndian).asInstanceOf[js.Number].toShort
+  }
+  def getInt(): Int = this.getInt(this.nextIndex(true, NativeIntBuffer.BYTES_PER_ELEMENT))
+  def getInt(index: Int): Int = {
+    this.checkIndex(index, NativeIntBuffer.BYTES_PER_ELEMENT)
+    this.dataView.getInt32(index, this.littleEndian).asInstanceOf[js.Number].toInt
+  }
+  def getLong(): Long = this.getLong(this.nextIndex(true, NativeLongBuffer.BYTES_PER_ELEMENT))
   def getLong(index: Int): Long = {
     this.checkIndex(index, NativeLongBuffer.BYTES_PER_ELEMENT)
 
     val (lower, upper) = {
       if (littleEndian)
-        (this.dataView.getInt32(index + 0, this.littleEndian).asInstanceOf[js.Number].intValue,
-          this.dataView.getInt32(index + 4, this.littleEndian).asInstanceOf[js.Number].intValue)
+        (this.dataView.getInt32(index + 0, this.littleEndian).asInstanceOf[js.Number].toInt,
+          this.dataView.getInt32(index + 4, this.littleEndian).asInstanceOf[js.Number].toInt)
       else
-        (this.dataView.getInt32(index + 4, this.littleEndian).asInstanceOf[js.Number].intValue,
-          this.dataView.getInt32(index + 0, this.littleEndian).asInstanceOf[js.Number].intValue)
+        (this.dataView.getInt32(index + 4, this.littleEndian).asInstanceOf[js.Number].toInt,
+          this.dataView.getInt32(index + 0, this.littleEndian).asInstanceOf[js.Number].toInt)
     }
 
     Bits.pairIntToLong(upper, lower)
   }
-  def getShort(): Short = this.getShort(this.nextGetIndex(NativeShortBuffer.BYTES_PER_ELEMENT))
-  def getShort(index: Int): Short = this.dataView.getInt16(this.checkIndex(index, NativeShortBuffer.BYTES_PER_ELEMENT), this.littleEndian).asInstanceOf[js.Number].shortValue
-  def order(): ByteOrder = {
-    if (littleEndian)
-      ByteOrder.LITTLE_ENDIAN
-    else
-      ByteOrder.BIG_ENDIAN
+  def getFloat(): Float = this.getFloat(this.nextIndex(true, NativeFloatBuffer.BYTES_PER_ELEMENT))
+  def getFloat(index: Int): Float = {
+    this.checkIndex(index, NativeFloatBuffer.BYTES_PER_ELEMENT)
+    this.dataView.getFloat32(index, this.littleEndian).asInstanceOf[js.Number].toFloat
   }
-  def order(bo: ByteOrder): NativeByteBuffer = {
-    littleEndian = bo match {
-      case ByteOrder.LITTLE_ENDIAN => true
-      case ByteOrder.BIG_ENDIAN => false
-      case _ => throw new IllegalArgumentException()
-    }
+  def getDouble(): Double = this.getDouble(this.nextIndex(true, NativeDoubleBuffer.BYTES_PER_ELEMENT))
+  def getDouble(index: Int): Double = {
+    this.checkIndex(index, NativeDoubleBuffer.BYTES_PER_ELEMENT)
+    this.dataView.getFloat64(index, this.littleEndian).asInstanceOf[js.Number].toDouble
+  }
+
+  def putChar(value: Char): ByteBuffer = throw new NotImplementedError // Char?
+  def putChar(index: Int, value: Char): ByteBuffer = throw new NotImplementedError // Char?
+  def putShort(value: Short): ByteBuffer = this.putShort(this.nextIndex(false, NativeShortBuffer.BYTES_PER_ELEMENT), value)
+  def putShort(index: Int, value: Short): ByteBuffer = {
+    this.checkIndex(index, NativeShortBuffer.BYTES_PER_ELEMENT)
+    this.dataView.setInt16(index, value, this.littleEndian)
     this
   }
-  def put(b: Byte): NativeByteBuffer = {
-    this.typedArray(this.nextPutIndex) = b
+  def putInt(value: Int): ByteBuffer = this.putInt(this.nextIndex(false, NativeIntBuffer.BYTES_PER_ELEMENT), value)
+  def putInt(index: Int, value: Int): ByteBuffer = {
+    this.checkIndex(index, NativeIntBuffer.BYTES_PER_ELEMENT)
+    this.dataView.setInt32(index, value, this.littleEndian)
     this
   }
-  def put(src: Array[Byte]): NativeByteBuffer = this.put(src, 0, src.length)
-  def put(src: Array[Byte], offset: Int, length: Int): NativeByteBuffer = {
-    this.checkBounds(offset, length, src.length)
-    if (length > this.remaining)
-      throw new BufferOverflowException
-    for (i <- 0 until length) {
-      this.typedArray(this.position + i) = src(offset + i)
-    }
-    this.position(this.position + length)
-    this
-  }
-  def put(src: ByteBuffer): NativeByteBuffer = {
-    // TODO Is there an efficient way to do that if the other NativeByteBuffer is backed by another JS array buffer? Didn't find anything related..
-    val srcLength = src.remaining
-    if (srcLength > this.remaining)
-      throw new BufferOverflowException
-    for (i <- 0 until srcLength) {
-      this.typedArray(this.position + i) = src.get
-    }
-    this.position(this.position + srcLength)
-    this
-  }
-  def put(index: Int, b: Byte): NativeByteBuffer = {
-    this.typedArray(checkIndex(index)) = b
-    this
-  }
-  def putChar(value: Char): NativeByteBuffer = ??? // Char?
-  def putChar(index: Int, value: Char): NativeByteBuffer = ??? // Char?
-  def putDouble(value: Double): NativeByteBuffer = this.putDouble(this.nextPutIndex(NativeDoubleBuffer.BYTES_PER_ELEMENT), value)
-  def putDouble(index: Int, value: Double): NativeByteBuffer = {
-    this.dataView.setFloat64(this.checkIndex(index, NativeDoubleBuffer.BYTES_PER_ELEMENT), value, this.littleEndian)
-    this
-  }
-  def putFloat(value: Float): NativeByteBuffer = this.putFloat(this.nextPutIndex(NativeFloatBuffer.BYTES_PER_ELEMENT), value)
-  def putFloat(index: Int, value: Float): NativeByteBuffer = {
-    this.dataView.setFloat32(this.checkIndex(index, NativeFloatBuffer.BYTES_PER_ELEMENT), value, this.littleEndian)
-    this
-  }
-  def putInt(value: Int): NativeByteBuffer = this.putInt(this.nextPutIndex(NativeIntBuffer.BYTES_PER_ELEMENT), value)
-  def putInt(index: Int, value: Int): NativeByteBuffer = {
-    this.dataView.setInt32(this.checkIndex(index, NativeIntBuffer.BYTES_PER_ELEMENT), value, this.littleEndian)
-    this
-  }
-  def putLong(value: Long): NativeByteBuffer = this.putLong(this.nextPutIndex(NativeLongBuffer.BYTES_PER_ELEMENT), value)
-  def putLong(index: Int, value: Long): NativeByteBuffer = {
+  def putLong(value: Long): ByteBuffer = this.putLong(this.nextIndex(false, NativeLongBuffer.BYTES_PER_ELEMENT), value)
+  def putLong(index: Int, value: Long): ByteBuffer = {
     this.checkIndex(index, NativeLongBuffer.BYTES_PER_ELEMENT)
 
     val (upper, lower) = Bits.longToPairInt(value)
@@ -177,111 +167,52 @@ class NativeByteBuffer(cMark: Int, cPosition: Int, cLimit: Int, cCapacity: Int, 
     }
     this
   }
-  def putShort(value: Short): NativeByteBuffer = this.putShort(this.nextPutIndex(NativeShortBuffer.BYTES_PER_ELEMENT), value)
-  def putShort(index: Int, value: Short): NativeByteBuffer = {
-    this.dataView.setInt16(this.checkIndex(index, NativeShortBuffer.BYTES_PER_ELEMENT), value, this.littleEndian)
+  def putFloat(value: Float): ByteBuffer = this.putFloat(this.nextIndex(false, NativeFloatBuffer.BYTES_PER_ELEMENT), value)
+  def putFloat(index: Int, value: Float): ByteBuffer = {
+    this.checkIndex(index, NativeFloatBuffer.BYTES_PER_ELEMENT)
+    this.dataView.setFloat32(index, value, this.littleEndian)
     this
   }
-  def slice(): NativeByteBuffer = {
-    // Why not passing the endianness? Don't know, Java doesn't do it... Seems weird, right?
-    new NativeByteBuffer(-1, 0, this.remaining, this.remaining, this.cBuffer, this.cBufferOffset + this.position, ByteOrder.BIG_ENDIAN)
+  def putDouble(value: Double): ByteBuffer = this.putDouble(this.nextIndex(false, NativeDoubleBuffer.BYTES_PER_ELEMENT), value)
+  def putDouble(index: Int, value: Double): ByteBuffer = {
+    this.checkIndex(index, NativeDoubleBuffer.BYTES_PER_ELEMENT)
+    this.dataView.setFloat64(index, value, this.littleEndian)
+    this
   }
 
-  def compareElement(b1: Byte, b2: Byte): Int = {
-    if (b1 < b2)
-      -1
-    else if (b1 > b2)
-      +1
-    else
-      0
-  }
-
-  def compareTo(that: ByteBuffer): Int = {
-    val length = Math.min(this.remaining, that.remaining)
-
-    val i = this.position
-    val j = that.position
-
-    for (k <- 0 until length) {
-      val curI = this.get(i + k)
-      val curJ = that.get(j + k)
-
-      val cmp = compareElement(curI, curJ)
-
-      if (cmp != 0)
-        return cmp
-    }
-
-    this.remaining - that.remaining
-  }
-  override def equals(ob: Any): Boolean = ob match {
-    case that: NativeByteBuffer => {
-      if (this.remaining != that.remaining)
-        return false
-      val length = this.remaining
-
-      val i = this.position
-      val j = that.position
-
-      for (k <- 0 until length) {
-        val curI = this.get(i + k)
-        val curJ = that.get(j + k)
-
-        if (compareElement(curI, curJ) != 0)
-          return false
-      }
-
-      return true
-    }
-    case _ => false
-  }
-  override def hashCode(): Int = {
-    var h: Int = 1
-    val length = this.remaining
-
-    for (i <- 0 until length) {
-      h = 31 * h + this.get(this.position + i).toInt
-    }
-
-    (h & 0xFFFFFFFF) // just making just the JavaScript Number (Double) doesn't play a trick on us here
-  }
-
-  override def toString(): String = "NativeByteBuffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
-
-  // ScalaJS specific methods
-  def jsBuffer(): js.Dynamic = this.cBuffer
-  def jsBufferOffset(): Int = this.cBufferOffset
-  
+  // ScalaJS specifics
   def hasJsArray(): Boolean = true
+  protected val typedArray = g.Int8Array(mBuffer, mBufferOffset, mCapacity).asInstanceOf[js.Array[js.Number]]
   def jsArray(): js.Array[js.Number] = typedArray
 
-  // ScalaJS internals
-  protected val typedArray: js.Array[js.Number] = g.Int8Array(cBuffer, cBufferOffset, cCapacity).asInstanceOf[js.Array[js.Number]]
+  def jsBuffer(): js.Dynamic = mBuffer
+  def jsBufferOffset(): Int = mBufferOffset
 
-  protected var littleEndian: Boolean = _
+  protected val dataView: js.Dynamic = g.DataView(this.mBuffer, this.mBufferOffset, this.mCapacity * this.bytes_per_element)
 }
 
 object NativeByteBuffer {
   def allocate(capacity: Int): NativeByteBuffer = {
     val jsBuffer = g.ArrayBuffer(capacity)
     // Why not native endianness? No idea, ask Oracle!
-    val NativeByteBuffer = new NativeByteBuffer(-1, 0, capacity, capacity, jsBuffer, 0, ByteOrder.BIG_ENDIAN)
-    NativeByteBuffer
+    val nativeByteBuffer = new NativeByteBuffer(capacity, capacity, 0, -1, jsBuffer, 0, ByteOrder.BIG_ENDIAN)
+    nativeByteBuffer
   }
   def allocateDirect(capacity: Int): NativeByteBuffer = allocate(capacity)
 
   /**
-   * WARNING: Behavior is different from the original wrap() methods from java.nio._ as the content of the array and the buffer are NOT shared in this implementation (unlike in Java).
+   * WARNING: Behavior is different from the original wrap() methods from java.nio._
+   * as the content of the array and the buffer are NOT shared in this implementation (unlike in Java).
    * This is basically just an helper method to create a buffer from an array, not an actual wrapper for an array.
    */
   def wrap(array: Array[Byte]): NativeByteBuffer = wrap(array, 0, array.length)
   def wrap(array: Array[Byte], offset: Int, length: Int): NativeByteBuffer = {
-    val NativeByteBuffer = allocate(length)
-    val internalJsArray = NativeByteBuffer.jsArray
+    val byteBuffer = allocate(length)
+    val internalJsArray = byteBuffer.jsArray
     for (i <- 0 until length) {
       internalJsArray(i) = array(i + offset)
     }
-    NativeByteBuffer
+    byteBuffer
   }
 
   // ScalaJS specific methods

@@ -1,32 +1,10 @@
 package scala.scalajs.nio
 
-import scala.scalajs.js
-import js.Dynamic.{ global => g }
+abstract class IntBuffer extends Buffer with TypedBuffer[Int, IntBuffer] with Comparable[IntBuffer] {
+  // Defining this one here instead of TypedBuffer because of the type erasure conflict
+  def put(src: Array[Int]): IntBuffer = this.put(src, 0, src.length)
 
-abstract class IntBuffer(cMark: Int, cPosition: Int, cLimit: Int, cCapacity: Int) extends Buffer(cMark, cPosition, cLimit, cCapacity) with Comparable[IntBuffer] {
-  def asReadOnlyBuffer(): IntBuffer
-  def compact(): IntBuffer
-  def compareTo(that: IntBuffer): Int
-  def duplicate(): IntBuffer
-  def equals(ob: Any): Boolean
-  def get(): Int
-  def get(dst: Array[Int]): IntBuffer
-  def get(dst: Array[Int], offset: Int, length: Int): IntBuffer
-  def get(index: Int): Int
-  def hashCode(): Int
-  def order(): ByteOrder
-  def put(f: Int): IntBuffer
-  def put(src: Array[Int]): IntBuffer
-  def put(src: Array[Int], offset: Int, length: Int): IntBuffer
-  def put(src: IntBuffer): IntBuffer
-  def put(index: Int, f: Int): IntBuffer
-  def slice(): IntBuffer
-  
-  def array(): Array[Int] // optional
-  def arrayOffset(): Int // optional
-  def hasArray(): Boolean
-  def isDirect(): Boolean
-  def isReadOnly(): Boolean
+  override def toString = "IntBuffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
 }
 
 object IntBuffer {
@@ -35,3 +13,4 @@ object IntBuffer {
   def wrap(array: Array[Int]): IntBuffer = NativeIntBuffer.wrap(array)
   def wrap(array: Array[Int], offset: Int, length: Int): IntBuffer = NativeIntBuffer.wrap(array, offset, length)
 }
+
