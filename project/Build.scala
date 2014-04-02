@@ -37,7 +37,8 @@ object MacroGLBuild extends Build {
       "-deprecation",
       "-unchecked",
       "-Xexperimental",
-      "-optimise"
+      "-optimise",
+      "-P:continuations:enable"
     ),
     scalaSource in Compile := baseDirectory.value / "src" / "macrogl" / "scala",
     unmanagedSourceDirectories in Compile += baseDirectory.value / "src" / "api-opengl" / "scala",
@@ -49,6 +50,7 @@ object MacroGLBuild extends Build {
       "org.lwjgl.lwjgl" % "lwjgl" % lwjglVersion,
       "org.lwjgl.lwjgl" % "lwjgl_util" % lwjglVersion
     ),
+    libraryDependencies += compilerPlugin("org.scala-lang.plugins" % "continuations" % scalaVersion.value),
     resolvers ++= Seq(
       "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
       "Sonatype OSS Releases" at "https://oss.sonatype.org/content/repositories/releases"
