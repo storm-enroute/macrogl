@@ -31,5 +31,5 @@ class AdaptiveFloatBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: js.Dy
       BigEndian
   }
 
-  override def toString = "NativeFloatBuffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
+  override def toString = "AdaptiveFloatBuffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
 }

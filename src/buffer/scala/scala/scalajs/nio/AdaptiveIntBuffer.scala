@@ -31,5 +31,5 @@ class AdaptiveIntBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: js.Dyna
       BigEndian
   }
 
-  override def toString = "NativeIntBuffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
+  override def toString = "AdaptiveIntBuffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
 }

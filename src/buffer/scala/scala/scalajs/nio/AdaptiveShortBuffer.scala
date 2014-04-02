@@ -31,5 +31,5 @@ class AdaptiveShortBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: js.Dy
       BigEndian
   }
 
-  override def toString = "NativeShortBuffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
+  override def toString = "AdaptiveShortBuffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
 }
