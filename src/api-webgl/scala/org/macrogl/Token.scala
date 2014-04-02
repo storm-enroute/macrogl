@@ -1,54 +1,60 @@
 package org.macrogl
 
-
-
-
-
+import org.scalajs.dom
+// See scalajs-dom for the package org.scalajs.dom
+// https://github.com/scala-js/scala-js-dom
 
 object Token {
 
-  type Buffer = Int
+  type Buffer = org.scalajs.dom.WebGLBuffer
 
   object Buffer {
-    val invalid: Buffer = -1
-    val none: Buffer = 0
+  	// TODO
+    /*val invalid: Buffer
+    val none: Buffer*/
   }
 
-  type Program = Int
+  type Program = org.scalajs.dom.WebGLProgram
 
   object Program {
-    val invalid: Program = 0
+  	// TODO
+    /*val invalid: Program = 0*/
   }
 
-  type Shader = Int
+  type Shader = org.scalajs.dom.WebGLShader
 
   object Shader {
-    val invalid: Shader = 0
+  	// TODO
+    /*val invalid: Shader = 0*/
   }
 
-  type UniformLocation = Int
+  type UniformLocation = org.scalajs.dom.WebGLUniformLocation
 
   object UniformLocation {
-    val invalid: UniformLocation = -1
+  	// TODO
+    /*val invalid: UniformLocation = -1*/
   }
 
-  type FrameBuffer = Int
+  type FrameBuffer = org.scalajs.dom.WebGLFramebuffer
 
   object FrameBuffer {
-    val invalid: FrameBuffer = -1
+  	// TODO
+    /*val invalid: FrameBuffer = -1*/
   }
 
-  type RenderBuffer = Int
+  type RenderBuffer = org.scalajs.dom.WebGLRenderbuffer
 
   object RenderBuffer {
-    val invalid: RenderBuffer = -1
+  	// TODO
+    /*val invalid: RenderBuffer = -1*/
   }
 
-  type Texture = Int
+  type Texture = org.scalajs.dom.WebGLTexture
 
   object Texture {
-    val invalid: Texture = -1
-    val none: Texture = 0
+  	// TODO
+    /*val invalid: Texture = -1
+    val none: Texture = 0*/
   }
 
 }
