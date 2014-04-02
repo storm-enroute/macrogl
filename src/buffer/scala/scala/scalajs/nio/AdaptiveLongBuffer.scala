@@ -1,6 +1,7 @@
 package scala.scalajs.nio
 
 import scala.scalajs.js
+import js.Dynamic.{ global => g }
 
 class AdaptiveLongBuffer(cap: Int, lim: Int, pos: Int, mar: Int,mBuffer: js.Dynamic,
     mBufferOffset: Int, mByteOrder: ByteOrder) extends NativeLongBuffer(cap, lim, pos, mar, mBuffer, mBufferOffset) {
@@ -47,4 +48,28 @@ class AdaptiveLongBuffer(cap: Int, lim: Int, pos: Int, mar: Int,mBuffer: js.Dyna
   }
 
   override def toString = "AdaptiveLongBuffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
+}
+
+object AdaptiveLongBuffer {
+  def allocate(capacity: Int): NativeLongBuffer = this.allocate(capacity, ByteOrder.nativeOrder)
+  def allocate(capacity: Int, byteOrder: ByteOrder): NativeLongBuffer = {
+    if (byteOrder == ByteOrder.nativeOrder){
+      NativeLongBuffer.allocate(capacity)
+    } else {
+      val jsBuffer = g.ArrayBuffer(capacity * NativeLongBuffer.BYTES_PER_ELEMENT)
+      val longBuffer = new AdaptiveLongBuffer(capacity, capacity, 0, -1, jsBuffer, 0, byteOrder)
+      longBuffer
+    }
+  }
+
+  def wrap(array: Array[Long]): NativeLongBuffer = this.wrap(array, ByteOrder.nativeOrder)
+  def wrap(array: Array[Long], byteOrder: ByteOrder): NativeLongBuffer = wrap(array, 0, array.length, byteOrder)
+  def wrap(array: Array[Long], offset: Int, length: Int): NativeLongBuffer = this.wrap(array, offset, length, ByteOrder.nativeOrder)
+  def wrap(array: Array[Long], offset: Int, length: Int, byteOrder: ByteOrder): NativeLongBuffer = {
+    val longBuffer = this.allocate(length, byteOrder)
+    for (i <- 0 until length) {
+      longBuffer.put(i, array(i + offset))
+    }
+    longBuffer
+  }
 }

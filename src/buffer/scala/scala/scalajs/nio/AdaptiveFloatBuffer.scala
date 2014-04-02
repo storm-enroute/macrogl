@@ -1,6 +1,7 @@
 package scala.scalajs.nio
 
 import scala.scalajs.js
+import js.Dynamic.{ global => g }
 
 class AdaptiveFloatBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: js.Dynamic, mBufferOffset: Int,
     mByteOrder: ByteOrder) extends NativeFloatBuffer(cap, lim, pos, mar, mBuffer, mBufferOffset) {
@@ -32,4 +33,28 @@ class AdaptiveFloatBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: js.Dy
   }
 
   override def toString = "AdaptiveFloatBuffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
+}
+
+object AdaptiveFloatBuffer {
+  def allocate(capacity: Int): NativeFloatBuffer = this.allocate(capacity, ByteOrder.nativeOrder)
+  def allocate(capacity: Int, byteOrder: ByteOrder): NativeFloatBuffer = {
+    if (byteOrder == ByteOrder.nativeOrder){
+      NativeFloatBuffer.allocate(capacity)
+    } else {
+      val jsBuffer = g.ArrayBuffer(capacity * NativeFloatBuffer.BYTES_PER_ELEMENT)
+      val floatBuffer = new AdaptiveFloatBuffer(capacity, capacity, 0, -1, jsBuffer, 0, byteOrder)
+      floatBuffer
+    }
+  }
+
+  def wrap(array: Array[Float]): NativeFloatBuffer = this.wrap(array, ByteOrder.nativeOrder)
+  def wrap(array: Array[Float], byteOrder: ByteOrder): NativeFloatBuffer = wrap(array, 0, array.length, byteOrder)
+  def wrap(array: Array[Float], offset: Int, length: Int): NativeFloatBuffer = this.wrap(array, offset, length, ByteOrder.nativeOrder)
+  def wrap(array: Array[Float], offset: Int, length: Int, byteOrder: ByteOrder): NativeFloatBuffer = {
+    val floatBuffer = this.allocate(length, byteOrder)
+    for (i <- 0 until length) {
+      floatBuffer.put(i, array(i + offset))
+    }
+    floatBuffer
+  }
 }
