@@ -1,6 +1,7 @@
 package org.macrogl
 
 import org.scalajs.dom
+import org.scalajs.nio
 
 // See https://github.com/scala-js/scala-js-dom/blob/master/src/main/scala/org/scalajs/dom/WebGL.scala for documentation about the WebGL DOM for ScalaJS
 
@@ -468,7 +469,7 @@ object Macrogl {
   }
 
   final def createDoubleData(sz: Int): Data.Double = {
-    org.scalajs.nio.NativeDoubleBuffer(sz)
+    org.scalajs.nio.NativeDoubleBuffer.allocate(sz)
   }
 
   /* public API - implicits */
