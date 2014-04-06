@@ -143,6 +143,24 @@ object MacroGLBuild extends Build {
     settings = macroglBufferSettings
   )
 
+	/* java.nio.Buffer's variant for macro-gl */
+
+	val macroglBufferSettings = Defaults.defaultSettings ++ scalaJSSettings ++ Seq(
+  	name := "macrogl-buffer",
+    version := "0.3-SNAPSHOT",
+  	scalaSource in Compile := baseDirectory.value / ".." / "src" / "buffer" / "scala",
+  	libraryDependencies ++= Seq(
+  		"org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" % scalaJSVersion % "test",
+  		"org.scala-lang.modules.scalajs" %% "scalajs-dom" % "0.4-SNAPSHOT"
+  	)
+  )
+  
+  lazy val macroglBuffer = Project(
+  	"macroglBuffer",
+  	file("macrogl-buffer"),
+  	settings = macroglBufferSettings
+  )
+
 }
 
 
