@@ -2,16 +2,17 @@ package org.scalajs.nio
 
 import scala.scalajs.js
 import js.Dynamic.{ global => g }
+import org.scalajs.dom
 
-class AdaptiveDoubleBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: js.Dynamic, mBufferOffset: Int,
+class AdaptiveDoubleBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: dom.ArrayBuffer, mBufferOffset: Int,
     mByteOrder: ByteOrder) extends NativeDoubleBuffer(cap, lim, pos, mar, mBuffer, mBufferOffset) {
   protected val littleEndian: Boolean = mByteOrder == LittleEndian
 
   override protected def iGet(index: Int): Double = {
-    this.dataView.getDouble64(index * this.bytes_per_element, this.littleEndian).asInstanceOf[js.Number].toDouble
+    this.dataView.getFloat64(index * this.bytes_per_element, this.littleEndian).toDouble
   }
   override protected def iSet(index: Int, value: Double): Unit = {
-    this.dataView.setDouble64(index * this.bytes_per_element, value, this.littleEndian)
+    this.dataView.setFloat64(index * this.bytes_per_element, value, this.littleEndian)
   }
 
   override def duplicate(): DoubleBuffer = {
@@ -41,7 +42,7 @@ object AdaptiveDoubleBuffer {
     if (byteOrder == ByteOrder.nativeOrder){
       NativeDoubleBuffer.allocate(capacity)
     } else {
-      val jsBuffer = g.ArrayBuffer(capacity * NativeDoubleBuffer.BYTES_PER_ELEMENT)
+      val jsBuffer = g.ArrayBuffer(capacity * NativeDoubleBuffer.BYTES_PER_ELEMENT).asInstanceOf[dom.ArrayBuffer]
       val doubleBuffer = new AdaptiveDoubleBuffer(capacity, capacity, 0, -1, jsBuffer, 0, byteOrder)
       doubleBuffer
     }

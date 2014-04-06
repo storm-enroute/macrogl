@@ -2,9 +2,10 @@ package org.scalajs.nio
 
 import scala.scalajs.js
 import js.Dynamic.{ global => g }
+import org.scalajs.dom
 
 class NativeByteBuffer(protected var mCapacity: Int, protected var mLimit: Int, protected var mPosition: Int,
-    protected var mMark: Int, mBuffer: js.Dynamic, mBufferOffset: Int, cByteOrder: ByteOrder) extends ByteBuffer
+    protected var mMark: Int, mBuffer: dom.ArrayBuffer, mBufferOffset: Int, cByteOrder: ByteOrder) extends ByteBuffer
     with TypedBufferBehaviour[Byte, ByteBuffer] with JsNativeBuffer[Byte] {
   
   protected var littleEndian: Boolean = _
@@ -105,12 +106,12 @@ class NativeByteBuffer(protected var mCapacity: Int, protected var mLimit: Int, 
   def getShort(): Short = this.getShort(this.nextIndex(true, NativeShortBuffer.BYTES_PER_ELEMENT))
   def getShort(index: Int): Short = {
     this.checkIndex(index, NativeShortBuffer.BYTES_PER_ELEMENT)
-    this.dataView.getInt16(index, this.littleEndian).asInstanceOf[js.Number].toShort
+    this.dataView.getInt16(index, this.littleEndian).toShort
   }
   def getInt(): Int = this.getInt(this.nextIndex(true, NativeIntBuffer.BYTES_PER_ELEMENT))
   def getInt(index: Int): Int = {
     this.checkIndex(index, NativeIntBuffer.BYTES_PER_ELEMENT)
-    this.dataView.getInt32(index, this.littleEndian).asInstanceOf[js.Number].toInt
+    this.dataView.getInt32(index, this.littleEndian).toInt
   }
   def getLong(): Long = this.getLong(this.nextIndex(true, NativeLongBuffer.BYTES_PER_ELEMENT))
   def getLong(index: Int): Long = {
@@ -118,11 +119,11 @@ class NativeByteBuffer(protected var mCapacity: Int, protected var mLimit: Int, 
 
     val (lower, upper) = {
       if (littleEndian)
-        (this.dataView.getInt32(index + 0, this.littleEndian).asInstanceOf[js.Number].toInt,
-          this.dataView.getInt32(index + 4, this.littleEndian).asInstanceOf[js.Number].toInt)
+        (this.dataView.getInt32(index + 0, this.littleEndian).toInt,
+          this.dataView.getInt32(index + 4, this.littleEndian).toInt)
       else
-        (this.dataView.getInt32(index + 4, this.littleEndian).asInstanceOf[js.Number].toInt,
-          this.dataView.getInt32(index + 0, this.littleEndian).asInstanceOf[js.Number].toInt)
+        (this.dataView.getInt32(index + 4, this.littleEndian).toInt,
+          this.dataView.getInt32(index + 0, this.littleEndian).toInt)
     }
 
     Bits.pairIntToLong(upper, lower)
@@ -130,12 +131,12 @@ class NativeByteBuffer(protected var mCapacity: Int, protected var mLimit: Int, 
   def getFloat(): Float = this.getFloat(this.nextIndex(true, NativeFloatBuffer.BYTES_PER_ELEMENT))
   def getFloat(index: Int): Float = {
     this.checkIndex(index, NativeFloatBuffer.BYTES_PER_ELEMENT)
-    this.dataView.getFloat32(index, this.littleEndian).asInstanceOf[js.Number].toFloat
+    this.dataView.getFloat32(index, this.littleEndian).toFloat
   }
   def getDouble(): Double = this.getDouble(this.nextIndex(true, NativeDoubleBuffer.BYTES_PER_ELEMENT))
   def getDouble(index: Int): Double = {
     this.checkIndex(index, NativeDoubleBuffer.BYTES_PER_ELEMENT)
-    this.dataView.getFloat64(index, this.littleEndian).asInstanceOf[js.Number].toDouble
+    this.dataView.getFloat64(index, this.littleEndian).toDouble
   }
 
   def putChar(value: Char): ByteBuffer = throw new NotImplementedError // Char?
@@ -182,18 +183,18 @@ class NativeByteBuffer(protected var mCapacity: Int, protected var mLimit: Int, 
 
   // ScalaJS specifics
   def hasJsArray(): Boolean = true
-  protected val typedArray = g.Int8Array(mBuffer, mBufferOffset, mCapacity).asInstanceOf[js.Array[js.Number]]
-  def jsArray(): js.Array[js.Number] = typedArray
+  protected val typedArray = new dom.Int8Array(mBuffer, mBufferOffset, mCapacity)
+  def jsArray(): dom.Int8Array = typedArray
 
-  def jsBuffer(): js.Dynamic = mBuffer
+  def jsBuffer(): dom.ArrayBuffer = mBuffer
   def jsBufferOffset(): Int = mBufferOffset
 
-  protected val dataView: js.Dynamic = g.DataView(this.mBuffer, this.mBufferOffset, this.mCapacity * this.bytes_per_element)
+  protected val dataView: dom.DataView = new dom.DataView(this.mBuffer, this.mBufferOffset, this.mCapacity * this.bytes_per_element)
 }
 
 object NativeByteBuffer {
   def allocate(capacity: Int): NativeByteBuffer = {
-    val jsBuffer = g.ArrayBuffer(capacity)
+    val jsBuffer = g.ArrayBuffer(capacity).asInstanceOf[dom.ArrayBuffer]
     // Why not native endianness? No idea, ask Oracle!
     val nativeByteBuffer = new NativeByteBuffer(capacity, capacity, 0, -1, jsBuffer, 0, ByteOrder.BIG_ENDIAN)
     nativeByteBuffer
@@ -217,5 +218,5 @@ object NativeByteBuffer {
 
   // ScalaJS specific methods
 
-  val BYTES_PER_ELEMENT: Int = g.Int8Array.BYTES_PER_ELEMENT.asInstanceOf[js.Number].intValue
+  val BYTES_PER_ELEMENT: Int = dom.Int8Array.BYTES_PER_ELEMENT.toInt
 }

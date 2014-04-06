@@ -2,9 +2,10 @@ package org.scalajs.nio
 
 import scala.scalajs.js
 import js.Dynamic.{ global => g }
+import org.scalajs.dom
 
 class NativeLongBuffer(protected var mCapacity: Int, protected var mLimit: Int, protected var mPosition: Int,
-    protected var mMark: Int, mBuffer: js.Dynamic, mBufferOffset: Int) extends LongBuffer
+    protected var mMark: Int, mBuffer: dom.ArrayBuffer, mBufferOffset: Int) extends LongBuffer
     with TypedBufferBehaviour[Long, LongBuffer] with JsNativeBuffer[Long] {
 
   protected val littleEndian: Boolean = ByteOrder.nativeOrder == LittleEndian
@@ -13,11 +14,11 @@ class NativeLongBuffer(protected var mCapacity: Int, protected var mLimit: Int, 
   protected def iGet(index: Int): Long = {
     val (lo, hi) =
       if (this.littleEndian) {
-        (this.typedArray(index * 2 + 0).asInstanceOf[js.Number].toInt,
-          this.typedArray(index * 2 + 1).asInstanceOf[js.Number].toInt)
+        (this.typedArray(index * 2 + 0).toInt,
+          this.typedArray(index * 2 + 1).toInt)
       } else {
-        (this.typedArray(index * 2 + 1).asInstanceOf[js.Number].toInt,
-          this.typedArray(index * 2 + 0).asInstanceOf[js.Number].toInt)
+        (this.typedArray(index * 2 + 1).toInt,
+          this.typedArray(index * 2 + 0).toInt)
       }
     Bits.pairIntToLong(hi, lo)
   }
@@ -59,19 +60,19 @@ class NativeLongBuffer(protected var mCapacity: Int, protected var mLimit: Int, 
   override def toString = "NativeLongBuffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
 
   // ScalaJS specifics
-  def hasJsArray(): Boolean = true
-  protected val typedArray = g.Int32Array(mBuffer, mBufferOffset, mCapacity * 2).asInstanceOf[js.Array[js.Number]]
-  def jsArray(): js.Array[js.Number] = typedArray
+  def hasJsArray(): Boolean = false
+  protected val typedArray = new dom.Int32Array(mBuffer, mBufferOffset, mCapacity * 2)
+  def jsArray(): Nothing = throw new UnsupportedOperationException
 
-  def jsBuffer(): js.Dynamic = mBuffer
+  def jsBuffer(): dom.ArrayBuffer = mBuffer
   def jsBufferOffset(): Int = mBufferOffset
 
-  protected val dataView: js.Dynamic = g.DataView(this.mBuffer, this.mBufferOffset, this.mCapacity * this.bytes_per_element)
+  protected val dataView: dom.DataView = new dom.DataView(this.mBuffer, this.mBufferOffset, this.mCapacity * this.bytes_per_element)
 }
 
 object NativeLongBuffer {
   def allocate(capacity: Int): NativeLongBuffer = {
-    val jsBuffer = g.ArrayBuffer(capacity * BYTES_PER_ELEMENT)
+    val jsBuffer = g.ArrayBuffer(capacity * BYTES_PER_ELEMENT).asInstanceOf[dom.ArrayBuffer]
     val longBuffer = new NativeLongBuffer(capacity, capacity, 0, -1, jsBuffer, 0)
     longBuffer
   }
@@ -79,12 +80,12 @@ object NativeLongBuffer {
   def wrap(array: Array[Long]): NativeLongBuffer = wrap(array, 0, array.length)
   def wrap(array: Array[Long], offset: Int, length: Int): NativeLongBuffer = {
     val longBuffer = allocate(length)
-    val internalJsArray = longBuffer.jsArray
     for (i <- 0 until length) {
-      internalJsArray(i) = array(i + offset)
+      longBuffer.put(array(i + offset))
     }
+    longBuffer.reset
     longBuffer
   }
 
-  val BYTES_PER_ELEMENT: Int = g.Int32Array.BYTES_PER_ELEMENT.asInstanceOf[js.Number].intValue * 2
+  val BYTES_PER_ELEMENT: Int = dom.Int32Array.BYTES_PER_ELEMENT.toInt * 2
 }

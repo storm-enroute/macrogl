@@ -2,6 +2,7 @@ package org.scalajs.nio
 
 import scala.scalajs.js
 import js.Dynamic.{ global => g }
+import org.scalajs.dom
 
 trait JsNativeBuffer[T] extends Buffer {
   // Should be the same for all subclasses
@@ -13,8 +14,8 @@ trait JsNativeBuffer[T] extends Buffer {
 
   // ScalaJS specific methods
   def hasJsBuffer(): Boolean = true
-  def jsDataView(): js.Dynamic = dataView
-  protected val dataView: js.Dynamic
+  def jsDataView(): dom.DataView = dataView
+  protected val dataView: dom.DataView
 
   def bytes_per_element: Int = this match {
     case b: ByteBuffer => NativeByteBuffer.BYTES_PER_ELEMENT
@@ -28,8 +29,8 @@ trait JsNativeBuffer[T] extends Buffer {
 
   // Still abstract
   def hasJsArray(): Boolean
-  def jsArray(): js.Array[js.Number]
+  def jsArray(): js.Object
 
-  def jsBuffer(): js.Dynamic
+  def jsBuffer(): dom.ArrayBuffer
   def jsBufferOffset(): Int
 }

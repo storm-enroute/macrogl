@@ -2,13 +2,14 @@ package org.scalajs.nio
 
 import scala.scalajs.js
 import js.Dynamic.{ global => g }
+import org.scalajs.dom
 
-class AdaptiveFloatBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: js.Dynamic, mBufferOffset: Int,
+class AdaptiveFloatBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: dom.ArrayBuffer, mBufferOffset: Int,
     mByteOrder: ByteOrder) extends NativeFloatBuffer(cap, lim, pos, mar, mBuffer, mBufferOffset) {
   protected val littleEndian: Boolean = mByteOrder == LittleEndian
 
   override protected def iGet(index: Int): Float = {
-    this.dataView.getFloat32(index * this.bytes_per_element, this.littleEndian).asInstanceOf[js.Number].toFloat
+    this.dataView.getFloat32(index * this.bytes_per_element, this.littleEndian).toFloat
   }
   override protected def iSet(index: Int, value: Float): Unit = {
     this.dataView.setFloat32(index * this.bytes_per_element, value, this.littleEndian)
@@ -41,7 +42,7 @@ object AdaptiveFloatBuffer {
     if (byteOrder == ByteOrder.nativeOrder){
       NativeFloatBuffer.allocate(capacity)
     } else {
-      val jsBuffer = g.ArrayBuffer(capacity * NativeFloatBuffer.BYTES_PER_ELEMENT)
+      val jsBuffer = g.ArrayBuffer(capacity * NativeFloatBuffer.BYTES_PER_ELEMENT).asInstanceOf[dom.ArrayBuffer]
       val floatBuffer = new AdaptiveFloatBuffer(capacity, capacity, 0, -1, jsBuffer, 0, byteOrder)
       floatBuffer
     }

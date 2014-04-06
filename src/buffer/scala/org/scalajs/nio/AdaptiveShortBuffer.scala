@@ -2,13 +2,14 @@ package org.scalajs.nio
 
 import scala.scalajs.js
 import js.Dynamic.{ global => g }
+import org.scalajs.dom
 
-class AdaptiveShortBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: js.Dynamic,
+class AdaptiveShortBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: dom.ArrayBuffer,
     mBufferOffset: Int, mByteOrder: ByteOrder) extends NativeShortBuffer(cap, lim, pos, mar, mBuffer, mBufferOffset) {
   protected val littleEndian: Boolean = mByteOrder == LittleEndian
 
   override protected def iGet(index: Int): Short = {
-    this.dataView.getInt16(index * this.bytes_per_element, this.littleEndian).asInstanceOf[js.Number].toShort
+    this.dataView.getInt16(index * this.bytes_per_element, this.littleEndian).toShort
   }
   override protected def iSet(index: Int, value: Short): Unit = {
     this.dataView.setInt16(index * this.bytes_per_element, value, this.littleEndian)
@@ -41,7 +42,7 @@ object AdaptiveShortBuffer {
     if (byteOrder == ByteOrder.nativeOrder){
       NativeShortBuffer.allocate(capacity)
     } else {
-      val jsBuffer = g.ArrayBuffer(capacity * NativeShortBuffer.BYTES_PER_ELEMENT)
+      val jsBuffer = g.ArrayBuffer(capacity * NativeShortBuffer.BYTES_PER_ELEMENT).asInstanceOf[dom.ArrayBuffer]
       val shortBuffer = new AdaptiveShortBuffer(capacity, capacity, 0, -1, jsBuffer, 0, byteOrder)
       shortBuffer
     }

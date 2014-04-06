@@ -1,6 +1,7 @@
 package org.scalajs.nio
 
 import scala.scalajs.js
+import org.scalajs.dom
 
 abstract class Buffer extends Object {
   def capacity(): Int
@@ -25,12 +26,12 @@ abstract class Buffer extends Object {
   // ScalaJS specific
   // You don't need the offset for Typed Array or Data View, it is taken care internally
   def hasJsArray(): Boolean
-  def jsArray(): js.Array[js.Number] // optional (throw UnsupportedOperationException if hasJsArray() is false)
+  def jsArray(): js.Object // optional (throw UnsupportedOperationException if hasJsArray() is false)
 
   def hasJsBuffer(): Boolean
-  def jsBuffer(): js.Dynamic // optional (throw UnsupportedOperationException if hasJsBuffer() is false)
+  def jsBuffer(): dom.ArrayBuffer // optional (throw UnsupportedOperationException if hasJsBuffer() is false)
   def jsBufferOffset(): Int // optional (throw UnsupportedOperationException if hasJsBuffer() is false)
-  def jsDataView(): js.Dynamic // optional (throw UnsupportedOperationException if hasJsBuffer() is false)
+  def jsDataView(): dom.DataView // optional (throw UnsupportedOperationException if hasJsBuffer() is false)
 
   override def toString = "Buffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
 }

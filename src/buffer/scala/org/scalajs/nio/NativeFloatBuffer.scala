@@ -2,9 +2,10 @@ package org.scalajs.nio
 
 import scala.scalajs.js
 import js.Dynamic.{ global => g }
+import org.scalajs.dom
 
 class NativeFloatBuffer(protected var mCapacity: Int, protected var mLimit: Int, protected var mPosition: Int,
-    protected var mMark: Int, mBuffer: js.Dynamic, mBufferOffset: Int) extends FloatBuffer
+    protected var mMark: Int, mBuffer: dom.ArrayBuffer, mBufferOffset: Int) extends FloatBuffer
     with TypedBufferBehaviour[Float, FloatBuffer] with JsNativeBuffer[Float] {
 
   // Completing internal implementation of TypedBufferBehaviour
@@ -45,18 +46,18 @@ class NativeFloatBuffer(protected var mCapacity: Int, protected var mLimit: Int,
 
   // ScalaJS specifics
   def hasJsArray(): Boolean = true
-  protected val typedArray = g.Float32Array(mBuffer, mBufferOffset, mCapacity).asInstanceOf[js.Array[js.Number]]
-  def jsArray(): js.Array[js.Number] = typedArray
+  protected val typedArray = new dom.Float32Array(mBuffer, mBufferOffset, mCapacity)
+  def jsArray(): dom.Float32Array = typedArray
 
-  def jsBuffer(): js.Dynamic = mBuffer
+  def jsBuffer(): dom.ArrayBuffer = mBuffer
   def jsBufferOffset(): Int = mBufferOffset
 
-  protected val dataView: js.Dynamic = g.DataView(this.mBuffer, this.mBufferOffset, this.mCapacity * this.bytes_per_element)
+  protected val dataView: dom.DataView = new dom.DataView(this.mBuffer, this.mBufferOffset, this.mCapacity * this.bytes_per_element)
 }
 
 object NativeFloatBuffer {
   def allocate(capacity: Int): NativeFloatBuffer = {
-    val jsBuffer = g.ArrayBuffer(capacity * BYTES_PER_ELEMENT)
+    val jsBuffer = g.ArrayBuffer(capacity * BYTES_PER_ELEMENT).asInstanceOf[dom.ArrayBuffer]
     val floatBuffer = new NativeFloatBuffer(capacity, capacity, 0, -1, jsBuffer, 0)
     floatBuffer
   }
@@ -71,5 +72,5 @@ object NativeFloatBuffer {
     floatBuffer
   }
 
-  val BYTES_PER_ELEMENT: Int = g.Float32Array.BYTES_PER_ELEMENT.asInstanceOf[js.Number].intValue
+  val BYTES_PER_ELEMENT: Int = dom.Float32Array.BYTES_PER_ELEMENT.toInt
 }

@@ -1,6 +1,7 @@
 package org.scalajs.nio
 
 import scala.scalajs.js
+import org.scalajs.dom
 
 trait ReadOnlyTypedBufferBehaviour[ContentType <: AnyVal, BufferType <: TypedBuffer[ContentType, BufferType]] {
   self: BufferType =>
@@ -68,12 +69,12 @@ trait ReadOnlyTypedBufferBehaviour[ContentType <: AnyVal, BufferType <: TypedBuf
 
   // ScalaJS specific
   def hasJsArray(): Boolean = false
-  def jsArray(): js.Array[js.Number] = throw new ReadOnlyBufferException
+  def jsArray(): Nothing = throw new ReadOnlyBufferException
 
   def hasJsBuffer(): Boolean = false
-  def jsBuffer(): js.Dynamic = throw new ReadOnlyBufferException
+  def jsBuffer(): dom.ArrayBuffer = throw new ReadOnlyBufferException
   def jsBufferOffset(): Int = throw new ReadOnlyBufferException
-  def jsDataView(): js.Dynamic = throw new ReadOnlyBufferException
+  def jsDataView(): dom.DataView = throw new ReadOnlyBufferException
 
   // Still abstract
   def asReadOnlyBuffer(): BufferType

@@ -2,6 +2,7 @@ package org.scalajs.nio
 
 import scala.scalajs.js
 import js.Dynamic.{ global => g }
+import org.scalajs.dom
 
 object Bits {
   // Public methods
@@ -105,13 +106,13 @@ object Bits {
 
   // Private internal components
   // Binary buffer to keep the temporary elements
-  private val buffer = g.ArrayBuffer(8)
+  private val buffer = g.ArrayBuffer(8).asInstanceOf[dom.ArrayBuffer]
   // Accessors to the buffer
-  private val viewByte = g.Int8Array(buffer).asInstanceOf[js.Array[js.Number]]
-  private val viewShort = g.Int16Array(buffer).asInstanceOf[js.Array[js.Number]]
-  private val viewInt = g.Int32Array(buffer).asInstanceOf[js.Array[js.Number]]
-  private val viewFloat = g.Float32Array(buffer).asInstanceOf[js.Array[js.Number]]
-  private val viewDouble = g.Float64Array(buffer).asInstanceOf[js.Array[js.Number]]
+  private val viewByte = new dom.Int8Array(buffer)
+  private val viewShort = new dom.Int16Array(buffer)
+  private val viewInt = new dom.Int32Array(buffer)
+  private val viewFloat = new dom.Float32Array(buffer)
+  private val viewDouble = new dom.Float64Array(buffer)
 
   private def swap2(): Unit = {
     val v0 = viewByte(0)

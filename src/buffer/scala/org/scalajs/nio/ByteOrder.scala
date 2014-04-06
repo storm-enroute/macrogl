@@ -2,6 +2,7 @@ package org.scalajs.nio
 
 import scala.scalajs.js
 import js.Dynamic.{ global => g }
+import org.scalajs.dom
 
 abstract sealed class ByteOrder
 
@@ -19,11 +20,10 @@ object ByteOrder {
   val LITTLE_ENDIAN: ByteOrder = LittleEndian
 
   private lazy val byteOrder: ByteOrder = {
-    val buffer = g.ArrayBuffer(2)
+    val buffer = g.ArrayBuffer(2).asInstanceOf[dom.ArrayBuffer]
 
-    // the cast is a small hack to access the array operator "ar[id] = val"
-    val byteView = g.Int8Array(buffer).asInstanceOf[js.Array[js.Number]]
-    val shortView = g.Int16Array(buffer).asInstanceOf[js.Array[js.Number]]
+    val byteView = new dom.Int8Array(buffer)
+    val shortView = new dom.Int16Array(buffer)
 
     byteView(0) = 0x0F
     byteView(1) = 0x00
