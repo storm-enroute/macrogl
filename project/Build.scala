@@ -3,6 +3,8 @@ import Keys._
 import Process._
 import java.io.File
 
+import scala.scalajs.sbtplugin.ScalaJSPlugin._
+import ScalaJSKeys._
 
 
 object MacroGLBuild extends Build {
@@ -80,11 +82,65 @@ object MacroGLBuild extends Build {
         </developer>
       </developers>
   )
-
+  
   lazy val macrogl = Project(
     "macrogl",
     file("."),
     settings = macroglSettings
+  )
+  
+  /* macro-gl with WebGL back-end */
+  
+  val macroglWebglSettings = Defaults.defaultSettings ++ scalaJSSettings ++ Seq(
+    name := "macrogl-webgl",
+    version := "0.3-SNAPSHOT",
+    scalacOptions ++= Seq(
+      "-deprecation",
+      "-unchecked",
+      "-Xexperimental",
+      "-optimise",
+      "-feature"
+    ),
+    scalaSource in Compile := baseDirectory.value / ".." / "src" / "macrogl" / "scala",
+    unmanagedSourceDirectories in Compile += baseDirectory.value / ".." / "src" / "api-webgl" / "scala",
+    libraryDependencies <+= scalaVersion { sv =>
+      "org.scala-lang" % "scala-compiler" % sv
+    },
+    libraryDependencies ++= Seq(
+      "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" % scalaJSVersion % "test",
+      "org.scala-lang.modules.scalajs" %% "scalajs-dom" % "0.4-SNAPSHOT"
+    )
+  )
+  
+  lazy val macroglWebgl = Project(
+    "macroglWebgl",
+    file("macrogl-webgl"),
+    settings = macroglWebglSettings
+  ) dependsOn(macroglBuffer)
+
+  /* java.nio.Buffer's variant for macro-gl */
+
+  val macroglBufferSettings = Defaults.defaultSettings ++ scalaJSSettings ++ Seq(
+    name := "macrogl-buffer",
+    version := "0.3-SNAPSHOT",
+    scalacOptions ++= Seq(
+      "-deprecation",
+      "-unchecked",
+      "-Xexperimental",
+      "-optimise",
+      "-feature"
+    ),
+    scalaSource in Compile := baseDirectory.value / ".." / "src" / "buffer" / "scala",
+    libraryDependencies ++= Seq(
+      "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" % scalaJSVersion % "test",
+      "org.scala-lang.modules.scalajs" %% "scalajs-dom" % "0.4-SNAPSHOT"
+    )
+  )
+  
+  lazy val macroglBuffer = Project(
+    "macroglBuffer",
+    file("macrogl-buffer"),
+    settings = macroglBufferSettings
   )
 
 }
