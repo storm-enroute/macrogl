@@ -1,5 +1,7 @@
 package org.scalajs.nio
 
+import org.scalajs.dom
+
 abstract class ByteBuffer extends Buffer with TypedBuffer[Byte, ByteBuffer] with Comparable[ByteBuffer] {
   // Defining this one here instead of TypedBuffer because of the type erasure conflict
   def put(src: Array[Byte]): ByteBuffer = this.put(src, 0, src.length)
@@ -38,6 +40,9 @@ abstract class ByteBuffer extends Buffer with TypedBuffer[Byte, ByteBuffer] with
   def putFloat(index: Int, value: Float): ByteBuffer
   def putDouble(value: Double): ByteBuffer
   def putDouble(index: Int, value: Double): ByteBuffer
+  
+  def array(): Array[Byte]
+  def jsArray(): dom.Int8Array
 }
 
 object ByteBuffer {

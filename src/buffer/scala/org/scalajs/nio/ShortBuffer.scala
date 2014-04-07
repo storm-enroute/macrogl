@@ -1,10 +1,15 @@
 package org.scalajs.nio
 
+import org.scalajs.dom
+
 abstract class ShortBuffer extends Buffer with TypedBuffer[Short, ShortBuffer] with Comparable[ShortBuffer] {
   // Defining this one here instead of TypedBuffer because of the type erasure conflict
   def put(src: Array[Short]): ShortBuffer = this.put(src, 0, src.length)
 
   override def toString = "ShortBuffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
+  
+  def array(): Array[Short]
+  def jsArray(): dom.Int16Array
 }
 
 object ShortBuffer {
