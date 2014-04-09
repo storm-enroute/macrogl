@@ -3,7 +3,7 @@ package org.macrogl
 
 
 import language.experimental.macros
-import scala.reflect.macros.Context
+import scala.reflect.macros.whitebox.Context
 import scala.collection._
 
 
