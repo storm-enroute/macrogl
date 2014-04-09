@@ -3,7 +3,7 @@ package org.macrogl
 
 
 import language.experimental.macros
-import scala.reflect.macros.Context
+import scala.reflect.macros.whitebox.Context
 import scala.collection._
 
 
@@ -37,11 +37,11 @@ object FrameBuffer {
 
   class Binding private[FrameBuffer] () {
     object AttachTexture2D {
-      def foreach[U](f: Unit => U)(implicit gl: Macrogl) = macro FrameBuffer.bindTexture[U]
+      def foreach[U](f: Unit => U)(implicit gl: Macrogl): Unit = macro FrameBuffer.bindTexture[U]
     }
 
     object AttachRenderBuffer {
-      def foreach[U](f: Unit => U)(implicit gl: Macrogl) = macro FrameBuffer.bindRenderBuffer[U]
+      def foreach[U](f: Unit => U)(implicit gl: Macrogl): Unit = macro FrameBuffer.bindRenderBuffer[U]
     }
 
     def attachTexture2D(attachment: Int, t: Texture, level: Int) = AttachTexture2D
