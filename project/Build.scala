@@ -32,12 +32,13 @@ object MacroGLBuild extends Build {
     name := "macrogl",
     organization := "com.storm-enroute",
     version := "0.3-SNAPSHOT",
-    scalaVersion := "2.10.2",
+    scalaVersion := "2.11.0-RC4",
     scalacOptions ++= Seq(
       "-deprecation",
       "-unchecked",
       "-Xexperimental",
-      "-optimise"
+      "-optimise",
+      "-feature"
     ),
     scalaSource in Compile := baseDirectory.value / "src" / "macrogl" / "scala",
     unmanagedSourceDirectories in Compile += baseDirectory.value / "src" / "api-opengl" / "scala",
