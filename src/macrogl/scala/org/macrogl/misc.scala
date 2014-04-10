@@ -380,9 +380,9 @@ package macrogl {
       import c.universe._
   
       def inlineAndReset[T](expr: c.Expr[T]): c.Expr[T] = {
-        c.Expr[T](c untypecheck inlineApplyRecursive(expr.tree))
-        // FIXME
-        expr
+        val res = c untypecheck inlineApplyRecursive(expr.tree)
+        // FIXME hack
+        c.Expr[T](c parse showCode(res))
       }
   
       def inlineApplyRecursive(tree: Tree): Tree = {
