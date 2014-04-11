@@ -3,7 +3,7 @@ package org
 
 
 import language.experimental.macros
-import scala.reflect.macros.Context
+import scala.reflect.macros.whitebox.Context
 
 
 
@@ -17,9 +17,9 @@ package macrogl {
 
   object Time {
 
-    def apply(thunk: Any) = macro Macros.timeForThunk
+    def apply(thunk: Any): Double = macro Macros.timeForThunk
 
-    def in(f: Double => Any)(thunk: Any) = macro Macros.timedThunk
+    def in(f: Double => Any)(thunk: Any): Any = macro Macros.timedThunk
 
   }
   
@@ -126,6 +126,7 @@ package macrogl {
   /* macros */
 
   object Macros {
+    import scala.language.implicitConversions
 
     implicit def c2utils(c: Context) = new Util[c.type](c)
   
@@ -321,7 +322,7 @@ package macrogl {
       val stats = for {
         (s, idx) <- settings.zipWithIndex
         sx = c.Expr[Int](s)
-        localName = newTermName("s$" + idx)
+        localName = TermName("s$" + idx)
         valexpr = reify {
           if (!gl.splice.isEnabled(sx.splice)) { gl.splice.enable(sx.splice); true } else false
         }
@@ -352,7 +353,7 @@ package macrogl {
       val stats = for {
         (s, idx) <- settings.zipWithIndex
         sx = c.Expr[Int](s)
-        localName = newTermName("s$" + idx)
+        localName = TermName("s$" + idx)
         valexpr = reify {
           if (gl.splice.isEnabled(sx.splice)) { gl.splice.disable(sx.splice); true } else false
         }
@@ -378,11 +379,14 @@ package macrogl {
     private[macrogl] class Util[C <: Context](val c: C) {
       import c.universe._
   
-      def inlineAndReset[T](expr: c.Expr[T]): c.Expr[T] =
-        c.Expr[T](c resetAllAttrs inlineApplyRecursive(expr.tree))
+      def inlineAndReset[T](expr: c.Expr[T]): c.Expr[T] = {
+        val res = c untypecheck inlineApplyRecursive(expr.tree)
+        // FIXME hack
+        c.Expr[T](c parse showCode(res))
+      }
   
       def inlineApplyRecursive(tree: Tree): Tree = {
-        val ApplyName = newTermName("apply")
+        val ApplyName = TermName("apply")
   
         object inliner extends Transformer {
           override def transform(tree: Tree): Tree = {
@@ -395,12 +399,12 @@ package macrogl {
                     // val a$0 = args(0); val b$0 = args(1); ...
                     val paramVals = params.zip(args).map {
                       case (ValDef(_, pName, _, _), a) =>
-                        ValDef(Modifiers(), newTermName("" + pName + "$0"), TypeTree(), a)
+                        ValDef(Modifiers(), TermName("" + pName + "$0"), TypeTree(), a)
                     }
                     // val a = a$0; val b = b$0
                     val paramVals2 = params.zip(args).map {
                       case (ValDef(_, pName, _, _), a) =>
-                        ValDef(Modifiers(), pName, TypeTree(), Ident(newTermName("" + pName + "$0")))
+                        ValDef(Modifiers(), pName, TypeTree(), Ident(TermName("" + pName + "$0")))
                     }
                     // The nested blocks avoid name clashes.
                     Block(paramVals, Block(paramVals2, body))
