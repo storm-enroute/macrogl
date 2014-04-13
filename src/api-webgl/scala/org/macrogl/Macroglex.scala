@@ -1,10 +1,7 @@
 package org.macrogl
 
 
-
-
-
-class Macroglex private[macrogl] () extends Macrogl() {
+class Macroglex private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingContext) extends Macrogl {
 }
 
 
@@ -16,7 +13,7 @@ object Macroglex {
 
   /* public API - implicits */
 
-  implicit def default = new Macroglex()
+  //implicit def default = new Macroglex()
 
 }
 

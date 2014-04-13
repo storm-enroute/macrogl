@@ -4,6 +4,8 @@ import org.scalajs.dom
 // See scalajs-dom for the package org.scalajs.dom
 // https://github.com/scala-js/scala-js-dom
 
+case class ActiveInfo(size: Int, tpe: Int, name: String)
+
 object Token {
 
   type Buffer = org.scalajs.dom.WebGLBuffer
