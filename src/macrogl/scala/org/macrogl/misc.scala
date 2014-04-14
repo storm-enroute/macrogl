@@ -379,11 +379,8 @@ package macrogl {
     private[macrogl] class Util[C <: Context](val c: C) {
       import c.universe._
   
-      def inlineAndReset[T](expr: c.Expr[T]): c.Expr[T] = {
-        val res = c untypecheck inlineApplyRecursive(expr.tree)
-        // FIXME hack
-        c.Expr[T](c parse showCode(res))
-      }
+      def inlineAndReset[T](expr: c.Expr[T]): c.Expr[T] =
+        c.Expr[T](inlineApplyRecursive(c untypecheck expr.tree))
   
       def inlineApplyRecursive(tree: Tree): Tree = {
         val ApplyName = TermName("apply")
