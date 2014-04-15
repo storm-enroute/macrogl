@@ -372,53 +372,52 @@ class Macrogl private[macrogl] () {
     ???
   }*/
 
-  // TODO
-  /*final def activeTexture(texture: Int) = {
-    gl.activeTexture(texture)
+  final def activeTexture(texture: Int) = {
+    GL13.glActiveTexture(texture)
   }
 
   final def attachShader(program: Token.Program, shader: Token.Shader) = {
-    gl.attachShader(program, shader)
+    GL20.glAttachShader(program, shader)
   }
 
   final def bindAttribLocation(program: Token.Program, index: Int, name: String) = {
-    gl.bindAttribLocation(program, index, name)
+    GL20.glBindAttribLocation(program, index, name)
   }
 
   final def bindBuffer(target: Int, buffer: Token.Buffer) = {
-    gl.bindBuffer(target, buffer)
+    GL15.glBindBuffer(target, buffer)
   }
 
   final def bindFramebuffer(target: Int, framebuffer: Token.FrameBuffer) = {
-    gl.bindFramebuffer(target, framebuffer)
+    GL30.glBindFramebuffer(target, framebuffer)
   }
 
   final def bindRenderbuffer(target: Int, renderbuffer: Token.RenderBuffer) = {
-    gl.bindRenderbuffer(target, renderbuffer)
+    GL30.glBindRenderbuffer(target, renderbuffer)
   }
 
   final def bindTexture(target: Int, texture: Token.Texture) = {
-    gl.bindTexture(target, texture)
+    GL11.glBindTexture(target, texture)
   }
 
   final def blendColor(red: Float, green: Float, blue: Float, alpha: Float) = {
-    gl.blendColor(red, green, blue, alpha)
+    GL14.glBlendColor(red, green, blue, alpha)
   }
 
   final def blendEquation(mode: Int) = {
-    gl.blendEquation(mode)
+    GL14.glBlendEquation(mode)
   }
 
   final def blendEquationSeparate(modeRGB: Int, modeAlpha: Int) = {
-    gl.blendEquationSeparate(modeRGB, modeAlpha)
+    GL20.glBlendEquationSeparate(modeRGB, modeAlpha)
   }
 
   final def blendFunc(sfactor: Int, dfactor: Int) = {
-    gl.blendFunc(sfactor, dfactor)
+    GL11.glBlendFunc(sfactor, dfactor)
   }
 
   final def blendFuncSeparate(srcfactorRGB: Int, dstfactorRGB: Int, srcfactorAlpha: Int, dstfactorAlpha: Int) = {
-    gl.blendFuncSeparate(srcfactorRGB, dstfactorRGB, srcfactorAlpha, dstfactorAlpha)
+    GL14.glBlendFuncSeparate(srcfactorRGB, dstfactorRGB, srcfactorAlpha, dstfactorAlpha)
   }
 
   /*
@@ -426,61 +425,64 @@ class Macrogl private[macrogl] () {
    * Reason: not available in the API GLES20 of Android
    */
 
-  private final def _bufferData(target: Int, data: Data, usage: Int) = {
-    val buffer: nio.Buffer = data
-    require(buffer.hasJsBuffer) // should we have a backup plan?
-
-    gl.bufferData(target, buffer.jsDataView, usage)
+  final def bufferData(target: Int, data: Data.Byte, usage: Int) = {
+    GL15.glBufferData(target, data, usage)
+  }
+  final def bufferData(target: Int, data: Data.Short, usage: Int) = {
+    GL15.glBufferData(target, data, usage)
+  }
+  final def bufferData(target: Int, data: Data.Int, usage: Int) = {
+    GL15.glBufferData(target, data, usage)
+  }
+  final def bufferData(target: Int, data: Data.Float, usage: Int) = {
+    GL15.glBufferData(target, data, usage)
+  }
+  final def bufferData(target: Int, data: Data.Double, usage: Int) = {
+    GL15.glBufferData(target, data, usage)
   }
 
-  final def bufferData(target: Int, data: Data.Byte, usage: Int) = this._bufferData(target, data.slice, usage)
-  final def bufferData(target: Int, data: Data.Short, usage: Int) = this._bufferData(target, data.slice, usage)
-  final def bufferData(target: Int, data: Data.Int, usage: Int) = this._bufferData(target, data.slice, usage)
-  final def bufferData(target: Int, data: Data.Float, usage: Int) = this._bufferData(target, data.slice, usage)
-  final def bufferData(target: Int, data: Data.Double, usage: Int) = this._bufferData(target, data.slice, usage)
-
-  private final def _bufferSubData(target: Int, offset: Long, data: Data) = {
-    // Not really how the Long is going to behave in JavaScript
-    val buffer: nio.Buffer = data
-    require(buffer.hasJsBuffer) // should we have a backup plan?
-
-    // TODO bufferSubData currently missing from org.scalajs.dom, correct this once it's ok
-    // PS: bufferSubData exists in the WebGL specs
-    gl.asInstanceOf[js.Dynamic].bufferSubData(target, offset, buffer.jsDataView)
+  final def bufferSubData(target: Int, offset: Long, data: Data.Byte) = {
+    GL15.glBufferSubData(target, offset, data)
   }
-
-  final def bufferSubData(target: Int, offset: Long, data: Data.Byte) = this._bufferSubData(target, offset, data.slice)
-  final def bufferSubData(target: Int, offset: Long, data: Data.Short) = this._bufferSubData(target, offset, data.slice)
-  final def bufferSubData(target: Int, offset: Long, data: Data.Int) = this._bufferSubData(target, offset, data.slice)
-  final def bufferSubData(target: Int, offset: Long, data: Data.Float) = this._bufferSubData(target, offset, data.slice)
-  final def bufferSubData(target: Int, offset: Long, data: Data.Double) = this._bufferSubData(target, offset, data.slice)
+  final def bufferSubData(target: Int, offset: Long, data: Data.Short) = {
+    GL15.glBufferSubData(target, offset, data)
+  }
+  final def bufferSubData(target: Int, offset: Long, data: Data.Int) = {
+    GL15.glBufferSubData(target, offset, data)
+  }
+  final def bufferSubData(target: Int, offset: Long, data: Data.Float) = {
+    GL15.glBufferSubData(target, offset, data)
+  }
+  final def bufferSubData(target: Int, offset: Long, data: Data.Double) = {
+    GL15.glBufferSubData(target, offset, data)
+  }
 
   final def checkFramebufferStatus(target: Int): Int = {
-    gl.checkFramebufferStatus(target).toInt
+    GL30.glCheckFramebufferStatus(target)
   }
 
   final def clear(mask: Int) = {
-    gl.clear(mask)
+    GL11.glClear(mask)
   }
 
   final def clearColor(red: Float, green: Float, blue: Float, alpha: Float) = {
-    gl.clearColor(red, green, blue, alpha)
+    GL11.glClearColor(red, green, blue, alpha)
   }
 
   final def clearDepth(depth: Double) = {
-    gl.clearDepth(depth)
+    GL11.glClearDepth(depth)
   }
 
   final def clearStencil(s: Int) = {
-    gl.clearStencil(s)
+    GL11.glClearStencil(s)
   }
 
   final def colorMask(red: Boolean, green: Boolean, blue: Boolean, alpha: Boolean) = {
-    gl.colorMask(red, green, blue, alpha)
+    GL11.glColorMask(red, green, blue, alpha)
   }
 
   final def compileShader(shader: Token.Shader) = {
-    gl.compileShader(shader)
+    GL20.glCompileShader(shader)
   }
 
   /*
@@ -490,106 +492,100 @@ class Macrogl private[macrogl] () {
 
   final def compressedTexImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
     data: Data.Byte) = {
-
-    val bytebuffer: nio.ByteBuffer = data.slice
-    require(bytebuffer.hasJsBuffer) // should we have a backup plan?
-    gl.compressedTexImage2D(target, level, internalformat, width, height, border, bytebuffer.jsDataView)
+    GL13.glCompressedTexImage2D(target, level, internalformat, width, height, border, data)
   }
 
   final def compressedTexSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, width: Int, height: Int,
     format: Int, data: Data.Byte) = {
-
-    val bytebuffer: nio.ByteBuffer = data.slice
-    require(bytebuffer.hasJsBuffer) // should we have a backup plan?
-    gl.compressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, bytebuffer.jsDataView)
+    GL13.glCompressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, data)
   }
 
   final def copyTexImage2D(target: Int, level: Int, internalFormat: Int, x: Int, y: Int, width: Int, height: Int, border: Int) = {
-    gl.copyTexImage2D(target, level, internalFormat, x, y, width, height, border)
+    GL11.glCopyTexImage2D(target, level, internalFormat, x, y, width, height, border)
   }
 
   final def copyTexSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, x: Int, y: Int, width: Int, height: Int) = {
-    gl.copyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height)
+    GL11.glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height)
   }
 
   final def createBuffer(): Token.Buffer = {
-    gl.createBuffer()
+    GL15.glGenBuffers()
   }
 
   final def createFramebuffer(): Token.FrameBuffer = {
-    gl.createFramebuffer()
+    GL30.glGenFramebuffers()
   }
 
   final def createProgram(): Token.Program = {
-    gl.createProgram()
+    GL20.glCreateProgram()
   }
 
   final def createRenderBuffer(): Token.RenderBuffer = {
-    gl.createRenderBuffer()
+    GL30.glGenRenderbuffers()
   }
 
   final def createShader(`type`: Int): Token.Shader = {
-    gl.createShader(`type`)
+    GL20.glCreateShader(`type`)
   }
 
   final def createTexture(): Token.Texture = {
-    gl.createTexture()
+    GL11.glGenTextures()
   }
 
   final def cullFace(mode: Int) = {
-    gl.cullFace(mode)
+    GL11.glCullFace(mode)
   }
 
   final def deleteBuffer(buffer: Token.Buffer) = {
-    gl.deleteBuffer(buffer)
+    GL15.glDeleteBuffers(buffer)
   }
 
   final def deleteFramebuffer(framebuffer: Token.FrameBuffer) = {
-    gl.deleteFramebuffer(framebuffer)
+    GL30.glDeleteFramebuffers(framebuffer)
   }
 
   final def deleteProgram(program: Token.Program) = {
-    gl.deleteProgram(program)
+    GL20.glDeleteProgram(program)
   }
 
   final def deleteRenderBuffer(renderbuffer: Token.RenderBuffer) = {
-    gl.deleteRenderbuffer(renderbuffer)
+    GL30.glDeleteRenderbuffers(renderbuffer)
   }
 
   final def deleteShader(shader: Token.Shader) = {
-    gl.deleteShader(shader)
+    GL20.glDeleteShader(shader)
   }
 
   final def deleteTexture(texture: Token.Texture) = {
-    gl.deleteTexture(texture)
+    GL11.glDeleteTextures(texture)
   }
 
   final def depthFunc(func: Int) = {
-    gl.depthFunc(func)
+    GL11.glDepthFunc(func)
   }
 
   final def depthMask(flag: Boolean) = {
-    gl.depthMask(flag)
+    GL11.glDepthMask(flag)
   }
 
   final def depthRange(zNear: Double, zFar: Double) = {
-    gl.depthRange(zNear, zFar)
+    GL11.glDepthRange(zNear, zFar)
   }
 
   final def detachShader(program: Token.Program, shader: Token.Shader) = {
-    gl.detachShader(program, shader)
+    GL20.glDetachShader(program, shader)
   }
 
   final def disable(cap: Int) = {
-    gl.disable(cap)
+    GL11.glDisable(cap)
   }
 
   final def disableVertexAttribArray(index: Int) = {
-    gl.disableVertexAttribArray(index)
+    GL20.glDisableVertexAttribArray(index)
   }
 
   final def drawArrays(mode: Int, first: Int, count: Int) = {
-    gl.drawArrays(mode, first, count)
+    GL11.glDrawArrays(mode, first, count)
   }
 
   /*
@@ -601,71 +597,74 @@ class Macrogl private[macrogl] () {
 
   final def drawElements(mode: Int, count: Int, `type`: Int, offset: Long) = {
     // may be a good idea to check that an element array buffer is currently bound
-    gl.drawElements(mode, count, `type`, offset)
+    GL11.glDrawElements(mode, count, `type`, offset)
   }
 
   final def enable(cap: Int) = {
-    gl.enable(cap)
+    GL11.glEnable(cap)
   }
 
   final def enableVertexAttribArray(index: Int) = {
-    gl.enableVertexAttribArray(index)
+    GL20.glEnableVertexAttribArray(index)
   }
 
   final def finish() {
-    gl.finish()
+    GL11.glFinish()
   }
 
   final def flush() {
-    gl.flush()
+    GL11.glFlush()
   }
 
   final def framebufferRenderbuffer(target: Int, attachment: Int, renderbuffertarget: Int, renderbuffer: Token.RenderBuffer) = {
-    gl.framebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer)
+    GL30.glFramebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer)
   }
 
   final def framebufferTexture2D(target: Int, attachment: Int, textarget: Int, texture: Token.Texture, level: Int) = {
-    gl.framebufferTexture2D(target, attachment, textarget, texture, level)
+    GL30.glFramebufferTexture2D(target, attachment, textarget, texture, level)
   }
 
   final def frontFace(mode: Int) = {
-    gl.frontFace(mode)
+    GL11.glFrontFace(mode)
   }
 
   final def generateMipmap(target: Int) = {
-    gl.generateMipmap(target)
+    GL30.glGenerateMipmap(target)
   }
 
   final def getActiveAttrib(program: Token.Program, index: Int): ActiveInfo = {
-    val jsActiveInfo = gl.getActiveAttrib(program, index)
-    ActiveInfo(jsActiveInfo.size.toInt, jsActiveInfo.`type`.toInt, jsActiveInfo.name)
+    val nameMaxSize = this.getProgramParameteri(program, GL20.GL_ACTIVE_ATTRIBUTE_MAX_LENGTH)
+    this.tmpInt.clear()
+    val name = GL20.glGetActiveAttrib(program, index, nameMaxSize, this.tmpInt)
+    ActiveInfo(this.tmpInt.get(0), this.tmpInt.get(1), name)
   }
 
   final def getActiveUniform(program: Token.Program, index: Int): ActiveInfo = {
-    // TODO org.scalajs.dom has the return type wrong, correct this once it's ok
-    val jsActiveInfoDyn = gl.asInstanceOf[js.Dynamic].getActiveUniform(program, index)
-    val jsActiveInfo = jsActiveInfoDyn.asInstanceOf[dom.WebGLActiveInfo]
-    ActiveInfo(jsActiveInfo.size.toInt, jsActiveInfo.`type`.toInt, jsActiveInfo.name)
+    val nameMaxSize = this.getProgramParameteri(program, GL20.GL_ACTIVE_UNIFORM_MAX_LENGTH)
+    this.tmpInt.clear()
+    val name = GL20.glGetActiveUniform(program, index, nameMaxSize, this.tmpInt)
+    ActiveInfo(this.tmpInt.get(0), this.tmpInt.get(1), name)
   }
 
   final def getAttachedShaders(program: Token.Program): Array[Token.Shader] = {
-    val jsArray = gl.getAttachedShaders(program)
-    val retArray = new Array[Token.Shader](jsArray.length.toInt)
-    jsArray.copyToArray(retArray)
-    retArray
+    val maxCount = this.getProgramParameteri(program, GL20.GL_ATTACHED_SHADERS)
+    val buffer = Macrogl.createIntData(maxCount)
+    this.tmpInt.clear()
+    GL20.glGetAttachedShaders(program, this.tmpInt, buffer)
+    val count = this.tmpInt.get(0)
+    val array = new Array[Token.Shader](count)
+    for(i <- 0 until count) {
+      array(i) = buffer.get(i)
+    }
+    array
   }
 
   final def getAttribLocation(program: Token.Program, name: String): Int = {
-    gl.getAttribLocation(program, name).toInt
+    GL20.glGetAttribLocation(program, name)
   }
 
   final def getBufferParameteri(target: Int, pname: Int): Int = {
-    // accept only GL_BUFFER_SIZE and GL_BUFFER_USAGE, both return a simple Int, no problem here
-    gl.getBufferParameter(target, pname).toInt
-  }
-
-  final def getError(): Int = {
-    gl.getError().toInt
+    GL15.glGetBufferParameteri(target, pname)
   }
 
   /*
@@ -681,151 +680,146 @@ class Macrogl private[macrogl] () {
    */
 
   final def getParameterBuffer(pname: Int): Token.Buffer = {
-    gl.getParameter(pname).asInstanceOf[Token.Buffer]
+    GL11.glGetInteger(pname)
   }
 
   final def getParameterFrameBuffer(pname: Int): Token.FrameBuffer = {
-    gl.getParameter(pname).asInstanceOf[Token.FrameBuffer]
+    GL11.glGetInteger(pname)
   }
 
   final def getParameterProgram(pname: Int): Token.Program = {
-    gl.getParameter(pname).asInstanceOf[Token.Program]
+    GL11.glGetInteger(pname)
   }
 
   final def getParameterRenderBuffer(pname: Int): Token.RenderBuffer = {
-    gl.getParameter(pname).asInstanceOf[Token.RenderBuffer]
+    GL11.glGetInteger(pname)
   }
 
   final def getParameterShader(pname: Int): Token.Shader = {
-    gl.getParameter(pname).asInstanceOf[Token.Shader]
+    GL11.glGetInteger(pname)
   }
   
   final def getParameterString(pname: Int): String = {
-    gl.getParameter(pname).asInstanceOf[js.String]
+    GL11.glGetString(pname)
   }
 
   final def getParameteri(pname: Int): Int = {
-    // LWJGL hint: use glGetInteger(int pname): Int
-    val ret = gl.getParameter(pname)
-    JSTypeHelper.toInt(ret)
+    GL11.glGetInteger(pname)
   }
 
   final def getParameteriv(pname: Int, outputs: Data.Int) = {
-    // LWJGL hint: use glGetInteger(int pname, IntBuffer params)
-    val ret = gl.getParameter(pname)
-    JSTypeHelper.toInts(ret, outputs)
+    GL11.glGetInteger(pname, outputs)
   }
 
   final def getParameterf(pname: Int): Float = {
-    // LWJGL hint: use glGetFloat(int pname): Int
-    gl.getParameter(pname).asInstanceOf[js.Number].toFloat
+    GL11.glGetFloat(pname)
   }
 
   final def getParameterfv(pname: Int, outputs: Data.Float) = {
-    // LWJGL hint: use glGetInteger(int pname, IntBuffer params)
-    val ret = gl.getParameter(pname)
-    JSTypeHelper.toFloats(ret, outputs)
+    GL11.glGetFloat(pname, outputs)
   }
 
   final def getParameterb(pname: Int): Boolean = {
-    // LWJGL hint: use glGetBoolean(int pname): Boolean
-    val ret = gl.getParameter(pname)
-    JSTypeHelper.toBoolean(ret)
+    GL11.glGetBoolean(pname)
   }
 
   final def getParameterbv(pname: Int, outputs: Data.Byte) = {
-    // LWJGL hint: use glGetBoolean(int pname, ByteBuffer params)
-    val ret = gl.getParameter(pname)
-    JSTypeHelper.toBooleans(ret, outputs)
+    GL11.glGetBoolean(pname, outputs)
   }
 
-  final def gerError(): Int = {
-    gl.getError().toInt
+  final def getError(): Int = {
+    GL11.glGetError()
   }
 
   final def getFramebufferAttachmentParameteri(target: Int, attachment: Int, pname: Int): Int = {
-    gl.getFramebufferAttachmentParameter(target, attachment, pname).asInstanceOf[js.Number].toInt
+    GL30.glGetFramebufferAttachmentParameteri(target, attachment, pname)
   }
 
   final def getFramebufferAttachmentParameterRenderbuffer(target: Int, attachment: Int, pname: Int): Token.RenderBuffer = {
-    gl.getFramebufferAttachmentParameter(target, attachment, pname).asInstanceOf[Token.RenderBuffer]
+    GL30.glGetFramebufferAttachmentParameteri(target, attachment, pname)
   }
 
   final def getFramebufferAttachmentParameterTexture(target: Int, attachment: Int, pname: Int): Token.Texture = {
-    gl.getFramebufferAttachmentParameter(target, attachment, pname).asInstanceOf[Token.Texture]
+    GL30.glGetFramebufferAttachmentParameteri(target, attachment, pname)
   }
 
   final def getProgramParameteri(program: Token.Program, pname: Int): Int = {
-    gl.getProgramParameter(program, pname).asInstanceOf[js.Number].toInt
+    GL20.glGetProgrami(program, pname)
   }
 
   final def getProgramParameterb(program: Token.Program, pname: Int): Boolean = {
-    gl.getProgramParameter(program, pname).asInstanceOf[js.Boolean]
+    GL20.glGetProgrami(program, pname) != Macrogl.FALSE
   }
 
   final def getProgramInfoLog(program: Token.Program): String = {
-    gl.getProgramInfoLog(program)
+    val infoLogLength = this.getProgramParameteri(program, GL20.GL_INFO_LOG_LENGTH)
+    GL20.glGetProgramInfoLog(program, infoLogLength)
   }
 
   final def getRenderbufferParameteri(target: Int, pname: Int): Int = {
-    gl.getRenderbufferParameter(target, pname).asInstanceOf[js.Number].toInt
+    GL30.glGetRenderbufferParameteri(target, pname)
   }
 
   final def getShaderParameteri(shader: Token.Shader, pname: Int): Int = {
-    gl.getShaderParameter(shader, pname).asInstanceOf[js.Number].toInt
+    GL20.glGetShaderi(shader, pname)
   }
 
-  final def getShaderParameterb(shader: Token.Shader, pname: Int): Int = {
-    gl.getShaderParameter(shader, pname).asInstanceOf[js.Number].toInt
+  final def getShaderParameterb(shader: Token.Shader, pname: Int): Boolean = {
+    GL20.glGetShaderi(shader, pname) != Macrogl.FALSE
   }
 
-  final def getShaderPrecisionFormat(shadertype: Int, precisiontype: Int) = {
-    val jsPrecisionFormat = gl.getShaderPrecisionFormat(shadertype, precisiontype)
-    PrecisionFormat(jsPrecisionFormat.rangeMin.toInt, jsPrecisionFormat.rangeMax.toInt, jsPrecisionFormat.precision.toInt)
+  final def getShaderPrecisionFormat(shadertype: Int, precisiontype: Int): PrecisionFormat = {
+    this.tmpInt.clear()
+    this.tmpInt.position(8)
+    val tmpInt2 = tmpInt.slice() // No need to allocate a second buffer for this
+    this.tmpInt.clear()
+    this.tmpInt.limit(8)
+    
+    ARBES2Compatibility.glGetShaderPrecisionFormat(shadertype, precisiontype, tmpInt, tmpInt2)
+    PrecisionFormat(tmpInt.get(0), tmpInt.get(1), tmpInt2.get(0))
   }
 
   final def getShaderInfoLog(shader: Token.Shader): String = {
-    gl.getShaderInfoLog(shader)
+    val infoLogLength = this.getShaderParameteri(shader, GL20.GL_INFO_LOG_LENGTH)
+    GL20.glGetShaderInfoLog(shader, infoLogLength)
   }
 
   final def getShaderSource(shader: Token.Shader): String = {
-    gl.getShaderSource(shader)
+    val sourceLength = this.getShaderParameteri(shader, GL20.GL_SHADER_SOURCE_LENGTH)
+    GL20.glGetShaderSource(shader, sourceLength)
   }
 
   final def getTexParameteri(target: Int, pname: Int): Int = {
-    // org.scalajs.dom could maybe use return type js.Number instead of js.Any
-    val ret = gl.getTexParameter(target, pname)
-    JSTypeHelper.toInt(ret)
+    GL11.glGetTexParameteri(target, pname)
   }
 
   final def getUniformi(program: Token.Program, location: Token.UniformLocation): Int = {
-    val ret = gl.getUniform(program, location)
-    JSTypeHelper.toInt(ret)
+    this.tmpInt.clear()
+    GL20.glGetUniform(program, location, this.tmpInt)
+    this.tmpInt.get(0)
   }
 
   final def getUniformiv(program: Token.Program, location: Token.UniformLocation, outputs: Data.Int) = {
-    val ret = gl.getUniform(program, location)
-    JSTypeHelper.toInts(ret, outputs)
+    GL20.glGetUniform(program, location, outputs)
   }
 
   final def getUniformf(program: Token.Program, location: Token.UniformLocation): Float = {
-    val ret = gl.getUniform(program, location)
-    JSTypeHelper.toFloat(ret)
+    this.tmpFloat.clear()
+    GL20.glGetUniform(program, location, this.tmpFloat)
+    this.tmpFloat.get(0)
   }
 
   final def getUniformfv(program: Token.Program, location: Token.UniformLocation, outputs: Data.Float) = {
-    val ret = gl.getUniform(program, location)
-    JSTypeHelper.toFloats(ret, outputs)
+    GL20.glGetUniform(program, location, outputs)
   }
 
   final def getUniformb(program: Token.Program, location: Token.UniformLocation): Boolean = {
-    val ret = gl.getUniform(program, location)
-    JSTypeHelper.toBoolean(ret)
+    this.getUniformi(program, location) != Macrogl.FALSE
   }
 
   final def getUniformbv(program: Token.Program, location: Token.UniformLocation, outputs: Data.Byte) = {
-    val ret = gl.getUniform(program, location)
-    JSTypeHelper.toBooleans(ret, outputs)
+    // TODO probably gonna remove boolean getUniform stuff
+    ???
   }
 
   final def getUniformLocation(program: Token.Program, name: String): Token.UniformLocation = {
@@ -1181,8 +1175,14 @@ class Macrogl private[macrogl] () {
   
   final def viewport(x: Int, y: Int, width: Int, height: Int) = {
     gl.viewport(x, y, width, height)
-  }*/
-
+  }
+  
+  private val maxResultSize = 16
+  private val tmpByte = Macrogl.createByteData(maxResultSize)
+  private val tmpShort = Macrogl.createShortData(maxResultSize)
+  private val tmpInt = Macrogl.createIntData(maxResultSize)
+  private val tmpFloat = Macrogl.createFloatData(maxResultSize)
+  private val tmpDouble = Macrogl.createDoubleData(maxResultSize)
 }
 
 

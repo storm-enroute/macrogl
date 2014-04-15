@@ -668,10 +668,6 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
     gl.getBufferParameter(target, pname).toInt
   }
 
-  final def getError(): Int = {
-    gl.getError().toInt
-  }
-
   /*
    * This set of function is a big mess around the different systems due to the fact that the returned value can be pretty
    * much anything.
@@ -743,7 +739,7 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
     JSTypeHelper.toBooleans(ret, outputs)
   }
 
-  final def gerError(): Int = {
+  final def getError(): Int = {
     gl.getError().toInt
   }
 
@@ -779,11 +775,11 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
     gl.getShaderParameter(shader, pname).asInstanceOf[js.Number].toInt
   }
 
-  final def getShaderParameterb(shader: Token.Shader, pname: Int): Int = {
-    gl.getShaderParameter(shader, pname).asInstanceOf[js.Number].toInt
+  final def getShaderParameterb(shader: Token.Shader, pname: Int): Boolean = {
+    gl.getShaderParameter(shader, pname).asInstanceOf[js.Boolean]
   }
 
-  final def getShaderPrecisionFormat(shadertype: Int, precisiontype: Int) = {
+  final def getShaderPrecisionFormat(shadertype: Int, precisiontype: Int): PrecisionFormat = {
     val jsPrecisionFormat = gl.getShaderPrecisionFormat(shadertype, precisiontype)
     PrecisionFormat(jsPrecisionFormat.rangeMin.toInt, jsPrecisionFormat.rangeMax.toInt, jsPrecisionFormat.precision.toInt)
   }
