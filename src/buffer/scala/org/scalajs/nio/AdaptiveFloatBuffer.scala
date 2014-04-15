@@ -32,6 +32,8 @@ class AdaptiveFloatBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: dom.A
     else
       BigEndian
   }
+  
+  override val hasJsArray = order() == ByteOrder.nativeOrder
 
   override def toString = "AdaptiveFloatBuffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
 }

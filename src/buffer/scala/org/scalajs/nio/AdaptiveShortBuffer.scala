@@ -32,6 +32,8 @@ class AdaptiveShortBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: dom.A
     else
       BigEndian
   }
+  
+  override val hasJsArray = order() == ByteOrder.nativeOrder
 
   override def toString = "AdaptiveShortBuffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
 }

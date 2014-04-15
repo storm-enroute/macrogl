@@ -32,6 +32,8 @@ class AdaptiveDoubleBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: dom.
     else
       BigEndian
   }
+  
+  override val hasJsArray = order() == ByteOrder.nativeOrder
 
   override def toString = "AdaptiveDoubleBuffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
 }

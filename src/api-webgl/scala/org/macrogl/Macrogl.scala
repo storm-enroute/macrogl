@@ -17,7 +17,6 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
 
   /*final def genBuffers(): Token.Buffer = {
     val buffer = gl.createBuffer()
-    // TODO how to check the return value?
     buffer
   }
 
@@ -431,21 +430,34 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
    * Reason: not available in the API GLES20 of Android
    */
 
-  final def bufferData(target: Int, data: Data, usage: Int) = {
+  private final def _bufferData(target: Int, data: Data, usage: Int) = {
     val buffer: nio.Buffer = data
-    require(buffer.hasJsBuffer) // TODO should we have a backup plan?
+    require(buffer.hasJsBuffer) // should we have a backup plan?
+
     gl.bufferData(target, buffer.jsDataView, usage)
   }
 
-  final def bufferSubData(target: Int, offset: Long, data: Data) = {
+  final def bufferData(target: Int, data: Data.Byte, usage: Int) = this._bufferData(target, data.slice, usage)
+  final def bufferData(target: Int, data: Data.Short, usage: Int) = this._bufferData(target, data.slice, usage)
+  final def bufferData(target: Int, data: Data.Int, usage: Int) = this._bufferData(target, data.slice, usage)
+  final def bufferData(target: Int, data: Data.Float, usage: Int) = this._bufferData(target, data.slice, usage)
+  final def bufferData(target: Int, data: Data.Double, usage: Int) = this._bufferData(target, data.slice, usage)
+
+  private final def _bufferSubData(target: Int, offset: Long, data: Data) = {
     // Not really how the Long is going to behave in JavaScript
     val buffer: nio.Buffer = data
-    require(buffer.hasJsBuffer) // TODO should we have a backup plan?
+    require(buffer.hasJsBuffer) // should we have a backup plan?
 
     // TODO bufferSubData currently missing from org.scalajs.dom, correct this once it's ok
     // PS: bufferSubData exists in the WebGL specs
     gl.asInstanceOf[js.Dynamic].bufferSubData(target, offset, buffer.jsDataView)
   }
+
+  final def bufferSubData(target: Int, offset: Long, data: Data.Byte) = this._bufferSubData(target, offset, data.slice)
+  final def bufferSubData(target: Int, offset: Long, data: Data.Short) = this._bufferSubData(target, offset, data.slice)
+  final def bufferSubData(target: Int, offset: Long, data: Data.Int) = this._bufferSubData(target, offset, data.slice)
+  final def bufferSubData(target: Int, offset: Long, data: Data.Float) = this._bufferSubData(target, offset, data.slice)
+  final def bufferSubData(target: Int, offset: Long, data: Data.Double) = this._bufferSubData(target, offset, data.slice)
 
   final def checkFramebufferStatus(target: Int): Int = {
     gl.checkFramebufferStatus(target).toInt
@@ -480,15 +492,19 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
    * Reason: not available in the API WebGL and the API GLES20 of Android
    */
 
-  final def compressedTexImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int, data: Data.Byte) = {
-    val bytebuffer: nio.ByteBuffer = data
-    require(bytebuffer.hasJsBuffer) // TODO should we have a backup plan?
+  final def compressedTexImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
+    data: Data.Byte) = {
+
+    val bytebuffer: nio.ByteBuffer = data.slice
+    require(bytebuffer.hasJsBuffer) // should we have a backup plan?
     gl.compressedTexImage2D(target, level, internalformat, width, height, border, bytebuffer.jsDataView)
   }
 
-  final def compressedTexSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, width: Int, height: Int, format: Int, data: Data.Byte) = {
-    val bytebuffer: nio.ByteBuffer = data
-    require(bytebuffer.hasJsBuffer) // TODO should we have a backup plan?
+  final def compressedTexSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, width: Int, height: Int,
+    format: Int, data: Data.Byte) = {
+
+    val bytebuffer: nio.ByteBuffer = data.slice
+    require(bytebuffer.hasJsBuffer) // should we have a backup plan?
     gl.compressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, bytebuffer.jsDataView)
   }
 
@@ -588,7 +604,7 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
    */
 
   final def drawElements(mode: Int, count: Int, `type`: Int, offset: Long) = {
-    // TODO may be a good idea to check that an element array buffer is currently bound
+    // may be a good idea to check that an element array buffer is currently bound
     gl.drawElements(mode, count, `type`, offset)
   }
 
@@ -647,7 +663,7 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
     gl.getAttribLocation(program, name).toInt
   }
 
-  final def getBufferParameter(target: Int, pname: Int): Int = {
+  final def getBufferParameteri(target: Int, pname: Int): Int = {
     // accept only GL_BUFFER_SIZE and GL_BUFFER_USAGE, both return a simple Int, no problem here
     gl.getBufferParameter(target, pname).toInt
   }
@@ -660,18 +676,13 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
    * This set of function is a big mess around the different systems due to the fact that the returned value can be pretty
    * much anything.
    * 
-   * On good old C, LWJGL and Android GLES20: glGet is divided between glGetBooleanv, glGetFloatv, glGetDoublev, glGetIntegerv and glGetString.
+   * On good old C, LWJGL and Android GLES20: glGet is divided between glGetBooleanv, glGetFloatv, glGetDoublev,
+   * glGetIntegerv and glGetString.
    * Please note that it can actually store SEVERAL values in the provided pointer/buffer.
    * 
    * On WebGL, things get a bit tricky. There is a single function getParameter that just return something of type Any (yay...
    * the joy of dynamic typing).
    */
-
-  private val maxResultSize = 16
-  private val tmpByteResult = Macrogl.createByteDate(maxResultSize)
-  private val tmpIntResult = Macrogl.createIntData(maxResultSize)
-  private val tmpFloatResult = Macrogl.createFloatData(maxResultSize)
-  private val tmpDoubleResult = Macrogl.createDoubleData(maxResultSize)
 
   final def getParameterBuffer(pname: Int): Token.Buffer = {
     gl.getParameter(pname).asInstanceOf[Token.Buffer]
@@ -692,79 +703,518 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
   final def getParameterShader(pname: Int): Token.Shader = {
     gl.getParameter(pname).asInstanceOf[Token.Shader]
   }
+  
+  final def getParameterString(pname: Int): String = {
+    gl.getParameter(pname).asInstanceOf[js.String]
+  }
 
-  final def getParameterInt(pname: Int): Int = {
+  final def getParameteri(pname: Int): Int = {
     // LWJGL hint: use glGetInteger(int pname): Int
-    gl.getParameter(pname).asInstanceOf[js.Number].toInt
-  }
-
-  final def getParameterInts(pname: Int, outputs: Data.Int): Data.Int = {
-    // LWJGL hint: use glGetInteger(int pname, IntBuffer params)
-    val slice: nio.IntBuffer = outputs.slice
-    
     val ret = gl.getParameter(pname)
-    // TODO check the return is an Array of Int
-    val jsArrayInt = ret.asInstanceOf[dom.Int32Array]
-    // org.scalajs.dom does not provides .length() method
-    val jsArrayLength = ret.asInstanceOf[js.Dynamic].length().asInstanceOf[js.Number].toInt
-    
-    require(slice.remaining >= jsArrayLength)
-    
-    if(slice.hasJsArray) { // optimized version for native buffer
-      slice.jsArray.set(jsArrayInt)
-    } else { // generic version
-      for(i <- 0 until jsArrayLength) {
-        slice.put(jsArrayInt(i).toInt)
-      }
-    }
-    
-    slice.position(0)
-    slice.limit(jsArrayLength)
-    slice.asReadOnlyBuffer()
+    JSTypeHelper.toInt(ret)
   }
 
-  final def getParameterFloat(pname: Int): Float = {
+  final def getParameteriv(pname: Int, outputs: Data.Int) = {
+    // LWJGL hint: use glGetInteger(int pname, IntBuffer params)
+    val ret = gl.getParameter(pname)
+    JSTypeHelper.toInts(ret, outputs)
+  }
+
+  final def getParameterf(pname: Int): Float = {
     // LWJGL hint: use glGetFloat(int pname): Int
     gl.getParameter(pname).asInstanceOf[js.Number].toFloat
   }
 
-  final def getParameterFloats(pname: Int, outputs: Data.Float): Data.Float = {
+  final def getParameterfv(pname: Int, outputs: Data.Float) = {
     // LWJGL hint: use glGetInteger(int pname, IntBuffer params)
-    val slice: nio.FloatBuffer = outputs.slice
-    
     val ret = gl.getParameter(pname)
-    // TODO check the return is an Array of Int
-    val jsArrayInt = ret.asInstanceOf[dom.Float32Array]
-    // org.scalajs.dom does not provides .length() method
-    val jsArrayLength = ret.asInstanceOf[js.Dynamic].length().asInstanceOf[js.Number].toInt
-    
-    require(slice.remaining >= jsArrayLength)
-    
-    if(slice.hasJsArray) { // optimized version for native buffer
-      slice.jsArray.set(jsArrayInt)
-    } else { // generic version
-      for(i <- 0 until jsArrayLength) {
-        slice.put(jsArrayInt(i).toFloat)
-      }
-    }
-    
-    slice.position(0)
-    slice.limit(jsArrayLength)
-    slice.asReadOnlyBuffer()
+    JSTypeHelper.toFloats(ret, outputs)
   }
 
-  final def getParameterBoolean(pname: Int): Boolean = {
+  final def getParameterb(pname: Int): Boolean = {
     // LWJGL hint: use glGetBoolean(int pname): Boolean
-    gl.getParameter(pname).asInstanceOf[js.Boolean]
+    val ret = gl.getParameter(pname)
+    JSTypeHelper.toBoolean(ret)
   }
 
-  final def getParameterBooleans(pname: Int, outputs: Data.Byte): Data.Byte = {
+  final def getParameterbv(pname: Int, outputs: Data.Byte) = {
     // LWJGL hint: use glGetBoolean(int pname, ByteBuffer params)
-    val slice: nio.ByteBuffer = outputs.slice
-    
     val ret = gl.getParameter(pname)
+    JSTypeHelper.toBooleans(ret, outputs)
+  }
+
+  final def gerError(): Int = {
+    gl.getError().toInt
+  }
+
+  final def getFramebufferAttachmentParameteri(target: Int, attachment: Int, pname: Int): Int = {
+    gl.getFramebufferAttachmentParameter(target, attachment, pname).asInstanceOf[js.Number].toInt
+  }
+
+  final def getFramebufferAttachmentParameterRenderbuffer(target: Int, attachment: Int, pname: Int): Token.RenderBuffer = {
+    gl.getFramebufferAttachmentParameter(target, attachment, pname).asInstanceOf[Token.RenderBuffer]
+  }
+
+  final def getFramebufferAttachmentParameterTexture(target: Int, attachment: Int, pname: Int): Token.Texture = {
+    gl.getFramebufferAttachmentParameter(target, attachment, pname).asInstanceOf[Token.Texture]
+  }
+
+  final def getProgramParameteri(program: Token.Program, pname: Int): Int = {
+    gl.getProgramParameter(program, pname).asInstanceOf[js.Number].toInt
+  }
+
+  final def getProgramParameterb(program: Token.Program, pname: Int): Boolean = {
+    gl.getProgramParameter(program, pname).asInstanceOf[js.Boolean]
+  }
+
+  final def getProgramInfoLog(program: Token.Program): String = {
+    gl.getProgramInfoLog(program)
+  }
+
+  final def getRenderbufferParameteri(target: Int, pname: Int): Int = {
+    gl.getRenderbufferParameter(target, pname).asInstanceOf[js.Number].toInt
+  }
+
+  final def getShaderParameteri(shader: Token.Shader, pname: Int): Int = {
+    gl.getShaderParameter(shader, pname).asInstanceOf[js.Number].toInt
+  }
+
+  final def getShaderParameterb(shader: Token.Shader, pname: Int): Int = {
+    gl.getShaderParameter(shader, pname).asInstanceOf[js.Number].toInt
+  }
+
+  final def getShaderPrecisionFormat(shadertype: Int, precisiontype: Int) = {
+    val jsPrecisionFormat = gl.getShaderPrecisionFormat(shadertype, precisiontype)
+    PrecisionFormat(jsPrecisionFormat.rangeMin.toInt, jsPrecisionFormat.rangeMax.toInt, jsPrecisionFormat.precision.toInt)
+  }
+
+  final def getShaderInfoLog(shader: Token.Shader): String = {
+    gl.getShaderInfoLog(shader)
+  }
+
+  final def getShaderSource(shader: Token.Shader): String = {
+    gl.getShaderSource(shader)
+  }
+
+  final def getTexParameteri(target: Int, pname: Int): Int = {
+    // org.scalajs.dom could maybe use return type js.Number instead of js.Any
+    val ret = gl.getTexParameter(target, pname)
+    JSTypeHelper.toInt(ret)
+  }
+
+  final def getUniformi(program: Token.Program, location: Token.UniformLocation): Int = {
+    val ret = gl.getUniform(program, location)
+    JSTypeHelper.toInt(ret)
+  }
+
+  final def getUniformiv(program: Token.Program, location: Token.UniformLocation, outputs: Data.Int) = {
+    val ret = gl.getUniform(program, location)
+    JSTypeHelper.toInts(ret, outputs)
+  }
+
+  final def getUniformf(program: Token.Program, location: Token.UniformLocation): Float = {
+    val ret = gl.getUniform(program, location)
+    JSTypeHelper.toFloat(ret)
+  }
+
+  final def getUniformfv(program: Token.Program, location: Token.UniformLocation, outputs: Data.Float) = {
+    val ret = gl.getUniform(program, location)
+    JSTypeHelper.toFloats(ret, outputs)
+  }
+
+  final def getUniformb(program: Token.Program, location: Token.UniformLocation): Boolean = {
+    val ret = gl.getUniform(program, location)
+    JSTypeHelper.toBoolean(ret)
+  }
+
+  final def getUniformbv(program: Token.Program, location: Token.UniformLocation, outputs: Data.Byte) = {
+    val ret = gl.getUniform(program, location)
+    JSTypeHelper.toBooleans(ret, outputs)
+  }
+
+  final def getUniformLocation(program: Token.Program, name: String): Token.UniformLocation = {
+    gl.getUniformLocation(program, name).asInstanceOf[Token.UniformLocation]
+  }
+
+  final def getVertexAttribi(index: Int, pname: Int): Int = {
+    val ret = gl.getVertexAttrib(index, pname)
+    JSTypeHelper.toInt(ret)
+  }
+
+  final def getVertexAttribf(index: Int, pname: Int): Float = {
+    val ret = gl.getVertexAttrib(index, pname)
+    JSTypeHelper.toFloat(ret)
+  }
+
+  final def getVertexAttribfv(index: Int, pname: Int, outputs: Data.Float) = {
+    val ret = gl.getVertexAttrib(index, pname)
+    JSTypeHelper.toFloats(ret, outputs)
+  }
+
+  final def getVertexAttribb(index: Int, pname: Int): Boolean = {
+    val ret = gl.getVertexAttrib(index, pname)
+    JSTypeHelper.toBoolean(ret)
+  }
+
+  /*
+   * Method glGetVertexAttribPointer discarded
+   * Reason: not available in the API GLES20 of Android
+   * Note: (partially) present with the name getVertexAttribOffset in the API WebGL (limited to retrieving only the
+   * offset, not the pointer)
+   */
+
+  final def hint(target: Int, mode: Int) = {
+    // org.scalajs.dom has the return type wrong (js.Any instead of void), correct this once it's ok
+    gl.asInstanceOf[js.Dynamic].hint(target, mode)
+  }
+
+  final def isBuffer(buffer: Token.Buffer): Boolean = {
+    gl.isBuffer(buffer)
+  }
+
+  final def isEnabled(cap: Int): Boolean = {
+    gl.isEnabled(cap)
+  }
+
+  final def isFramebuffer(framebuffer: Token.FrameBuffer): Boolean = {
+    gl.isFramebuffer(framebuffer)
+  }
+
+  final def isProgram(program: Token.Program): Boolean = {
+    gl.isProgram(program)
+  }
+
+  final def isRenderbuffer(renderbuffer: Token.RenderBuffer): Boolean = {
+    gl.isRenderbuffer(renderbuffer)
+  }
+
+  final def isShader(shader: Token.Shader): Boolean = {
+    gl.isShader(shader)
+  }
+
+  final def isTexture(texture: Token.Texture): Boolean = {
+    gl.isTexture(texture)
+  }
+
+  final def lineWidth(width: Float) = {
+    gl.lineWidth(width)
+  }
+
+  final def linkProgram(program: Token.Program) = {
+    gl.linkProgram(program)
+  }
+
+  final def pixelStorei(pname: Int, param: Int) = {
+    gl.pixelStorei(pname, param)
+  }
+
+  final def polygonOffset(factor: Float, units: Float) = {
+    gl.polygonOffset(factor, units)
+  }
+
+  private final def _readPixels(x: Int, y: Int, width: Int, height: Int, format: Int, `type`: Int, pixels: Data) = {
+    val buffer: nio.Buffer = pixels
+    require(buffer.hasJsBuffer)
+    gl.readPixels(x, y, width, height, format, `type`, buffer.jsDataView)
+  }
+
+  final def readPixels(x: Int, y: Int, width: Int, height: Int, format: Int, `type`: Int, pixels: Data.Byte) =
+    this._readPixels(x, y, width, height, format, `type`, pixels.slice)
+  final def readPixels(x: Int, y: Int, width: Int, height: Int, format: Int, `type`: Int, pixels: Data.Short) =
+    this._readPixels(x, y, width, height, format, `type`, pixels.slice)
+  final def readPixels(x: Int, y: Int, width: Int, height: Int, format: Int, `type`: Int, pixels: Data.Int) =
+    this._readPixels(x, y, width, height, format, `type`, pixels.slice)
+  final def readPixels(x: Int, y: Int, width: Int, height: Int, format: Int, `type`: Int, pixels: Data.Float) =
+    this._readPixels(x, y, width, height, format, `type`, pixels.slice)
+  final def readPixels(x: Int, y: Int, width: Int, height: Int, format: Int, `type`: Int, pixels: Data.Double) =
+    this._readPixels(x, y, width, height, format, `type`, pixels.slice)
+
+  final def renderbufferStorage(target: Int, internalformat: Int, width: Int, height: Int) = {
+    gl.renderbufferStorage(target, internalformat, width, height)
+  }
+
+  final def sampleCoverage(value: Float, invert: Boolean) = {
+    gl.sampleCoverage(value, invert)
+  }
+
+  final def scissor(x: Int, y: Int, width: Int, height: Int) = {
+    gl.scissor(x, y, width, height)
+  }
+
+  final def shaderSource(shader: Token.Shader, source: String) = {
+    gl.shaderSource(shader, source)
+  }
+
+  final def stencilFunc(func: Int, ref: Int, mask: Int) = {
+    gl.stencilFunc(func, ref, mask)
+  }
+
+  final def stencilFuncSeparate(face: Int, func: Int, ref: Int, mask: Int) = {
+    gl.stencilFuncSeparate(face, func, ref, mask)
+  }
+
+  final def stencilMask(mask: Int) = {
+    gl.stencilMask(mask)
+  }
+
+  final def stencilMaskSeparate(face: Int, mask: Int) = {
+    gl.stencilMaskSeperate(face, mask)
+  }
+
+  final def stencilOp(fail: Int, zfail: Int, zpass: Int) = {
+    gl.stencilOp(fail, zfail, zpass)
+  }
+
+  final def stencilOpSeparate(face: Int, sfail: Int, dpfail: Int, dppass: Int) = {
+    gl.stencilOpSeperate(face, sfail, dpfail, dppass)
+  }
+
+  private final def _texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
+    format: Int, `type`: Int, pixels: Data) = {
+
+    val buffer: nio.Buffer = pixels
+    require(buffer.hasJsBuffer)
+    gl.texImage2D(target, level, internalformat, width, height, border, format, `type`, buffer.jsDataView)
+  }
+
+  final def texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
+    format: Int, `type`: Int, pixels: Data.Byte) = this._texImage2D(target, level, internalformat, width, height, border,
+    format, `type`, pixels.slice)
+  final def texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
+    format: Int, `type`: Int, pixels: Data.Short) = this._texImage2D(target, level, internalformat, width, height, border,
+    format, `type`, pixels.slice)
+  final def texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
+    format: Int, `type`: Int, pixels: Data.Int) = this._texImage2D(target, level, internalformat, width, height, border,
+    format, `type`, pixels.slice)
+  final def texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
+    format: Int, `type`: Int, pixels: Data.Float) = this._texImage2D(target, level, internalformat, width, height, border,
+    format, `type`, pixels.slice)
+  final def texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
+    format: Int, `type`: Int, pixels: Data.Double) = this._texImage2D(target, level, internalformat, width, height, border,
+    format, `type`, pixels.slice)
+
+  final def texParameterf(target: Int, pname: Int, param: Float) = {
+    gl.texParameterf(target, pname, param)
+  }
+
+  final def texParameteri(target: Int, pname: Int, param: Int) = {
+    gl.texParameteri(target, pname, param)
+  }
+
+  private final def _texSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, width: Int, height: Int,
+    format: Int, `type`: Int, pixels: Data) = {
+
+    val buffer: nio.Buffer = pixels
+    require(buffer.hasJsBuffer)
+    gl.texSubImage2D(target, level, xoffset, yoffset, width, height, format, `type`, buffer.jsDataView)
+  }
+
+  final def texSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, width: Int, height: Int,
+    format: Int, `type`: Int, pixels: Data.Byte) = this._texSubImage2D(target, level, xoffset, yoffset, width, height,
+    format, `type`, pixels.slice)
+  final def texSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, width: Int, height: Int,
+    format: Int, `type`: Int, pixels: Data.Short) = this._texSubImage2D(target, level, xoffset, yoffset, width, height,
+    format, `type`, pixels.slice)
+  final def texSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, width: Int, height: Int,
+    format: Int, `type`: Int, pixels: Data.Int) = this._texSubImage2D(target, level, xoffset, yoffset, width, height,
+    format, `type`, pixels.slice)
+  final def texSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, width: Int, height: Int,
+    format: Int, `type`: Int, pixels: Data.Float) = this._texSubImage2D(target, level, xoffset, yoffset, width, height,
+    format, `type`, pixels.slice)
+  final def texSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, width: Int, height: Int,
+    format: Int, `type`: Int, pixels: Data.Double) = this._texSubImage2D(target, level, xoffset, yoffset, width, height,
+    format, `type`, pixels.slice)
+
+  final def uniform1f(location: Token.UniformLocation, v0: Float) = {
+    gl.uniform1f(location, v0)
+  }
+  
+  final def uniform1fv(location: Token.UniformLocation, values: Data.Float) = {
+    val slice = values.slice
+    require(slice.hasJsArray)
+    gl.uniform1fv(location, slice.jsArray)
+  }
+  
+  final def uniform1i(location: Token.UniformLocation, x: Int) = {
+    gl.uniform1i(location, x)
+  }
+  
+  final def uniform1iv(location: Token.UniformLocation, values: Data.Int) = {
+    val slice = values.slice
+    require(slice.hasJsArray)
+    gl.uniform1iv(location, slice.jsArray)
+  }
+  
+  final def uniform2f(location: Token.UniformLocation, x: Float, y: Float) = {
+    gl.uniform2f(location, x, y)
+  }
+  
+  final def uniform2fv(location: Token.UniformLocation, values: Data.Float) = {
+    val slice = values.slice
+    require(slice.hasJsArray)
+    gl.uniform2fv(location, slice.jsArray)
+  }
+  
+  final def uniform2i(location: Token.UniformLocation, x: Int, y: Int) = {
+    gl.uniform2i(location, x, y)
+  }
+  
+  final def uniform2iv(location: Token.UniformLocation, values: Data.Int) = {
+    val slice = values.slice
+    require(slice.hasJsArray)
+    gl.uniform2iv(location, slice.jsArray)
+  }
+  
+  final def uniform3f(location: Token.UniformLocation, x: Float, y: Float, z: Float) = {
+    gl.uniform3f(location, x, y, z)
+  }
+  
+  final def uniform3fv(location: Token.UniformLocation, values: Data.Float) = {
+    val slice = values.slice
+    require(slice.hasJsArray)
+    gl.uniform3fv(location, slice.jsArray)
+  }
+  
+  final def uniform3i(location: Token.UniformLocation, x: Int, y: Int, z: Int) = {
+    gl.uniform3i(location, x, y, z)
+  }
+  
+  final def uniform3iv(location: Token.UniformLocation, values: Data.Int) = {
+    val slice = values.slice
+    require(slice.hasJsArray)
+    gl.uniform3iv(location, slice.jsArray)
+  }
+  
+  final def uniform4f(location: Token.UniformLocation, x: Float, y: Float, z: Float, w: Float) = {
+    gl.uniform4f(location, x, y, z, w)
+  }
+  
+  final def uniform4fv(location: Token.UniformLocation, values: Data.Float) = {
+    val slice = values.slice
+    require(slice.hasJsArray)
+    gl.uniform4fv(location, slice.jsArray)
+  }
+  
+  final def uniform4i(location: Token.UniformLocation, x: Int, y: Int, z: Int, w: Int) = {
+    gl.uniform4i(location, x, y, z, w)
+  }
+  
+  final def uniform4iv(location: Token.UniformLocation, values: Data.Int) = {
+    val slice = values.slice
+    require(slice.hasJsArray)
+    gl.uniform4iv(location, slice.jsArray)
+  }
+  
+  final def uniformMatrix2fv(location: Token.UniformLocation, transpose: Boolean, matrices: Data.Float) = {
+    val slice = matrices.slice
+    require(slice.hasJsArray)
+    gl.uniformMatrix2fv(location, transpose, slice.jsArray)
+  }
+  
+  final def uniformMatrix3fv(location: Token.UniformLocation, transpose: Boolean, matrices: Data.Float) = {
+    val slice = matrices.slice
+    require(slice.hasJsArray)
+    gl.uniformMatrix3fv(location, transpose, slice.jsArray)
+  }
+  
+  final def uniformMatrix4fv(location: Token.UniformLocation, transpose: Boolean, matrices: Data.Float) = {
+    val slice = matrices.slice
+    require(slice.hasJsArray)
+    gl.uniformMatrix4fv(location, transpose, slice.jsArray)
+  }
+  
+  final def useProgram(program: Token.Program) = {
+    gl.useProgram(program)
+  }
+  
+  final def validateProgram(program: Token.Program) = {
+    gl.validateProgram(program)
+  }
+  
+  final def vertexAttrib1f(index: Int, x: Float) = {
+    gl.vertexAttrib1f(index, x)
+  }
+  
+  final def vertexAttrib1fv(index: Int, values: Data.Float) = {
+    val slice = values.slice
+    require(slice.hasJsArray)
+    gl.vertexAttrib1fv(index, slice.jsArray)
+  }
+  
+  final def vertexAttrib2f(index: Int, x: Float, y: Float) = {
+    gl.vertexAttrib2f(index, x, y)
+  }
+  
+  final def vertexAttrib2fv(index: Int, values: Data.Float) = {
+    val slice = values.slice
+    require(slice.hasJsArray)
+    gl.vertexAttrib2fv(index, slice.jsArray)
+  }
+  
+  final def vertexAttrib3f(index: Int, x: Float, y: Float, z: Float) = {
+    gl.vertexAttrib3f(index, x, y, z)
+  }
+  
+  final def vertexAttrib3fv(index: Int, values: Data.Float) = {
+    val slice = values.slice
+    require(slice.hasJsArray)
+    gl.vertexAttrib3fv(index, slice.jsArray)
+  }
+  
+  final def vertexAttrib4f(index: Int, x: Float, y: Float, z: Float, w: Float) = {
+    gl.vertexAttrib4f(index, x, y, z, w)
+  }
+  
+  final def vertexAttrib4fv(index: Int, values: Data.Float) = {
+    val slice = values.slice
+    require(slice.hasJsArray)
+    gl.vertexAttrib4fv(index, slice.jsArray)
+  }
+  
+  /*
+   * Method vertexAttribPointer with signature glVertexAttribPointer(int index, int size, boolean normalized,
+   * int stride, *Buffer buffer) discarded
+   * Reason: not available in the API WebGL
+   * Note: available in the API GLES20 of Android
+   * Note: the following available method requires the use of an array buffer currently bound to ARRAY_BUFFER
+   */
+  
+  final def vertexAttribPointer(index: Int, size: Int, `type`: Int, normalized: Boolean, stride: Int, offset: Long) = {
+    gl.vertexAttribPointer(index, size, `type`, normalized, stride, offset)
+  }
+  
+  final def viewport(x: Int, y: Int, width: Int, height: Int) = {
+    gl.viewport(x, y, width, height)
+  }
+}
+
+private object JSTypeHelper {
+  // TODO complete this with some on-the-fly conversions
+
+  def toBoolean(value: js.Any): Boolean = {
+    value.asInstanceOf[js.Boolean]
+  }
+
+  def toInt(value: js.Any): Int = {
+    value.asInstanceOf[js.Number].toInt
+  }
+
+  def toShort(value: js.Any): Short = {
+    value.asInstanceOf[js.Number].toShort
+  }
+
+  def toFloat(value: js.Any): Float = {
+    value.asInstanceOf[js.Number].toFloat
+  }
+
+  def toDouble(value: js.Any): Double = {
+    value.asInstanceOf[js.Number].toDouble
+  }
+
+  def toBooleans(value: js.Any, data: Data.Byte) = {
+    val slice = data.slice
     // TODO check the return is an Array of boolean
-    val jsArrayBool = ret.asInstanceOf[js.Array[js.Boolean]]
+    val jsArrayBool = value.asInstanceOf[js.Array[js.Boolean]]
     val jsArrayLength = jsArrayBool.length.toInt
 
     require(slice.remaining >= jsArrayLength)
@@ -776,17 +1226,43 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
         else
           0.toByte)
     }
-
-    slice.position(0)
-    slice.limit(jsArrayLength)
-    slice.asReadOnlyBuffer()
   }
 
-  final def getParameterString(pname: Int): String = {
-    gl.getParameter(pname).asInstanceOf[js.String]
+  def toInts(value: js.Any, data: Data.Int) = {
+    val slice = data.slice
+    // TODO check the return is an Array of Int
+    val jsArrayInt = value.asInstanceOf[dom.Int32Array]
+    // org.scalajs.dom does not provides .length() method
+    val jsArrayLength = value.asInstanceOf[js.Dynamic].length().asInstanceOf[js.Number].toInt
+
+    require(slice.remaining >= jsArrayLength)
+
+    if (slice.hasJsArray) { // optimized version for native buffer
+      slice.jsArray.set(jsArrayInt)
+    } else { // generic version
+      for (i <- 0 until jsArrayLength) {
+        slice.put(jsArrayInt(i).toInt)
+      }
+    }
   }
-  
-  // TODO to be continued
+
+  def toFloats(value: js.Any, data: Data.Float) = {
+    val slice = data.slice
+    // TODO check the return is an Array of Float
+    val jsArrayInt = value.asInstanceOf[dom.Float32Array]
+    // org.scalajs.dom does not provides .length() method
+    val jsArrayLength = value.asInstanceOf[js.Dynamic].length().asInstanceOf[js.Number].toInt
+
+    require(slice.remaining >= jsArrayLength)
+
+    if (slice.hasJsArray) { // optimized version for native buffer
+      slice.jsArray.set(jsArrayInt)
+    } else { // generic version
+      for (i <- 0 until jsArrayLength) {
+        slice.put(jsArrayInt(i).toFloat)
+      }
+    }
+  }
 }
 
 // Those constants are actually retrieved from the rendering context in WebGL, this may be a problem to keep them in an object
@@ -1166,8 +1642,12 @@ object Macrogl {
 
   /* public API - methods */
 
-  final def createByteDate(sz: Int): Data.Byte = {
+  final def createByteData(sz: Int): Data.Byte = {
     org.scalajs.nio.NativeByteBuffer.allocate(sz).order(nio.ByteOrder.nativeOrder)
+  }
+
+  final def createShortData(sz: Int): Data.Short = {
+    org.scalajs.nio.NativeShortBuffer.allocate(sz)
   }
 
   final def createIntData(sz: Int): Data.Int = {
