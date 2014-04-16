@@ -15,20 +15,20 @@ extends Handle {
 
   def acquire() {
     release()
-    rbtoken = gl.createRenderBuffer
+    rbtoken = gl.createRenderbuffer
     allocateStorage()
   }
 
   private def allocateStorage() {
-    val oldbinding = gl.getCurrentRenderBufferBinding
+    val oldbinding = gl.getCurrentRenderbufferBinding
     gl.bindRenderbuffer(Macrogl.RENDERBUFFER, this.token)
     gl.renderbufferStorage(Macrogl.RENDERBUFFER, format, width, height)
     gl.bindRenderbuffer(Macrogl.RENDERBUFFER, oldbinding)
   }
 
   def release() {
-    if (!gl.validRenderBuffer(rbtoken)) {
-      gl.deleteRenderBuffer(rbtoken)
+    if (!gl.validRenderbuffer(rbtoken)) {
+      gl.deleteRenderbuffer(rbtoken)
       rbtoken = Token.RenderBuffer.invalid
     }
   }

@@ -22,7 +22,7 @@ final class FrameBuffer(implicit gl: Macrogl) extends Handle {
   }
 
   def release() {
-    if (!gl.validFrameBuffer(fbtoken)) {
+    if (!gl.validFramebuffer(fbtoken)) {
       gl.deleteFramebuffer(fbtoken)
       fbtoken = Token.FrameBuffer.invalid
     }

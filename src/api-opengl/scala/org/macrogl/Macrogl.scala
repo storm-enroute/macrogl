@@ -164,7 +164,7 @@ class Macrogl private[macrogl] () {
     GL20.glCreateProgram()
   }
 
-  final def createRenderBuffer(): Token.RenderBuffer = {
+  final def createRenderbuffer(): Token.RenderBuffer = {
     GL30.glGenRenderbuffers()
   }
 
@@ -192,7 +192,7 @@ class Macrogl private[macrogl] () {
     GL20.glDeleteProgram(program)
   }
 
-  final def deleteRenderBuffer(renderbuffer: Token.RenderBuffer) = {
+  final def deleteRenderbuffer(renderbuffer: Token.RenderBuffer) = {
     GL30.glDeleteRenderbuffers(renderbuffer)
   }
 
@@ -327,7 +327,7 @@ class Macrogl private[macrogl] () {
     GL11.glGetInteger(pname)
   }
 
-  final def getParameterFrameBuffer(pname: Int): Token.FrameBuffer = {
+  final def getParameterFramebuffer(pname: Int): Token.FrameBuffer = {
     GL11.glGetInteger(pname)
   }
 
@@ -335,7 +335,7 @@ class Macrogl private[macrogl] () {
     GL11.glGetInteger(pname)
   }
 
-  final def getParameterRenderBuffer(pname: Int): Token.RenderBuffer = {
+  final def getParameterRenderbuffer(pname: Int): Token.RenderBuffer = {
     GL11.glGetInteger(pname)
   }
 
@@ -819,8 +819,8 @@ class Macrogl private[macrogl] () {
     this.getParameterProgram(Macrogl.CURRENT_PROGRAM)
   }
   
-  final def getCurrentRenderBufferBinding(): Token.RenderBuffer = {
-    this.getParameterRenderBuffer(Macrogl.RENDERBUFFER_BINDING)
+  final def getCurrentRenderbufferBinding(): Token.RenderBuffer = {
+    this.getParameterRenderbuffer(Macrogl.RENDERBUFFER_BINDING)
   }
   
   final def shaderSource(shader: Token.Shader, srcarray: Array[CharSequence]) {
@@ -843,11 +843,11 @@ class Macrogl private[macrogl] () {
     (uloc != -1)
   }
 
-  final def validFrameBuffer(fb: Token.FrameBuffer): Boolean = {
+  final def validFramebuffer(fb: Token.FrameBuffer): Boolean = {
     (fb > 0) && this.isFramebuffer(fb)
   }
 
-  final def validRenderBuffer(rb: Token.RenderBuffer): Boolean = {
+  final def validRenderbuffer(rb: Token.RenderBuffer): Boolean = {
     (rb > 0) && this.isRenderbuffer(rb)
   }
   

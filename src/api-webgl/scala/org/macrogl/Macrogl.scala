@@ -169,8 +169,9 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
     gl.createProgram()
   }
 
-  final def createRenderBuffer(): Token.RenderBuffer = {
-    gl.createRenderBuffer()
+  final def createRenderbuffer(): Token.RenderBuffer = {
+    // TODO org.scalajs.dom has the name wrong the 'b' is not capital in the WebGL spec, correct this once it's ok
+    gl.asInstanceOf[js.Dynamic].createRenderbuffer().asInstanceOf[Token.RenderBuffer]
   }
 
   final def createShader(`type`: Int): Token.Shader = {
@@ -197,7 +198,7 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
     gl.deleteProgram(program)
   }
 
-  final def deleteRenderBuffer(renderbuffer: Token.RenderBuffer) = {
+  final def deleteRenderbuffer(renderbuffer: Token.RenderBuffer) = {
     gl.deleteRenderbuffer(renderbuffer)
   }
 
@@ -325,7 +326,7 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
     gl.getParameter(pname).asInstanceOf[Token.Buffer]
   }
 
-  final def getParameterFrameBuffer(pname: Int): Token.FrameBuffer = {
+  final def getParameterFramebuffer(pname: Int): Token.FrameBuffer = {
     gl.getParameter(pname).asInstanceOf[Token.FrameBuffer]
   }
 
@@ -333,7 +334,7 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
     gl.getParameter(pname).asInstanceOf[Token.Program]
   }
 
-  final def getParameterRenderBuffer(pname: Int): Token.RenderBuffer = {
+  final def getParameterRenderbuffer(pname: Int): Token.RenderBuffer = {
     gl.getParameter(pname).asInstanceOf[Token.RenderBuffer]
   }
 
@@ -848,8 +849,8 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
     this.getParameterProgram(Macrogl.CURRENT_PROGRAM)
   }
   
-  final def getCurrentRenderBufferBinding(): Token.RenderBuffer = {
-    this.getParameterRenderBuffer(Macrogl.RENDERBUFFER_BINDING)
+  final def getCurrentRenderbufferBinding(): Token.RenderBuffer = {
+    this.getParameterRenderbuffer(Macrogl.RENDERBUFFER_BINDING)
   }
   
   final def shaderSource(shader: Token.Shader, srcarray: Array[CharSequence]) {
@@ -872,11 +873,11 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
     (uloc != null)
   }
 
-  final def validFrameBuffer(fb: Token.FrameBuffer): Boolean = {
+  final def validFramebuffer(fb: Token.FrameBuffer): Boolean = {
     (fb != null) && this.isFramebuffer(fb)
   }
 
-  final def validRenderBuffer(rb: Token.RenderBuffer): Boolean = {
+  final def validRenderbuffer(rb: Token.RenderBuffer): Boolean = {
     (rb != null) && this.isRenderbuffer(rb)
   }
   
