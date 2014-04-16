@@ -18,12 +18,12 @@ final class FrameBuffer(implicit gl: Macrogl) extends Handle {
 
   def acquire() {
     release()
-    fbtoken = gl.genFrameBuffers()
+    fbtoken = gl.createFramebuffer
   }
 
   def release() {
     if (!gl.validFrameBuffer(fbtoken)) {
-      gl.deleteFrameBuffers(fbtoken)
+      gl.deleteFramebuffer(fbtoken)
       fbtoken = Token.FrameBuffer.invalid
     }
   }
@@ -60,10 +60,10 @@ object FrameBuffer {
       val a = attachment.splice
       val t = texture.splice
       val l = level.splice
-      gl.splice.frameBufferTexture2D(Macrogl.GL_FRAMEBUFFER, a, t.target, t.token, l)
+      gl.splice.framebufferTexture2D(Macrogl.FRAMEBUFFER, a, t.target, t.token, l)
       gl.splice.checkError()
       try f.splice(())
-      finally gl.splice.frameBufferTexture2D(Macrogl.GL_FRAMEBUFFER, a, t.target, 0, l)
+      finally gl.splice.framebufferTexture2D(Macrogl.FRAMEBUFFER, a, t.target, 0, l)
       ()
     }
 
@@ -82,10 +82,10 @@ object FrameBuffer {
       val t = target.splice
       val a = attachment.splice
       val rb = rbuff.splice
-      gl.splice.frameBufferRenderBuffer(t, a, Macrogl.GL_RENDERBUFFER, rb.token)
+      gl.splice.framebufferRenderbuffer(t, a, Macrogl.RENDERBUFFER, rb.token)
       gl.splice.checkError()
       try f.splice(())
-      finally gl.splice.frameBufferRenderBuffer(t, a, Macrogl.GL_RENDERBUFFER, 0)
+      finally gl.splice.framebufferRenderbuffer(t, a, Macrogl.RENDERBUFFER, 0)
       ()
     }
 

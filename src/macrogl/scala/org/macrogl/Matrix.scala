@@ -130,8 +130,8 @@ object Matrix {
 
   final class Projection(a: Array[Double]) extends Matrix(a) {
     def this() = this(new Array[Double](16))
-    def mode = Macrogl.GL_PROJECTION
-    def matrixMode = Macrogl.GL_PROJECTION_MATRIX
+    def mode = Macroglex.PROJECTION
+    def matrixMode = Macroglex.PROJECTION_MATRIX
   }
 
   implicit val projectionCtor = new Ctor[Projection] {
@@ -140,8 +140,8 @@ object Matrix {
 
   final class Modelview(a: Array[Double]) extends Matrix(a) {
     def this() = this(new Array[Double](16))
-    def mode = Macrogl.GL_MODELVIEW
-    def matrixMode = Macrogl.GL_MODELVIEW_MATRIX
+    def mode = Macroglex.MODELVIEW
+    def matrixMode = Macroglex.MODELVIEW_MATRIX
   }
 
   implicit val modelviewCtor = new Ctor[Modelview] {
@@ -150,8 +150,8 @@ object Matrix {
 
   final class Texture(a: Array[Double]) extends Matrix(a) {
     def this() = this(new Array[Double](16))
-    def mode = Macrogl.GL_TEXTURE
-    def matrixMode = Macrogl.GL_TEXTURE_MATRIX
+    def mode = Macrogl.TEXTURE
+    def matrixMode = Macroglex.TEXTURE_MATRIX
   }
 
   implicit val textureCtor = new Ctor[Texture] {
@@ -175,15 +175,15 @@ object Matrix {
     0.0, 0.0, 0.0, 1.0
   ))
 
-  def orthoProjection(m: Projection)(left: Double, right: Double, bottom: Double, top: Double, nearPlane: Double, farPlane: Double)(implicit gl: Macrogl) {
-    val oldmode = gl.getInteger(Macrogl.GL_MATRIX_MODE)
-    gl.matrixMode(Macrogl.GL_PROJECTION)
+  def orthoProjection(m: Projection)(left: Double, right: Double, bottom: Double, top: Double, nearPlane: Double, farPlane: Double)(implicit gl: Macroglex) {
+    val oldmode = gl.getParameteri(Macroglex.MATRIX_MODE)
+    gl.matrixMode(Macroglex.PROJECTION)
     gl.pushMatrix()
     try {
       gl.loadIdentity()
       gl.ortho(left, right, bottom, top, nearPlane, farPlane)
       Results.doubleResult.rewind()
-      gl.getDouble(Macrogl.GL_PROJECTION_MATRIX, Results.doubleResult)
+      gl.getParameterdv(Macroglex.PROJECTION_MATRIX, Results.doubleResult)
       Results.doubleResult.get(m.array, 0, 16)
     } finally {
       gl.popMatrix()
@@ -192,15 +192,15 @@ object Matrix {
     }
   }
 
-  def perspectiveProjection(m: Projection)(left: Double, right: Double, bottom: Double, top: Double, nearPlane: Double, farPlane: Double)(implicit gl: Macrogl) {
-    val oldmode = gl.getInteger(Macrogl.GL_MATRIX_MODE)
-    gl.matrixMode(Macrogl.GL_PROJECTION)
+  def perspectiveProjection(m: Projection)(left: Double, right: Double, bottom: Double, top: Double, nearPlane: Double, farPlane: Double)(implicit gl: Macroglex) {
+    val oldmode = gl.getParameteri(Macroglex.MATRIX_MODE)
+    gl.matrixMode(Macroglex.PROJECTION)
     gl.pushMatrix()
     try {
       gl.loadIdentity()
       gl.frustum(left, right, bottom, top, nearPlane, farPlane)
       Results.doubleResult.rewind()
-      gl.getDouble(Macrogl.GL_PROJECTION_MATRIX, Results.doubleResult)
+      gl.getParameterdv(Macroglex.PROJECTION_MATRIX, Results.doubleResult)
       Results.doubleResult.get(m.array, 0, 16)
     } finally {
       gl.popMatrix()
@@ -209,15 +209,15 @@ object Matrix {
     }
   }
 
-  def view(m: Modelview)(xfrom: Float, yfrom: Float, zfrom: Float, xto: Float, yto: Float, zto: Float, xup: Float, yup: Float, zup: Float)(implicit gl: Macrogl) {
-    val oldmode = gl.getInteger(Macrogl.GL_MATRIX_MODE)
-    gl.matrixMode(Macrogl.GL_MODELVIEW)
+  def view(m: Modelview)(xfrom: Float, yfrom: Float, zfrom: Float, xto: Float, yto: Float, zto: Float, xup: Float, yup: Float, zup: Float)(implicit gl: Macroglex) {
+    val oldmode = gl.getParameteri(Macroglex.MATRIX_MODE)
+    gl.matrixMode(Macroglex.MODELVIEW)
     gl.pushMatrix()
     try {
       gl.loadIdentity()
       gl.lookAt(xfrom, yfrom, zfrom, xto, yto, zto, xup, yup, zup)
       Results.doubleResult.rewind()
-      gl.getDouble(Macrogl.GL_MODELVIEW_MATRIX, Results.doubleResult)
+      gl.getParameterdv(Macroglex.MODELVIEW_MATRIX, Results.doubleResult)
       Results.doubleResult.get(m.array, 0, 16)
     } finally {
       gl.popMatrix()

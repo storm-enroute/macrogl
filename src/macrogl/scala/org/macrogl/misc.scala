@@ -27,7 +27,7 @@ package macrogl {
     def clear(bits: Int)(implicit gl: Macrogl) {
       gl.clear(bits)
     }
-    def drawbuffers(b0: Int, b1: Int, b2: Int)(implicit gl: Macrogl) {
+    def drawbuffers(b0: Int, b1: Int, b2: Int)(implicit gl: Macroglex) {
       val ib = Results.intResult
       ib.clear()
       ib.put(0, b0)
@@ -37,7 +37,7 @@ package macrogl {
       ib.limit(3)
       gl.drawBuffers(ib)
     }
-    def drawbuffer(b: Int)(implicit gl: Macrogl) {
+    def drawbuffer(b: Int)(implicit gl: Macroglex) {
       val ib = Results.intResult
       ib.clear()
       ib.put(0, b)
@@ -45,10 +45,10 @@ package macrogl {
       ib.limit(1)
       gl.drawBuffers(ib)
     }
-    def readbuffer(b: Int)(implicit gl: Macrogl) {
+    def readbuffer(b: Int)(implicit gl: Macroglex) {
       gl.readBuffer(b)
     }
-    def draw(mode: Int)(body: =>Unit)(implicit gl: Macrogl) {
+    def draw(mode: Int)(body: =>Unit)(implicit gl: Macroglex) {
       gl.begin(mode)
       body
       gl.end()
@@ -73,7 +73,7 @@ package macrogl {
 
   object setting {
     object Color {
-      def foreach[U](f: Unit => U)(implicit gl: Macrogl): Unit = macro Macros.setColor[U]
+      def foreach[U](f: Unit => U)(implicit gl: Macroglex): Unit = macro Macros.setColor[U]
     }
     object CullFace {
       def foreach[U](f: Unit => U)(implicit gl: Macrogl): Unit = macro Macros.setCullFace[U]
@@ -96,7 +96,7 @@ package macrogl {
       def foreach[U](f: Unit => U)(implicit gl: Macrogl): Unit = macro Macros.useProgram[U]
     }
     object TransformationMatrix {
-      def foreach[U](f: Unit => U)(implicit gl: Macrogl): Unit = macro Macros.useMatrix[U]
+      def foreach[U](f: Unit => U)(implicit gl: Macroglex): Unit = macro Macros.useMatrix[U]
     }
     object TextureObject {
       def foreach[U](f: Unit => U)(implicit gl: Macrogl): Unit = macro Macros.useTexture[U]
@@ -137,10 +137,10 @@ package macrogl {
   
       val r = reify {
         val fb = (c.Expr[FrameBuffer](fbt)).splice
-        val oldbinding = gl.splice.getInteger(Macrogl.GL_FRAMEBUFFER_BINDING)
-        gl.splice.bindFrameBuffer(Macrogl.GL_FRAMEBUFFER, fb.token)
+        val oldbinding = gl.splice.getParameteri(Macrogl.FRAMEBUFFER_BINDING)
+        gl.splice.bindFramebuffer(Macrogl.FRAMEBUFFER, fb.token)
         try f.splice(fb.binding)
-        finally gl.splice.bindFrameBuffer(Macrogl.GL_FRAMEBUFFER, oldbinding)
+        finally gl.splice.bindFramebuffer(Macrogl.FRAMEBUFFER, oldbinding)
         ()
       }
   
@@ -154,10 +154,10 @@ package macrogl {
   
       val r = reify {
         val rb = (c.Expr[RenderBuffer](rbt)).splice
-        val oldbinding = gl.splice.getInteger(Macrogl.GL_RENDERBUFFER_BINDING)
-        gl.splice.bindRenderBuffer(Macrogl.GL_RENDERBUFFER, rb.token)
+        val oldbinding = gl.splice.getParameteri(Macrogl.RENDERBUFFER_BINDING)
+        gl.splice.bindRenderbuffer(Macrogl.RENDERBUFFER, rb.token)
         try f.splice(())
-        finally gl.splice.bindRenderBuffer(Macrogl.GL_RENDERBUFFER, oldbinding)
+        finally gl.splice.bindRenderbuffer(Macrogl.RENDERBUFFER, oldbinding)
         ()
       }
   
@@ -171,7 +171,7 @@ package macrogl {
   
       val r = reify {
         val t = (c.Expr[Texture](tt)).splice
-        val oldbinding = gl.splice.getInteger(t.binding)
+        val oldbinding = gl.splice.getParameteri(t.binding)
         gl.splice.activeTexture((c.Expr[Int](texnum)).splice)
         gl.splice.bindTexture(t.target, t.token)
         try f.splice(())
@@ -182,14 +182,14 @@ package macrogl {
       c.inlineAndReset(r)
     }
   
-    def useMatrix[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U])(gl: c.Expr[Macrogl]): c.Expr[Unit] = {
+    def useMatrix[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U])(gl: c.Expr[Macroglex]): c.Expr[Unit] = {
       import c.universe._
   
       val Apply(Apply(TypeApply(Select(Apply(_, List(mt)), _), _), _), _) = c.macroApplication
   
       val r = reify {
         val m = (c.Expr[Matrix](mt)).splice
-        val oldmode = gl.splice.getInteger(Macrogl.GL_MATRIX_MODE)
+        val oldmode = gl.splice.getParameteri(Macroglex.MATRIX_MODE)
         val dr = Results.doubleResult
         gl.splice.matrixMode(m.mode)
         gl.splice.pushMatrix()
@@ -230,7 +230,7 @@ package macrogl {
       c.inlineAndReset(r)
     }
   
-    def setColor[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U])(gl: c.Expr[Macrogl]): c.Expr[Unit] = {
+    def setColor[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U])(gl: c.Expr[Macroglex]): c.Expr[Unit] = {
       import c.universe._
   
       val Apply(Apply(TypeApply(Select(Apply(_, List(rt, gt, bt, at)), _), _), _), _) = c.macroApplication
@@ -241,7 +241,7 @@ package macrogl {
         val b = (c.Expr[Float](bt)).splice
         val a = (c.Expr[Float](at)).splice
         Results.floatResult.rewind()
-        gl.splice.getFloat(Macrogl.GL_CURRENT_COLOR, Results.floatResult)
+        gl.splice.getParameterfv(Macroglex.CURRENT_COLOR, Results.floatResult)
         val or = Results.floatResult.get(0)
         val og = Results.floatResult.get(1)
         val ob = Results.floatResult.get(2)
@@ -262,7 +262,7 @@ package macrogl {
   
       val r = reify {
         val v = (c.Expr[Int](vt)).splice
-        val ov = gl.splice.getInteger(Macrogl.GL_CULL_FACE_MODE)
+        val ov = gl.splice.getParameteri(Macrogl.CULL_FACE_MODE)
         gl.splice.cullFace(v)
         try f.splice(())
         finally gl.splice.cullFace(ov)
@@ -283,7 +283,7 @@ package macrogl {
         val w = (c.Expr[Int](bt)).splice
         val h = (c.Expr[Int](at)).splice
         Results.intResult.clear()
-        gl.splice.getInteger(Macrogl.GL_VIEWPORT, Results.intResult)
+        gl.splice.getParameteriv(Macrogl.VIEWPORT, Results.intResult)
         val ox = Results.intResult.get(0)
         val oy = Results.intResult.get(1)
         val ow = Results.intResult.get(2)
@@ -303,8 +303,8 @@ package macrogl {
       val Apply(Apply(TypeApply(Select(Apply(_, List(sfactor, dfactor)), _), _), _), _) = c.macroApplication
   
       val r = reify {
-        val osrc = gl.splice.getInteger(Macrogl.GL_BLEND_SRC)
-        val odst = gl.splice.getInteger(Macrogl.GL_BLEND_DST)
+        val osrc = gl.splice.getParameteri(Macroglex.BLEND_SRC)
+        val odst = gl.splice.getParameteri(Macroglex.BLEND_DST)
         gl.splice.blendFunc((c.Expr[Int](sfactor)).splice, c.Expr[Int](dfactor).splice)
         try f.splice(())
         finally gl.splice.blendFunc(osrc, odst)

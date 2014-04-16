@@ -6,11 +6,16 @@ import org.scalajs.nio
 import scala.scalajs.js
 import js.Dynamic.{ global => g }
 
-// See https://github.com/scala-js/scala-js-dom/blob/master/src/main/scala/org/scalajs/dom/WebGL.scala for documentation about the WebGL DOM for ScalaJS
+// See https://github.com/scala-js/scala-js-dom/blob/master/src/main/scala/org/scalajs/dom/WebGL.scala for documentation
+// about the WebGL DOM for ScalaJS
 
 class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingContext) {
 
   /* public API */
+  final def bytesPerShort = 2
+  final def bytesPerInt = 4
+  final def bytesPerFloat = 4
+  final def bytesPerDouble = 8
 
   final def activeTexture(texture: Int) = {
     gl.activeTexture(texture)
@@ -60,10 +65,9 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
     gl.blendFuncSeparate(srcfactorRGB, dstfactorRGB, srcfactorAlpha, dstfactorAlpha)
   }
 
-  /*
-   * Method bufferData with signature glBufferData(int target, long data_size, int usage) discarded
-   * Reason: not available in the API GLES20 of Android
-   */
+  final def bufferData(target: Int, totalBytes: Long, usage: Int) {
+    gl.bufferData(target, totalBytes, usage)
+  }
 
   private final def _bufferData(target: Int, data: Data, usage: Int) = {
     val buffer: nio.Buffer = data
@@ -123,7 +127,9 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
   }
 
   /*
-   * Method compressedTexImage2D with signature glCompressedTexImage2D(int target, int level, int internalformat, int width, int height, int border, int data_imageSize, long data_buffer_offset) discarded
+   * Method compressedTexImage2D with signature glCompressedTexImage2D(int target, int level, int internalformat, int width,
+   * int height, int border, int data_imageSize, long data_buffer_offset) discarded
+   * 
    * Reason: not available in the API WebGL and the API GLES20 of Android
    */
 

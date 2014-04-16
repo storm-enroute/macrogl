@@ -16,10 +16,6 @@ class Macroglex private[macrogl] () extends Macrogl() {
 
   // Moved from Macrogl
 
-  final def bufferData(target: Int, totalBytes: Long, usage: Int) {
-    GL15.glBufferData(target, totalBytes, usage)
-  }
-
   final def getBufferSubData(target: Int, offset: Long, data: Data.Byte) {
     GL15.glGetBufferSubData(target, offset, data)
   }

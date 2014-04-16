@@ -19,7 +19,7 @@ object MeshBuffer {
     val Apply(Apply(TypeApply(Select(Apply(Apply(_, List(mesh)), List(layoutIndex)), _), _), _), _) = c.macroApplication
 
     val r = reify {
-      glex.splice.bindShaderStorageBuffer(Macroglex.GL_SHADER_STORAGE_BUFFER, (c.Expr[Int](layoutIndex)).splice, (c.Expr[MeshBuffer](mesh)).splice.token)
+      glex.splice.bindShaderStorageBuffer(Macroglex.SHADER_STORAGE_BUFFER, (c.Expr[Int](layoutIndex)).splice, (c.Expr[MeshBuffer](mesh)).splice.token)
       try f.splice(())
       finally {
       }

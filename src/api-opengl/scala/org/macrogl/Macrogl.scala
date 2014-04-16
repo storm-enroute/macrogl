@@ -7,6 +7,10 @@ import org.lwjgl.util.glu._
 class Macrogl private[macrogl] () {
 
   /* public API */
+  final def bytesPerShort = 2
+  final def bytesPerInt = 4
+  final def bytesPerFloat = 4
+  final def bytesPerDouble = 8
 
   final def activeTexture(texture: Int) = {
     GL13.glActiveTexture(texture)
@@ -60,6 +64,10 @@ class Macrogl private[macrogl] () {
    * Method bufferData with signature glBufferData(int target, long data_size, int usage) discarded
    * Reason: not available in the API GLES20 of Android
    */
+  
+  final def bufferData(target: Int, totalBytes: Long, usage: Int) {
+    GL15.glBufferData(target, totalBytes, usage)
+  }
 
   final def bufferData(target: Int, data: Data.Byte, usage: Int) = {
     GL15.glBufferData(target, data, usage)

@@ -33,12 +33,12 @@ object Program {
 
     case class Geometry(source: String, afterAttach: Token.Program => Unit = x => {}) extends org.macrogl.Program.Shader {
       def name = "Geometry shader"
-      def mode = Macroglex.GL_GEOMETRY_SHADER
+      def mode = Macroglex.GEOMETRY_SHADER
     }
   
     case class Compute(source: String, afterAttach: Token.Program => Unit = x => {}) extends org.macrogl.Program.Shader {
       def name = "Compute shader"
-      def mode = Macroglex.GL_COMPUTE_SHADER
+      def mode = Macroglex.COMPUTE_SHADER
     }
 
   }
