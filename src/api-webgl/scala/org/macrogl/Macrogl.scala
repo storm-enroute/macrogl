@@ -961,9 +961,47 @@ private object JSTypeHelper {
       }
     }
   }
+  
+  val maxUint32: Long = 0xFFFFFFFFL
+  val maxInt32: Int = Int.MaxValue
+  val minInt32: Int = Int.MinValue
+  
+  /*
+   * Convert an unsigned int to a normalized floating-point value
+   * [0, maxUint32] -> [0, 1]
+   */
+  def unsignedIntToNormalizedFloat(c: Int): Float = {
+    val cl = (c.toLong & maxUint32)
+    (cl.toDouble / maxUint32).toFloat
+  }
+  
+  /*
+   * Convert a signed int to a normalized floating-point value
+   * [minInt32, maxInt32] -> [-1, 1]
+   */
+  def signedIntToNormalizedFloat(c: Int): Float = {
+    if(c >= 0) (c.toDouble / maxInt32).toFloat
+    else (-(c.toDouble) / minInt32).toFloat
+  }
+  
+  /*
+   * Convert a normalized floating-point value to an unsigned int
+   * [0, 1] -> [0, maxUint32]
+   */
+  def normalizedFloatToUnsignedInt(f: Float): Int = {
+    (f.toDouble * maxUint32).toInt
+  }
+  
+  /*
+   * Convert a normalized floating-point value to a signed int
+   * [-1, 1] -> [minInt32, maxInt32]
+   */
+  def normalizedFloatToSignedInt(f: Float): Int = {
+    if(f >= 0) (f.toDouble * maxInt32).toInt
+    else (-(f.toDouble) * minInt32).toInt
+  }
 }
 
-// Those constants are actually retrieved from the rendering context in WebGL, this may be a problem to keep them in an object
 object Macrogl {
 
   /* public API - constants */
