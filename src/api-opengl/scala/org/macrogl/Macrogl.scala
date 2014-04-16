@@ -818,32 +818,33 @@ class Macrogl private[macrogl] () {
   }
 
   final def getUniformbv(program: Token.Program, location: Token.UniformLocation, outputs: Data.Byte) = {
-    // TODO probably gonna remove boolean getUniform stuff
+    // TODO probably gonna remove boolean getUniform stuff...
     ???
   }
 
   final def getUniformLocation(program: Token.Program, name: String): Token.UniformLocation = {
-    gl.getUniformLocation(program, name).asInstanceOf[Token.UniformLocation]
+    GL20.glGetUniformLocation(program, name)
+    
   }
 
   final def getVertexAttribi(index: Int, pname: Int): Int = {
-    val ret = gl.getVertexAttrib(index, pname)
-    JSTypeHelper.toInt(ret)
+    this.tmpInt.clear()
+    GL20.glGetVertexAttrib(index, pname, this.tmpInt)
+    this.tmpInt.get(0)
   }
 
   final def getVertexAttribf(index: Int, pname: Int): Float = {
-    val ret = gl.getVertexAttrib(index, pname)
-    JSTypeHelper.toFloat(ret)
+    this.tmpFloat.clear()
+    GL20.glGetVertexAttrib(index, pname, this.tmpFloat)
+    this.tmpFloat.get(0)
   }
 
   final def getVertexAttribfv(index: Int, pname: Int, outputs: Data.Float) = {
-    val ret = gl.getVertexAttrib(index, pname)
-    JSTypeHelper.toFloats(ret, outputs)
+    GL20.glGetVertexAttrib(index, pname, outputs)
   }
 
   final def getVertexAttribb(index: Int, pname: Int): Boolean = {
-    val ret = gl.getVertexAttrib(index, pname)
-    JSTypeHelper.toBoolean(ret)
+    this.getVertexAttribi(index, pname) != Macrogl.FALSE
   }
 
   /*
@@ -854,311 +855,277 @@ class Macrogl private[macrogl] () {
    */
 
   final def hint(target: Int, mode: Int) = {
-    // org.scalajs.dom has the return type wrong (js.Any instead of void), correct this once it's ok
-    gl.asInstanceOf[js.Dynamic].hint(target, mode)
+    GL11.glHint(target, mode)
   }
 
   final def isBuffer(buffer: Token.Buffer): Boolean = {
-    gl.isBuffer(buffer)
+    GL15.glIsBuffer(buffer)
   }
 
   final def isEnabled(cap: Int): Boolean = {
-    gl.isEnabled(cap)
+    GL11.glIsEnabled(cap)
   }
 
   final def isFramebuffer(framebuffer: Token.FrameBuffer): Boolean = {
-    gl.isFramebuffer(framebuffer)
+    GL30.glIsFramebuffer(framebuffer)
   }
 
   final def isProgram(program: Token.Program): Boolean = {
-    gl.isProgram(program)
+    GL20.glIsProgram(program)
   }
 
   final def isRenderbuffer(renderbuffer: Token.RenderBuffer): Boolean = {
-    gl.isRenderbuffer(renderbuffer)
+    GL30.glIsRenderbuffer(renderbuffer)
   }
 
   final def isShader(shader: Token.Shader): Boolean = {
-    gl.isShader(shader)
+    GL20.glIsShader(shader)
   }
 
   final def isTexture(texture: Token.Texture): Boolean = {
-    gl.isTexture(texture)
+    GL11.glIsTexture(texture)
   }
 
   final def lineWidth(width: Float) = {
-    gl.lineWidth(width)
+    GL11.glLineWidth(width)
   }
 
   final def linkProgram(program: Token.Program) = {
-    gl.linkProgram(program)
+    GL20.glLinkProgram(program)
   }
 
   final def pixelStorei(pname: Int, param: Int) = {
-    gl.pixelStorei(pname, param)
+    GL11.glPixelStorei(pname, param)
   }
 
   final def polygonOffset(factor: Float, units: Float) = {
-    gl.polygonOffset(factor, units)
+    GL11.glPolygonOffset(factor, units)
   }
 
-  private final def _readPixels(x: Int, y: Int, width: Int, height: Int, format: Int, `type`: Int, pixels: Data) = {
-    val buffer: nio.Buffer = pixels
-    require(buffer.hasJsBuffer)
-    gl.readPixels(x, y, width, height, format, `type`, buffer.jsDataView)
+  final def readPixels(x: Int, y: Int, width: Int, height: Int, format: Int, `type`: Int, pixels: Data.Byte) = {
+    GL11.glReadPixels(x, y, width, height, format, `type`, pixels)
   }
-
-  final def readPixels(x: Int, y: Int, width: Int, height: Int, format: Int, `type`: Int, pixels: Data.Byte) =
-    this._readPixels(x, y, width, height, format, `type`, pixels.slice)
-  final def readPixels(x: Int, y: Int, width: Int, height: Int, format: Int, `type`: Int, pixels: Data.Short) =
-    this._readPixels(x, y, width, height, format, `type`, pixels.slice)
-  final def readPixels(x: Int, y: Int, width: Int, height: Int, format: Int, `type`: Int, pixels: Data.Int) =
-    this._readPixels(x, y, width, height, format, `type`, pixels.slice)
-  final def readPixels(x: Int, y: Int, width: Int, height: Int, format: Int, `type`: Int, pixels: Data.Float) =
-    this._readPixels(x, y, width, height, format, `type`, pixels.slice)
-  final def readPixels(x: Int, y: Int, width: Int, height: Int, format: Int, `type`: Int, pixels: Data.Double) =
-    this._readPixels(x, y, width, height, format, `type`, pixels.slice)
+  final def readPixels(x: Int, y: Int, width: Int, height: Int, format: Int, `type`: Int, pixels: Data.Short) = {
+    GL11.glReadPixels(x, y, width, height, format, `type`, pixels)
+  }
+  final def readPixels(x: Int, y: Int, width: Int, height: Int, format: Int, `type`: Int, pixels: Data.Int) = {
+    GL11.glReadPixels(x, y, width, height, format, `type`, pixels)
+  }
+  final def readPixels(x: Int, y: Int, width: Int, height: Int, format: Int, `type`: Int, pixels: Data.Float) = {
+    GL11.glReadPixels(x, y, width, height, format, `type`, pixels)
+  }
+  final def readPixels(x: Int, y: Int, width: Int, height: Int, format: Int, `type`: Int, pixels: Data.Double) = {
+    GL11.glReadPixels(x, y, width, height, format, `type`, pixels)
+  }
 
   final def renderbufferStorage(target: Int, internalformat: Int, width: Int, height: Int) = {
-    gl.renderbufferStorage(target, internalformat, width, height)
+    GL30.glRenderbufferStorage(target, internalformat, width, height)
   }
 
   final def sampleCoverage(value: Float, invert: Boolean) = {
-    gl.sampleCoverage(value, invert)
+    GL13.glSampleCoverage(value, invert)
   }
 
   final def scissor(x: Int, y: Int, width: Int, height: Int) = {
-    gl.scissor(x, y, width, height)
+    GL11.glScissor(x, y, width, height)
   }
 
   final def shaderSource(shader: Token.Shader, source: String) = {
-    gl.shaderSource(shader, source)
+    GL20.glShaderSource(shader, source)
   }
 
   final def stencilFunc(func: Int, ref: Int, mask: Int) = {
-    gl.stencilFunc(func, ref, mask)
+    GL11.glStencilFunc(func, ref, mask)
   }
 
   final def stencilFuncSeparate(face: Int, func: Int, ref: Int, mask: Int) = {
-    gl.stencilFuncSeparate(face, func, ref, mask)
+    GL20.glStencilFuncSeparate(face, func, ref, mask)
   }
 
   final def stencilMask(mask: Int) = {
-    gl.stencilMask(mask)
+    GL11.glStencilMask(mask)
   }
 
   final def stencilMaskSeparate(face: Int, mask: Int) = {
-    gl.stencilMaskSeperate(face, mask)
+    GL20.glStencilMaskSeparate(face, mask)
   }
 
   final def stencilOp(fail: Int, zfail: Int, zpass: Int) = {
-    gl.stencilOp(fail, zfail, zpass)
+    GL11.glStencilOp(fail, zfail, zpass)
   }
 
   final def stencilOpSeparate(face: Int, sfail: Int, dpfail: Int, dppass: Int) = {
-    gl.stencilOpSeperate(face, sfail, dpfail, dppass)
-  }
-
-  private final def _texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
-    format: Int, `type`: Int, pixels: Data) = {
-
-    val buffer: nio.Buffer = pixels
-    require(buffer.hasJsBuffer)
-    gl.texImage2D(target, level, internalformat, width, height, border, format, `type`, buffer.jsDataView)
+    GL20.glStencilOpSeparate(face, sfail, dpfail, dppass)
   }
 
   final def texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
-    format: Int, `type`: Int, pixels: Data.Byte) = this._texImage2D(target, level, internalformat, width, height, border,
-    format, `type`, pixels.slice)
+    format: Int, `type`: Int, pixels: Data.Byte) = {
+    GL11.glTexImage2D(target, level, internalformat, width, height, border, format, `type`, pixels)
+  }
   final def texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
-    format: Int, `type`: Int, pixels: Data.Short) = this._texImage2D(target, level, internalformat, width, height, border,
-    format, `type`, pixels.slice)
+    format: Int, `type`: Int, pixels: Data.Short) = {
+    GL11.glTexImage2D(target, level, internalformat, width, height, border, format, `type`, pixels)
+  }
   final def texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
-    format: Int, `type`: Int, pixels: Data.Int) = this._texImage2D(target, level, internalformat, width, height, border,
-    format, `type`, pixels.slice)
+    format: Int, `type`: Int, pixels: Data.Int) = {
+    GL11.glTexImage2D(target, level, internalformat, width, height, border, format, `type`, pixels)
+  }
   final def texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
-    format: Int, `type`: Int, pixels: Data.Float) = this._texImage2D(target, level, internalformat, width, height, border,
-    format, `type`, pixels.slice)
+    format: Int, `type`: Int, pixels: Data.Float) = {
+    GL11.glTexImage2D(target, level, internalformat, width, height, border, format, `type`, pixels)
+  }
   final def texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
-    format: Int, `type`: Int, pixels: Data.Double) = this._texImage2D(target, level, internalformat, width, height, border,
-    format, `type`, pixels.slice)
+    format: Int, `type`: Int, pixels: Data.Double) = {
+    GL11.glTexImage2D(target, level, internalformat, width, height, border, format, `type`, pixels)
+  }
 
   final def texParameterf(target: Int, pname: Int, param: Float) = {
-    gl.texParameterf(target, pname, param)
+    GL11.glTexParameterf(target, pname, param)
   }
 
   final def texParameteri(target: Int, pname: Int, param: Int) = {
-    gl.texParameteri(target, pname, param)
-  }
-
-  private final def _texSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, width: Int, height: Int,
-    format: Int, `type`: Int, pixels: Data) = {
-
-    val buffer: nio.Buffer = pixels
-    require(buffer.hasJsBuffer)
-    gl.texSubImage2D(target, level, xoffset, yoffset, width, height, format, `type`, buffer.jsDataView)
+    GL11.glTexParameteri(target, pname, param)
   }
 
   final def texSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, width: Int, height: Int,
-    format: Int, `type`: Int, pixels: Data.Byte) = this._texSubImage2D(target, level, xoffset, yoffset, width, height,
-    format, `type`, pixels.slice)
+    format: Int, `type`: Int, pixels: Data.Byte) = {
+    GL11.glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, `type`, pixels)
+  }
   final def texSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, width: Int, height: Int,
-    format: Int, `type`: Int, pixels: Data.Short) = this._texSubImage2D(target, level, xoffset, yoffset, width, height,
-    format, `type`, pixels.slice)
+    format: Int, `type`: Int, pixels: Data.Short) = {
+    GL11.glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, `type`, pixels)
+  }
   final def texSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, width: Int, height: Int,
-    format: Int, `type`: Int, pixels: Data.Int) = this._texSubImage2D(target, level, xoffset, yoffset, width, height,
-    format, `type`, pixels.slice)
+    format: Int, `type`: Int, pixels: Data.Int) = {
+    GL11.glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, `type`, pixels)
+  }
   final def texSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, width: Int, height: Int,
-    format: Int, `type`: Int, pixels: Data.Float) = this._texSubImage2D(target, level, xoffset, yoffset, width, height,
-    format, `type`, pixels.slice)
+    format: Int, `type`: Int, pixels: Data.Float) = {
+    GL11.glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, `type`, pixels)
+  }
   final def texSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, width: Int, height: Int,
-    format: Int, `type`: Int, pixels: Data.Double) = this._texSubImage2D(target, level, xoffset, yoffset, width, height,
-    format, `type`, pixels.slice)
+    format: Int, `type`: Int, pixels: Data.Double) = {
+    GL11.glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, `type`, pixels)
+  }
 
-  final def uniform1f(location: Token.UniformLocation, v0: Float) = {
-    gl.uniform1f(location, v0)
+  final def uniform1f(location: Token.UniformLocation, x: Float) = {
+    GL20.glUniform1f(location, x)
   }
   
   final def uniform1fv(location: Token.UniformLocation, values: Data.Float) = {
-    val slice = values.slice
-    require(slice.hasJsArray)
-    gl.uniform1fv(location, slice.jsArray)
+    GL20.glUniform1(location, values)
   }
   
   final def uniform1i(location: Token.UniformLocation, x: Int) = {
-    gl.uniform1i(location, x)
+    GL20.glUniform1i(location, x)
   }
   
   final def uniform1iv(location: Token.UniformLocation, values: Data.Int) = {
-    val slice = values.slice
-    require(slice.hasJsArray)
-    gl.uniform1iv(location, slice.jsArray)
+    GL20.glUniform1(location, values)
   }
   
   final def uniform2f(location: Token.UniformLocation, x: Float, y: Float) = {
-    gl.uniform2f(location, x, y)
+    GL20.glUniform2f(location, x, y)
   }
   
   final def uniform2fv(location: Token.UniformLocation, values: Data.Float) = {
-    val slice = values.slice
-    require(slice.hasJsArray)
-    gl.uniform2fv(location, slice.jsArray)
+    GL20.glUniform2(location, values)
   }
   
   final def uniform2i(location: Token.UniformLocation, x: Int, y: Int) = {
-    gl.uniform2i(location, x, y)
+    GL20.glUniform2i(location, x, y)
   }
   
   final def uniform2iv(location: Token.UniformLocation, values: Data.Int) = {
-    val slice = values.slice
-    require(slice.hasJsArray)
-    gl.uniform2iv(location, slice.jsArray)
+    GL20.glUniform2(location, values)
   }
   
   final def uniform3f(location: Token.UniformLocation, x: Float, y: Float, z: Float) = {
-    gl.uniform3f(location, x, y, z)
+    GL20.glUniform3f(location, x, y, z)
   }
   
   final def uniform3fv(location: Token.UniformLocation, values: Data.Float) = {
-    val slice = values.slice
-    require(slice.hasJsArray)
-    gl.uniform3fv(location, slice.jsArray)
+    GL20.glUniform3(location, values)
   }
   
   final def uniform3i(location: Token.UniformLocation, x: Int, y: Int, z: Int) = {
-    gl.uniform3i(location, x, y, z)
+    GL20.glUniform3i(location, x, y, z)
   }
   
   final def uniform3iv(location: Token.UniformLocation, values: Data.Int) = {
-    val slice = values.slice
-    require(slice.hasJsArray)
-    gl.uniform3iv(location, slice.jsArray)
+    GL20.glUniform3(location, values)
   }
   
   final def uniform4f(location: Token.UniformLocation, x: Float, y: Float, z: Float, w: Float) = {
-    gl.uniform4f(location, x, y, z, w)
+    GL20.glUniform4f(location, x, y, z, w)
   }
   
   final def uniform4fv(location: Token.UniformLocation, values: Data.Float) = {
-    val slice = values.slice
-    require(slice.hasJsArray)
-    gl.uniform4fv(location, slice.jsArray)
+    GL20.glUniform4(location, values)
   }
   
   final def uniform4i(location: Token.UniformLocation, x: Int, y: Int, z: Int, w: Int) = {
-    gl.uniform4i(location, x, y, z, w)
+    GL20.glUniform4i(location, x, y, z, w)
   }
   
   final def uniform4iv(location: Token.UniformLocation, values: Data.Int) = {
-    val slice = values.slice
-    require(slice.hasJsArray)
-    gl.uniform4iv(location, slice.jsArray)
+    GL20.glUniform4(location, values)
   }
   
   final def uniformMatrix2fv(location: Token.UniformLocation, transpose: Boolean, matrices: Data.Float) = {
-    val slice = matrices.slice
-    require(slice.hasJsArray)
-    gl.uniformMatrix2fv(location, transpose, slice.jsArray)
+    GL20.glUniformMatrix2(location, transpose, matrices)
   }
   
   final def uniformMatrix3fv(location: Token.UniformLocation, transpose: Boolean, matrices: Data.Float) = {
-    val slice = matrices.slice
-    require(slice.hasJsArray)
-    gl.uniformMatrix3fv(location, transpose, slice.jsArray)
+    GL20.glUniformMatrix3(location, transpose, matrices)
   }
   
   final def uniformMatrix4fv(location: Token.UniformLocation, transpose: Boolean, matrices: Data.Float) = {
-    val slice = matrices.slice
-    require(slice.hasJsArray)
-    gl.uniformMatrix4fv(location, transpose, slice.jsArray)
+    GL20.glUniformMatrix4(location, transpose, matrices)
   }
   
   final def useProgram(program: Token.Program) = {
-    gl.useProgram(program)
+    GL20.glUseProgram(program)
   }
   
   final def validateProgram(program: Token.Program) = {
-    gl.validateProgram(program)
+    GL20.glValidateProgram(program)
   }
   
   final def vertexAttrib1f(index: Int, x: Float) = {
-    gl.vertexAttrib1f(index, x)
+    GL20.glVertexAttrib1f(index, x)
   }
   
   final def vertexAttrib1fv(index: Int, values: Data.Float) = {
     val slice = values.slice
-    require(slice.hasJsArray)
-    gl.vertexAttrib1fv(index, slice.jsArray)
+    GL20.glVertexAttrib1f(index, slice.get())
   }
   
   final def vertexAttrib2f(index: Int, x: Float, y: Float) = {
-    gl.vertexAttrib2f(index, x, y)
+    GL20.glVertexAttrib2f(index, x, y)
   }
   
   final def vertexAttrib2fv(index: Int, values: Data.Float) = {
     val slice = values.slice
-    require(slice.hasJsArray)
-    gl.vertexAttrib2fv(index, slice.jsArray)
+    GL20.glVertexAttrib2f(index, slice.get(), slice.get())
   }
   
   final def vertexAttrib3f(index: Int, x: Float, y: Float, z: Float) = {
-    gl.vertexAttrib3f(index, x, y, z)
+    GL20.glVertexAttrib3f(index, x, y, z)
   }
   
   final def vertexAttrib3fv(index: Int, values: Data.Float) = {
     val slice = values.slice
-    require(slice.hasJsArray)
-    gl.vertexAttrib3fv(index, slice.jsArray)
+    GL20.glVertexAttrib3f(index, slice.get(), slice.get(), slice.get())
   }
   
   final def vertexAttrib4f(index: Int, x: Float, y: Float, z: Float, w: Float) = {
-    gl.vertexAttrib4f(index, x, y, z, w)
+    GL20.glVertexAttrib4f(index, x, y, z, w)
   }
   
   final def vertexAttrib4fv(index: Int, values: Data.Float) = {
     val slice = values.slice
-    require(slice.hasJsArray)
-    gl.vertexAttrib4fv(index, slice.jsArray)
+    GL20.glVertexAttrib4f(index, slice.get(), slice.get(), slice.get(), slice.get())
   }
   
   /*
@@ -1170,11 +1137,11 @@ class Macrogl private[macrogl] () {
    */
   
   final def vertexAttribPointer(index: Int, size: Int, `type`: Int, normalized: Boolean, stride: Int, offset: Long) = {
-    gl.vertexAttribPointer(index, size, `type`, normalized, stride, offset)
+    GL20.glVertexAttribPointer(index, size, `type`, normalized, stride, offset)
   }
   
   final def viewport(x: Int, y: Int, width: Int, height: Int) = {
-    gl.viewport(x, y, width, height)
+    GL11.glViewport(x, y, width, height)
   }
   
   private val maxResultSize = 16

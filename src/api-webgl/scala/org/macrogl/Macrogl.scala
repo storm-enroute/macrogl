@@ -1021,8 +1021,8 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
     format: Int, `type`: Int, pixels: Data.Double) = this._texSubImage2D(target, level, xoffset, yoffset, width, height,
     format, `type`, pixels.slice)
 
-  final def uniform1f(location: Token.UniformLocation, v0: Float) = {
-    gl.uniform1f(location, v0)
+  final def uniform1f(location: Token.UniformLocation, x: Float) = {
+    gl.uniform1f(location, x)
   }
   
   final def uniform1fv(location: Token.UniformLocation, values: Data.Float) = {
