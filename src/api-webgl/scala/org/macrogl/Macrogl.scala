@@ -123,7 +123,7 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
   }
 
   /*
-   * Method ompressedTexImage2D with signature glCompressedTexImage2D(int target, int level, int internalformat, int width, int height, int border, int data_imageSize, long data_buffer_offset) discarded
+   * Method compressedTexImage2D with signature glCompressedTexImage2D(int target, int level, int internalformat, int width, int height, int border, int data_imageSize, long data_buffer_offset) discarded
    * Reason: not available in the API WebGL and the API GLES20 of Android
    */
 
@@ -960,82 +960,6 @@ private object JSTypeHelper {
 object Macrogl {
 
   /* public API - constants */
-
-  /*val GL_FALSE = false
-
-  val GL_MATRIX_MODE = ??? // deprecated?
-
-  val GL_PROJECTION = ??? // deprecated?
-
-  val GL_PROJECTION_MATRIX = ??? // deprecated?
-
-  val GL_MODELVIEW = ??? // deprecated?
-
-  val GL_MODELVIEW_MATRIX = ??? // deprecated?
-
-  val GL_TEXTURE = gl.TEXTURE.toInt
-
-  val GL_TEXTURE_MATRIX = ??? // deprecated?
-
-  val GL_ARRAY_BUFFER = gl.ARRAY_BUFFER.toInt
-
-  val GL_FLOAT = gl.FLOAT.toInt
-
-  val GL_CURRENT_PROGRAM = gl.CURRENT_PROGRAM.toInt
-
-  val GL_NO_ERROR = gl.NO_ERROR.toInt
-
-  val GL_VERTEX_SHADER = gl.VERTEX_SHADER.toInt
-
-  val GL_FRAGMENT_SHADER = gl.FRAGMENT_SHADER.toInt
-
-  val GL_FRAMEBUFFER = gl.FRAMEBUFFER.toInt
-
-  val GL_FRAMEBUFFER_BINDING = gl.FRAMEBUFFER_BINDING.toInt
-
-  val GL_RENDERBUFFER = gl.RENDERBUFFER.toInt
-
-  val GL_RENDERBUFFER_BINDING = gl.RENDERBUFFER_BINDING.toInt
-
-  val GL_COMPILE_STATUS = gl.COMPILE_STATUS.toInt
-
-  val GL_LINK_STATUS = gl.LINK_STATUS.toInt
-
-  val GL_VALIDATE_STATUS = gl.VALIDATE_STATUS.toInt
-
-  val GL_STREAM_COPY = ??? // deprecated?
-
-  val GL_TEXTURE_1D = ??? // deprecated?
-
-  val GL_TEXTURE_BINDING_1D = ??? // deprecated?
-
-  val GL_TEXTURE_2D = gl.TEXTURE_2D.toInt
-
-  val GL_TEXTURE_BINDING_2D = gl.TEXTURE_BINDING_2D.toInt
-
-  val GL_TEXTURE_MIN_FILTER = gl.TEXTURE_MIN_FILTER.toInt
-
-  val GL_TEXTURE_MAG_FILTER = gl.TEXTURE_MAG_FILTER.toInt
-
-  val GL_TEXTURE_WRAP_S = gl.TEXTURE_WRAP_S.toInt
-
-  val GL_TEXTURE_WRAP_T = gl.TEXTURE_WRAP_T.toInt
-
-  val GL_TEXTURE_COMPARE_MODE = ??? // deprecated?
-
-  val GL_TEXTURE_COMPARE_FUNC = ??? // deprecated?
-
-  val GL_DEPTH_TEXTURE_MODE = ??? // deprecated?
-
-  val GL_CURRENT_COLOR = ??? // deprecated?
-
-  val GL_CULL_FACE_MODE = gl.CULL_FACE_MODE.toInt
-
-  val GL_VIEWPORT = gl.VIEWPORT.toInt
-
-  val GL_BLEND_SRC = ??? // maybe gl.BLEND_SRC_RGB
-
-  val GL_BLEND_DST = ??? // maybe BLEND_DST_RGB*/
 
   val FALSE = 0
   val TRUE = 1
