@@ -8,370 +8,6 @@ class Macrogl private[macrogl] () {
 
   /* public API */
 
-  final def bytesPerFloat = 4
-
-  /*final def genBuffers(): Token.Buffer = {
-    val buffer = gl.createBuffer()
-    buffer
-  }
-
-  final def bindBuffer(target: Int, buffer: Token.Buffer) {
-    gl.bindBuffer(target, buffer)
-  }
-
-  final def bufferData(target: Int, totalBytes: Long, usage: Int) {
-    gl.bufferData(target, totalBytes, usage)
-  }
-  
-  //Added from the original api-opengl
-  final def bufferData(target: Int, data: Data.Float, usage: Int) {
-  	gl.bufferData(target, data.jsDataView, usage)
-  }
-
-  final def deleteBuffers(buffer: Token.Buffer) {
-    gl.deleteBuffer(buffer)
-  }
-
-  final def bufferSubData(target: Int, offset: Long, data: Data.Float) {
-    ???
-  }
-
-  final def getBufferSubData(target: Int, offset: Long, data: Data.Float) {
-    ???
-  }
-
-  final def enableVertexAttribArray(index: Int) {
-    ???
-  }
-
-  final def disableVertexAttribArray(index: Int) {
-    ???
-  }
-
-  final def vertexAttribPointer(index: Int, numComponents: Int, componentType: Int, normalized: Boolean, stride: Int, byteOffset: Long) {
-    ???
-  }
-
-  final def drawArrays(mode: Int, first: Int, count: Int) {
-    ???
-  }
-
-  final def getCurrentProgram(): Token.Program = {
-    ???
-  }
-
-  final def useProgram(program: Token.Program) {
-    ???
-  }
-
-  final def getUniformLocation(program: Token.Program, varname: String): Token.UniformLocation = {
-    ???
-  }
-
-  final def uniform1f(loc: Token.UniformLocation, v: Float) {
-    ???
-  }
-
-  final def uniform2f(loc: Token.UniformLocation, x: Float, y: Float) {
-    ???
-  }
-
-  final def uniform3f(loc: Token.UniformLocation, x: Float, y: Float, z: Float) {
-    ???
-  }
-
-  final def uniform4f(loc: Token.UniformLocation, x: Float, y: Float, z: Float, w: Float) {
-    ???
-  }
-
-  final def uniform1i(loc: Token.UniformLocation, v: Int) {
-    ???
-  }
-
-  final def uniform2i(loc: Token.UniformLocation, x: Int, y: Int) {
-    ???
-  }
-
-  final def uniform3i(loc: Token.UniformLocation, x: Int, y: Int, z: Int) {
-    ???
-  }
-
-  final def uniform4i(loc: Token.UniformLocation, x: Int, y: Int, z: Int, w: Int) {
-    ???
-  }
-
-  final def uniformMatrix4(loc: Token.UniformLocation, transpose: Boolean, matrix: Data.Float) {
-    ???
-  }
-
-  final def createProgram(): Token.Program = {
-    ???
-  }
-
-  final def deleteProgram(program: Token.Program) {
-    ???
-  }
-
-  final def getProgrami(program: Token.Program, parameterName: Int): Int = {
-    ???
-  }
-
-  final def getProgramInfoLog(program: Token.Program, maxLength: Int): String {
-    ???
-  }
-
-  final def linkProgram(program: Token.Program) {
-    ???
-  }
-
-  final def validateProgram(program: Token.Program) {
-    ???
-  }
-
-  final def createShader(mode: Int): Token.Shader = {
-    ???
-  }
-
-  final def deleteShader(shader: Token.Shader) {
-    ???
-  }
-
-  final def shaderSource(shader: Token.Shader, srcarray: Array[CharSequence]) {
-    ???
-  }
-
-  final def compileShader(shader: Token.Shader) {
-    ???
-  }
-
-  final def getShaderi(shader: Token.Shader, parameterName: Int): Int = {
-    ???
-  }
-
-  final def getShaderInfoLog(shader: Token.Shader, maxLength: Int): String {
-    ???
-  }
-
-  final def attachShader(program: Token.Program, s: Token.Shader) {
-    ???
-  }
-
-  final def genFrameBuffers(): Token.FrameBuffer = {
-    ???
-  }
-
-  final def deleteFrameBuffers(fb: Token.FrameBuffer) {
-    ???
-  }
-
-  final def bindFrameBuffer(target: Int, fb: Token.FrameBuffer) {
-    ???
-  }
-
-  final def frameBufferTexture2D(target: Int, attachment: Int, textarget: Int, texture: Token.Texture, level: Int) {
-    ???
-  }
-
-  final def frameBufferRenderBuffer(target: Int, attachment: Int, renderbuffertarget: Int, renderbuffer: Token.RenderBuffer) {
-    ???
-  }
-
-  final def getInteger(flag: Int): Int = {
-    ???
-  }
-
-  final def getInteger(flag: Int, data: Data.Int) {
-    ???
-  }
-
-  final def getFloat(flag: Int, data: Data.Float) {
-    ???
-  }
-
-  final def getDouble(flag: Int, data: Data.Double) {
-    ???
-  }
-
-  final def getRenderBufferBinding(): Int = {
-    ???
-  }
-
-  final def genRenderBuffers(): Token.RenderBuffer = {
-    ???
-  }
-
-  final def deleteRenderBuffers(rb: Token.RenderBuffer) {
-    ???
-  }
-
-  final def bindRenderBuffer(target: Int, rb: Token.RenderBuffer) {
-    ???
-  }
-
-  final def renderBufferStorage(target: Int, format: Int, width: Int, height: Int) {
-    ???
-  }
-
-  final def genTextures(): Token.Texture = {
-    ???
-  }
-
-  final def deleteTextures(t: Token.Texture) {
-    ???
-  }
-
-  final def activeTexture(num: Int) {
-    ???
-  }
-
-  final def bindTexture(target: Int, texture: Token.Texture) {
-    ???
-  }
-
-  final def texParameterf(target: Int, name: Int, v: Float) {
-    ???
-  }
-
-  final def texParameteri(target: Int, name: Int, v: Int) {
-    ???
-  }
-
-  final def getTexParameteri(target: Int, name: Int): Int = {
-    ???
-  }
-
-  final def texImage1D(target: Int, level: Int, internalFormat: Int, wdt: Int, border: Int, format: Int, dataType: Int, data: Data.Int) {
-    ???
-  }
-
-  final def texImage2D(target: Int, level: Int, internalFormat: Int, wdt: Int, hgt: Int, border: Int, format: Int, dataType: Int, data: Data.Int) {
-    ???
-  }
-
-  final def texImage2D(target: Int, level: Int, internalFormat: Int, wdt: Int, hgt: Int, border: Int, format: Int, dataType: Int, data: Data.Byte) {
-    ???
-  }
-
-  final def viewport(x: Int, y: Int, w: Int, h: Int) {
-    ???
-  }
-
-  final def enable(flag: Int) {
-    ???
-  }
-
-  final def disable(flag: Int) {
-    ???
-  }
-
-  final def isEnabled(flag: Int): Boolean = {
-    ???
-  }
-
-  final def validProgram(program: Token.Program): Boolean = {
-    ???
-  }
-
-  final def validShader(shader: Token.Shader): Boolean = {
-    ???
-  }
-
-  final def validBuffer(buffer: Token.Buffer): Boolean = {
-    ???
-  }
-
-  final def validUniformLocation(uloc: Token.UniformLocation): Boolean = {
-    ???
-  }
-
-  final def validFrameBuffer(fb: Token.FrameBuffer): Boolean = {
-    ???
-  }
-
-  final def validRenderBuffer(rb: Token.RenderBuffer): Boolean = {
-    ???
-  }
-
-  final def differentPrograms(p1: Token.Program, p2: Token.Program): Boolean = {
-    ???
-  }
-
-  final def clear(bits: Int) {
-    ???
-  }
-
-  final def color4f(r: Float, g: Float, b: Float, a: Float) {
-    ???
-  }
-
-  final def cullFace(flag: Int) {
-    ???
-  }
-
-  final def drawBuffers(ib: Data.Int) {
-    ???
-  }
-
-  final def readBuffer(b: Int) {
-    ???
-  }
-
-  final def begin(mode: Int) {
-    ???
-  }
-
-  final def end() {
-    ???
-  }
-
-  final def matrixMode(mode: Int) {
-    ???
-  }
-
-  final def pushMatrix() {
-    ???
-  }
-
-  final def popMatrix() {
-    ???
-  }
-
-  final def loadMatrix(data: Data.Double) {
-    ???
-  }
-
-  final def loadIdentity() {
-    ???
-  }
-
-  final def frustum(left: Double, right: Double, bottom: Double, top: Double, nearPlane: Double, farPlane: Double) {
-    ???
-  }
-
-  final def ortho(left: Double, right: Double, bottom: Double, top: Double, nearPlane: Double, farPlane: Double) {
-    ???
-  }
-
-  final def lookAt(xfrom: Float, yfrom: Float, zfrom: Float, xto: Float, yto: Float, zto: Float, xup: Float, yup: Float, zup: Float) {
-    ???
-  }
-
-  final def blendFunc(srcFactor: Int, dstFactor: Int) {
-    ???
-  }
-
-  final def checkError() {
-    ???
-  }
-
-  final def errorMessage(): String = {
-    ???
-  }
-
-  final def framebufferStatus(target: Int): String = {
-    ???
-  }*/
-
   final def activeTexture(texture: Int) = {
     GL13.glActiveTexture(texture)
   }
@@ -486,7 +122,7 @@ class Macrogl private[macrogl] () {
   }
 
   /*
-   * Method ompressedTexImage2D with signature glCompressedTexImage2D(int target, int level, int internalformat, int width, int height, int border, int data_imageSize, long data_buffer_offset) discarded
+   * Method compressedTexImage2D with signature glCompressedTexImage2D(int target, int level, int internalformat, int width, int height, int border, int data_imageSize, long data_buffer_offset) discarded
    * Reason: not available in the API WebGL and the API GLES20 of Android
    */
 
@@ -1150,6 +786,66 @@ class Macrogl private[macrogl] () {
   private val tmpInt = Macrogl.createIntData(maxResultSize)
   private val tmpFloat = Macrogl.createFloatData(maxResultSize)
   private val tmpDouble = Macrogl.createDoubleData(maxResultSize)
+  
+  // Helper methods
+  
+  final def checkError() {
+    val code = this.getError()
+    if(code != Macrogl.NO_ERROR) {
+      val msg = this.errorMessage(code)
+      throw new MacroglException("Error "+code+" : "+msg)
+    }
+  }
+  
+  final def errorMessage(code: Int) = {
+    val msg: String = GLU.gluErrorString(code)
+    msg
+  }
+  
+  final def errorMessage(): String = {
+    val code = this.getError()
+    this.errorMessage(code)
+  }
+  
+  final def getCurrentProgram(): Token.Program = {
+    this.getParameterProgram(Macrogl.CURRENT_PROGRAM)
+  }
+  
+  final def getCurrentRenderBufferBinding(): Token.RenderBuffer = {
+    this.getParameterRenderBuffer(Macrogl.RENDERBUFFER_BINDING)
+  }
+  
+  final def shaderSource(shader: Token.Shader, srcarray: Array[CharSequence]) {
+    this.shaderSource(shader, srcarray.mkString("\n"))
+  }
+  
+  final def validProgram(program: Token.Program): Boolean = {
+    (program > 0) && this.isProgram(program)
+  }
+
+  final def validShader(shader: Token.Shader): Boolean = {
+    (shader > 0) && this.isShader(shader)
+  }
+
+  final def validBuffer(buffer: Token.Buffer): Boolean = {
+    (buffer > 0) && this.isBuffer(buffer)
+  }
+
+  final def validUniformLocation(uloc: Token.UniformLocation): Boolean = {
+    (uloc != -1)
+  }
+
+  final def validFrameBuffer(fb: Token.FrameBuffer): Boolean = {
+    (fb > 0) && this.isFramebuffer(fb)
+  }
+
+  final def validRenderBuffer(rb: Token.RenderBuffer): Boolean = {
+    (rb > 0) && this.isRenderbuffer(rb)
+  }
+  
+  final def differentPrograms(p1: Token.Program, p2: Token.Program): Boolean = {
+    p1 != p2
+  }
 }
 
 
