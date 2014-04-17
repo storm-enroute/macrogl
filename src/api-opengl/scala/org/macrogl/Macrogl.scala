@@ -59,11 +59,6 @@ class Macrogl private[macrogl] () {
   final def blendFuncSeparate(srcfactorRGB: Int, dstfactorRGB: Int, srcfactorAlpha: Int, dstfactorAlpha: Int) = {
     GL14.glBlendFuncSeparate(srcfactorRGB, dstfactorRGB, srcfactorAlpha, dstfactorAlpha)
   }
-
-  /*
-   * Method bufferData with signature glBufferData(int target, long data_size, int usage) discarded
-   * Reason: not available in the API GLES20 of Android
-   */
   
   final def bufferData(target: Int, totalBytes: Long, usage: Int) {
     GL15.glBufferData(target, totalBytes, usage)
