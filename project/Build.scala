@@ -26,9 +26,7 @@ object MacroGLBuild extends Build {
       publish <<= streams.map(_.log.info("Publishing to Sonatype is disabled since the \"" + publishUser + "\" and/or \"" + publishPass + "\" environment variables are not set."))
   })
 
-  val lwjglVersion = "2.9.0"
-
-  val macroglSettings = Defaults.defaultSettings ++ publishCreds ++ Seq(
+  val macroglSettings = Defaults.defaultSettings ++ publishCreds ++ LWJGLPlugin.lwjglSettings ++ Seq(
     name := "macrogl",
     organization := "com.storm-enroute",
     version := "0.4-SNAPSHOT",
@@ -47,10 +45,6 @@ object MacroGLBuild extends Build {
     libraryDependencies <+= scalaVersion { sv =>
       "org.scala-lang" % "scala-compiler" % sv
     },
-    libraryDependencies ++= Seq(
-      "org.lwjgl.lwjgl" % "lwjgl" % lwjglVersion,
-      "org.lwjgl.lwjgl" % "lwjgl_util" % lwjglVersion
-    ),
     resolvers ++= Seq(
       "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
       "Sonatype OSS Releases" at "https://oss.sonatype.org/content/repositories/releases"
