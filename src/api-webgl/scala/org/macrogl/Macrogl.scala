@@ -9,7 +9,7 @@ import js.Dynamic.{ global => g }
 // See https://github.com/scala-js/scala-js-dom/blob/master/src/main/scala/org/scalajs/dom/WebGL.scala for documentation
 // about the WebGL DOM for ScalaJS
 
-class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingContext) {
+class Macrogl (implicit gl: org.scalajs.dom.WebGLRenderingContext) {
 
   /* public API */
   final def bytesPerShort = 2
@@ -71,32 +71,33 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
 
   private final def _bufferData(target: Int, data: Data, usage: Int) = {
     val buffer: nio.Buffer = data
-    require(buffer.hasJsBuffer) // should we have a backup plan?
-
-    gl.bufferData(target, buffer.jsDataView, usage)
+    if(buffer != null)
+    	require(buffer.hasJsBuffer) // should we have a backup plan?
+    gl.bufferData(target, if(buffer != null) buffer.jsDataView else null, usage)
   }
 
-  final def bufferData(target: Int, data: Data.Byte, usage: Int) = this._bufferData(target, data.slice, usage)
-  final def bufferData(target: Int, data: Data.Short, usage: Int) = this._bufferData(target, data.slice, usage)
-  final def bufferData(target: Int, data: Data.Int, usage: Int) = this._bufferData(target, data.slice, usage)
-  final def bufferData(target: Int, data: Data.Float, usage: Int) = this._bufferData(target, data.slice, usage)
-  final def bufferData(target: Int, data: Data.Double, usage: Int) = this._bufferData(target, data.slice, usage)
+  final def bufferData(target: Int, data: Data.Byte, usage: Int) = this._bufferData(target, if(data != null) data.slice else null, usage)
+  final def bufferData(target: Int, data: Data.Short, usage: Int) = this._bufferData(target, if(data != null) data.slice else null, usage)
+  final def bufferData(target: Int, data: Data.Int, usage: Int) = this._bufferData(target, if(data != null) data.slice else null, usage)
+  final def bufferData(target: Int, data: Data.Float, usage: Int) = this._bufferData(target, if(data != null) data.slice else null, usage)
+  final def bufferData(target: Int, data: Data.Double, usage: Int) = this._bufferData(target, if(data != null) data.slice else null, usage)
 
   private final def _bufferSubData(target: Int, offset: Long, data: Data) = {
     // Not really how the Long is going to behave in JavaScript
     val buffer: nio.Buffer = data
-    require(buffer.hasJsBuffer) // should we have a backup plan?
+    if(buffer != null)
+    	require(buffer.hasJsBuffer) // should we have a backup plan?
 
     // TODO bufferSubData currently missing from org.scalajs.dom, correct this once it's ok
     // PS: bufferSubData exists in the WebGL specs
-    gl.asInstanceOf[js.Dynamic].bufferSubData(target, offset, buffer.jsDataView)
+    gl.asInstanceOf[js.Dynamic].bufferSubData(target, offset, if(buffer != null) buffer.jsDataView else null)
   }
 
-  final def bufferSubData(target: Int, offset: Long, data: Data.Byte) = this._bufferSubData(target, offset, data.slice)
-  final def bufferSubData(target: Int, offset: Long, data: Data.Short) = this._bufferSubData(target, offset, data.slice)
-  final def bufferSubData(target: Int, offset: Long, data: Data.Int) = this._bufferSubData(target, offset, data.slice)
-  final def bufferSubData(target: Int, offset: Long, data: Data.Float) = this._bufferSubData(target, offset, data.slice)
-  final def bufferSubData(target: Int, offset: Long, data: Data.Double) = this._bufferSubData(target, offset, data.slice)
+  final def bufferSubData(target: Int, offset: Long, data: Data.Byte) = this._bufferSubData(target, offset, if(data != null) data.slice else null)
+  final def bufferSubData(target: Int, offset: Long, data: Data.Short) = this._bufferSubData(target, offset, if(data != null) data.slice else null)
+  final def bufferSubData(target: Int, offset: Long, data: Data.Int) = this._bufferSubData(target, offset, if(data != null) data.slice else null)
+  final def bufferSubData(target: Int, offset: Long, data: Data.Float) = this._bufferSubData(target, offset, if(data != null) data.slice else null)
+  final def bufferSubData(target: Int, offset: Long, data: Data.Double) = this._bufferSubData(target, offset, if(data != null) data.slice else null)
 
   final def checkFramebufferStatus(target: Int): Int = {
     gl.checkFramebufferStatus(target).toInt
@@ -136,17 +137,15 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
   final def compressedTexImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
     data: Data.Byte) = {
 
-    val bytebuffer: nio.ByteBuffer = data.slice
-    require(bytebuffer.hasJsBuffer) // should we have a backup plan?
-    gl.compressedTexImage2D(target, level, internalformat, width, height, border, bytebuffer.jsDataView)
+    val bytebuffer: nio.ByteBuffer = if(data != null) {val tmp = data.slice; require(tmp.hasJsBuffer); tmp} else null
+    gl.compressedTexImage2D(target, level, internalformat, width, height, border, if(data != null) bytebuffer.jsDataView else null)
   }
 
   final def compressedTexSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, width: Int, height: Int,
     format: Int, data: Data.Byte) = {
 
-    val bytebuffer: nio.ByteBuffer = data.slice
-    require(bytebuffer.hasJsBuffer) // should we have a backup plan?
-    gl.compressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, bytebuffer.jsDataView)
+    val bytebuffer: nio.ByteBuffer = if(data != null) {val tmp = data.slice; require(tmp.hasJsBuffer); tmp} else null
+    gl.compressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, if(data != null) bytebuffer.jsDataView else null)
   }
 
   final def copyTexImage2D(target: Int, level: Int, internalFormat: Int, x: Int, y: Int, width: Int, height: Int, border: Int) = {
@@ -460,7 +459,7 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
     JSTypeHelper.toFloats(ret, outputs)
   }
 
-  final def getUniformb(program: Token.Program, location: Token.UniformLocation): Boolean = {
+  /*final def getUniformb(program: Token.Program, location: Token.UniformLocation): Boolean = {
     val ret = gl.getUniform(program, location)
     JSTypeHelper.toBoolean(ret)
   }
@@ -468,7 +467,7 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
   final def getUniformbv(program: Token.Program, location: Token.UniformLocation, outputs: Data.Byte) = {
     val ret = gl.getUniform(program, location)
     JSTypeHelper.toBooleans(ret, outputs)
-  }
+  }*/
 
   final def getUniformLocation(program: Token.Program, name: String): Token.UniformLocation = {
     gl.getUniformLocation(program, name).asInstanceOf[Token.UniformLocation]
@@ -552,8 +551,8 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
 
   private final def _readPixels(x: Int, y: Int, width: Int, height: Int, format: Int, `type`: Int, pixels: Data) = {
     val buffer: nio.Buffer = pixels
-    require(buffer.hasJsBuffer)
-    gl.readPixels(x, y, width, height, format, `type`, buffer.jsDataView)
+    if(pixels != null) require(buffer.hasJsBuffer)
+    gl.readPixels(x, y, width, height, format, `type`, if(pixels != null) buffer.jsDataView else null)
   }
 
   final def readPixels(x: Int, y: Int, width: Int, height: Int, format: Int, `type`: Int, pixels: Data.Byte) =
@@ -611,8 +610,8 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
     format: Int, `type`: Int, pixels: Data) = {
 
     val buffer: nio.Buffer = pixels
-    require(buffer.hasJsBuffer)
-    gl.texImage2D(target, level, internalformat, width, height, border, format, `type`, buffer.jsDataView)
+    if(pixels != null) require(buffer.hasJsBuffer)
+    gl.texImage2D(target, level, internalformat, width, height, border, format, `type`, if(pixels != null) buffer.jsDataView else null)
   }
 
   final def texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
@@ -643,8 +642,8 @@ class Macrogl private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingConte
     format: Int, `type`: Int, pixels: Data) = {
 
     val buffer: nio.Buffer = pixels
-    require(buffer.hasJsBuffer)
-    gl.texSubImage2D(target, level, xoffset, yoffset, width, height, format, `type`, buffer.jsDataView)
+    if(pixels != null) require(buffer.hasJsBuffer)
+    gl.texSubImage2D(target, level, xoffset, yoffset, width, height, format, `type`, if(pixels != null) buffer.jsDataView else null)
   }
 
   final def texSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, width: Int, height: Int,

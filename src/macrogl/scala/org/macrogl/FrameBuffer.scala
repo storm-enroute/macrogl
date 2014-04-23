@@ -63,7 +63,7 @@ object FrameBuffer {
       gl.splice.framebufferTexture2D(Macrogl.FRAMEBUFFER, a, t.target, t.token, l)
       gl.splice.checkError()
       try f.splice(())
-      finally gl.splice.framebufferTexture2D(Macrogl.FRAMEBUFFER, a, t.target, 0, l)
+      finally gl.splice.framebufferTexture2D(Macrogl.FRAMEBUFFER, a, t.target, Token.Texture.none, l)
       ()
     }
 
@@ -85,7 +85,7 @@ object FrameBuffer {
       gl.splice.framebufferRenderbuffer(t, a, Macrogl.RENDERBUFFER, rb.token)
       gl.splice.checkError()
       try f.splice(())
-      finally gl.splice.framebufferRenderbuffer(t, a, Macrogl.RENDERBUFFER, 0)
+      finally gl.splice.framebufferRenderbuffer(t, a, Macrogl.RENDERBUFFER, Token.RenderBuffer.none)
       ()
     }
 

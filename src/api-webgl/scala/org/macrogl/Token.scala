@@ -9,52 +9,47 @@ object Token {
   type Buffer = org.scalajs.dom.WebGLBuffer
 
   object Buffer {
-  	// TODO
-    /*val invalid: Buffer
-    val none: Buffer*/
+    val invalid: Buffer = null
+    val none: Buffer = null
   }
 
   type Program = org.scalajs.dom.WebGLProgram
 
   object Program {
-  	// TODO
-    /*val invalid: Program = 0*/
+    val invalid: Program = null
   }
 
   type Shader = org.scalajs.dom.WebGLShader
 
   object Shader {
-  	// TODO
-    /*val invalid: Shader = 0*/
+    val invalid: Shader = null
   }
 
   type UniformLocation = org.scalajs.dom.WebGLUniformLocation
 
   object UniformLocation {
-  	// TODO
-    /*val invalid: UniformLocation = -1*/
+    val invalid: UniformLocation = null
   }
 
   type FrameBuffer = org.scalajs.dom.WebGLFramebuffer
 
   object FrameBuffer {
-  	// TODO
-    /*val invalid: FrameBuffer = -1*/
+    val invalid: FrameBuffer = null
+    val none: FrameBuffer = null
   }
 
   type RenderBuffer = org.scalajs.dom.WebGLRenderbuffer
 
   object RenderBuffer {
-  	// TODO
-    /*val invalid: RenderBuffer = -1*/
+    val invalid: RenderBuffer = null
+    val none: RenderBuffer = null
   }
 
   type Texture = org.scalajs.dom.WebGLTexture
 
   object Texture {
-  	// TODO
-    /*val invalid: Texture = -1
-    val none: Texture = 0*/
+    val invalid: Texture = null
+    val none: Texture = null
   }
 
 }
