@@ -1,10 +1,6 @@
 <img src='macrogl-title-96.png'></img>
 
 
-
-MacroGL
-=======
-
 Scala macro-based frontend for OpenGL for structured and efficient graphics code.
 
 
