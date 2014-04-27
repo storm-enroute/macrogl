@@ -75,7 +75,7 @@ object Bits {
    */
   def pairIntToLong(x: (Int, Int)): Long = pairIntToLong(x._1, x._2)
   def pairIntToLong(upper: Int, lower: Int): Long = {
-    (upper.toLong << 32) | (lower.toLong)
+    (upper.toLong << 32) | (lower.toLong & 0xFFFFFFFFL)
   }
 
   def longBitsToDouble(x: Long): Double = {

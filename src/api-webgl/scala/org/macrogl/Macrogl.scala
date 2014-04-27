@@ -9,7 +9,7 @@ import js.Dynamic.{ global => g }
 // See https://github.com/scala-js/scala-js-dom/blob/master/src/main/scala/org/scalajs/dom/WebGL.scala for documentation
 // about the WebGL DOM for ScalaJS
 
-class Macrogl (implicit gl: org.scalajs.dom.WebGLRenderingContext) {
+class Macrogl(implicit gl: org.scalajs.dom.WebGLRenderingContext) {
 
   /* public API */
   final def bytesPerShort = 2
@@ -71,33 +71,33 @@ class Macrogl (implicit gl: org.scalajs.dom.WebGLRenderingContext) {
 
   private final def _bufferData(target: Int, data: Data, usage: Int) = {
     val buffer: nio.Buffer = data
-    if(buffer != null)
-    	require(buffer.hasJsBuffer) // should we have a backup plan?
-    gl.bufferData(target, if(buffer != null) buffer.jsDataView else null, usage)
+    if (buffer != null)
+      require(buffer.hasJsBuffer) // should we have a backup plan?
+    gl.bufferData(target, if (buffer != null) buffer.jsDataView else null, usage)
   }
 
-  final def bufferData(target: Int, data: Data.Byte, usage: Int) = this._bufferData(target, if(data != null) data.slice else null, usage)
-  final def bufferData(target: Int, data: Data.Short, usage: Int) = this._bufferData(target, if(data != null) data.slice else null, usage)
-  final def bufferData(target: Int, data: Data.Int, usage: Int) = this._bufferData(target, if(data != null) data.slice else null, usage)
-  final def bufferData(target: Int, data: Data.Float, usage: Int) = this._bufferData(target, if(data != null) data.slice else null, usage)
-  final def bufferData(target: Int, data: Data.Double, usage: Int) = this._bufferData(target, if(data != null) data.slice else null, usage)
+  final def bufferData(target: Int, data: Data.Byte, usage: Int) = this._bufferData(target, if (data != null) data.slice else null, usage)
+  final def bufferData(target: Int, data: Data.Short, usage: Int) = this._bufferData(target, if (data != null) data.slice else null, usage)
+  final def bufferData(target: Int, data: Data.Int, usage: Int) = this._bufferData(target, if (data != null) data.slice else null, usage)
+  final def bufferData(target: Int, data: Data.Float, usage: Int) = this._bufferData(target, if (data != null) data.slice else null, usage)
+  final def bufferData(target: Int, data: Data.Double, usage: Int) = this._bufferData(target, if (data != null) data.slice else null, usage)
 
   private final def _bufferSubData(target: Int, offset: Long, data: Data) = {
     // Not really how the Long is going to behave in JavaScript
     val buffer: nio.Buffer = data
-    if(buffer != null)
-    	require(buffer.hasJsBuffer) // should we have a backup plan?
+    if (buffer != null)
+      require(buffer.hasJsBuffer) // should we have a backup plan?
 
     // TODO bufferSubData currently missing from org.scalajs.dom, correct this once it's ok
     // PS: bufferSubData exists in the WebGL specs
-    gl.asInstanceOf[js.Dynamic].bufferSubData(target, offset, if(buffer != null) buffer.jsDataView else null)
+    gl.asInstanceOf[js.Dynamic].bufferSubData(target, offset, if (buffer != null) buffer.jsDataView else null)
   }
 
-  final def bufferSubData(target: Int, offset: Long, data: Data.Byte) = this._bufferSubData(target, offset, if(data != null) data.slice else null)
-  final def bufferSubData(target: Int, offset: Long, data: Data.Short) = this._bufferSubData(target, offset, if(data != null) data.slice else null)
-  final def bufferSubData(target: Int, offset: Long, data: Data.Int) = this._bufferSubData(target, offset, if(data != null) data.slice else null)
-  final def bufferSubData(target: Int, offset: Long, data: Data.Float) = this._bufferSubData(target, offset, if(data != null) data.slice else null)
-  final def bufferSubData(target: Int, offset: Long, data: Data.Double) = this._bufferSubData(target, offset, if(data != null) data.slice else null)
+  final def bufferSubData(target: Int, offset: Long, data: Data.Byte) = this._bufferSubData(target, offset, if (data != null) data.slice else null)
+  final def bufferSubData(target: Int, offset: Long, data: Data.Short) = this._bufferSubData(target, offset, if (data != null) data.slice else null)
+  final def bufferSubData(target: Int, offset: Long, data: Data.Int) = this._bufferSubData(target, offset, if (data != null) data.slice else null)
+  final def bufferSubData(target: Int, offset: Long, data: Data.Float) = this._bufferSubData(target, offset, if (data != null) data.slice else null)
+  final def bufferSubData(target: Int, offset: Long, data: Data.Double) = this._bufferSubData(target, offset, if (data != null) data.slice else null)
 
   final def checkFramebufferStatus(target: Int): Int = {
     gl.checkFramebufferStatus(target).toInt
@@ -137,15 +137,15 @@ class Macrogl (implicit gl: org.scalajs.dom.WebGLRenderingContext) {
   final def compressedTexImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
     data: Data.Byte) = {
 
-    val bytebuffer: nio.ByteBuffer = if(data != null) {val tmp = data.slice; require(tmp.hasJsBuffer); tmp} else null
-    gl.compressedTexImage2D(target, level, internalformat, width, height, border, if(data != null) bytebuffer.jsDataView else null)
+    val bytebuffer: nio.ByteBuffer = if (data != null) { val tmp = data.slice; require(tmp.hasJsBuffer); tmp } else null
+    gl.compressedTexImage2D(target, level, internalformat, width, height, border, if (data != null) bytebuffer.jsDataView else null)
   }
 
   final def compressedTexSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, width: Int, height: Int,
     format: Int, data: Data.Byte) = {
 
-    val bytebuffer: nio.ByteBuffer = if(data != null) {val tmp = data.slice; require(tmp.hasJsBuffer); tmp} else null
-    gl.compressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, if(data != null) bytebuffer.jsDataView else null)
+    val bytebuffer: nio.ByteBuffer = if (data != null) { val tmp = data.slice; require(tmp.hasJsBuffer); tmp } else null
+    gl.compressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, if (data != null) bytebuffer.jsDataView else null)
   }
 
   final def copyTexImage2D(target: Int, level: Int, internalFormat: Int, x: Int, y: Int, width: Int, height: Int, border: Int) = {
@@ -340,7 +340,7 @@ class Macrogl (implicit gl: org.scalajs.dom.WebGLRenderingContext) {
   final def getParameterShader(pname: Int): Token.Shader = {
     gl.getParameter(pname).asInstanceOf[Token.Shader]
   }
-  
+
   final def getParameterString(pname: Int): String = {
     gl.getParameter(pname).asInstanceOf[js.String]
   }
@@ -551,8 +551,8 @@ class Macrogl (implicit gl: org.scalajs.dom.WebGLRenderingContext) {
 
   private final def _readPixels(x: Int, y: Int, width: Int, height: Int, format: Int, `type`: Int, pixels: Data) = {
     val buffer: nio.Buffer = pixels
-    if(pixels != null) require(buffer.hasJsBuffer)
-    gl.readPixels(x, y, width, height, format, `type`, if(pixels != null) buffer.jsDataView else null)
+    if (pixels != null) require(buffer.hasJsBuffer)
+    gl.readPixels(x, y, width, height, format, `type`, if (pixels != null) buffer.jsDataView else null)
   }
 
   final def readPixels(x: Int, y: Int, width: Int, height: Int, format: Int, `type`: Int, pixels: Data.Byte) =
@@ -595,7 +595,9 @@ class Macrogl (implicit gl: org.scalajs.dom.WebGLRenderingContext) {
   }
 
   final def stencilMaskSeparate(face: Int, mask: Int) = {
-    gl.stencilMaskSeperate(face, mask)
+    // TODO
+    //gl.stencilMaskSeperate(face, mask)
+    gl.asInstanceOf[js.Dynamic].stencilMaskSeparate(face, mask)
   }
 
   final def stencilOp(fail: Int, zfail: Int, zpass: Int) = {
@@ -603,15 +605,17 @@ class Macrogl (implicit gl: org.scalajs.dom.WebGLRenderingContext) {
   }
 
   final def stencilOpSeparate(face: Int, sfail: Int, dpfail: Int, dppass: Int) = {
-    gl.stencilOpSeperate(face, sfail, dpfail, dppass)
+    // TODO
+    //gl.stencilOpSeperate(face, sfail, dpfail, dppass)
+    gl.asInstanceOf[js.Dynamic].stencilOpSeparate(face, sfail, dpfail, dppass)
   }
 
   private final def _texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
     format: Int, `type`: Int, pixels: Data) = {
 
     val buffer: nio.Buffer = pixels
-    if(pixels != null) require(buffer.hasJsBuffer)
-    gl.texImage2D(target, level, internalformat, width, height, border, format, `type`, if(pixels != null) buffer.jsDataView else null)
+    if (pixels != null) require(buffer.hasJsBuffer)
+    gl.texImage2D(target, level, internalformat, width, height, border, format, `type`, if (pixels != null) buffer.jsDataView else null)
   }
 
   final def texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
@@ -642,8 +646,8 @@ class Macrogl (implicit gl: org.scalajs.dom.WebGLRenderingContext) {
     format: Int, `type`: Int, pixels: Data) = {
 
     val buffer: nio.Buffer = pixels
-    if(pixels != null) require(buffer.hasJsBuffer)
-    gl.texSubImage2D(target, level, xoffset, yoffset, width, height, format, `type`, if(pixels != null) buffer.jsDataView else null)
+    if (pixels != null) require(buffer.hasJsBuffer)
+    gl.texSubImage2D(target, level, xoffset, yoffset, width, height, format, `type`, if (pixels != null) buffer.jsDataView else null)
   }
 
   final def texSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, width: Int, height: Int,
@@ -665,149 +669,149 @@ class Macrogl (implicit gl: org.scalajs.dom.WebGLRenderingContext) {
   final def uniform1f(location: Token.UniformLocation, x: Float) = {
     gl.uniform1f(location, x)
   }
-  
+
   final def uniform1fv(location: Token.UniformLocation, values: Data.Float) = {
     val slice = values.slice
     require(slice.hasJsArray)
     gl.uniform1fv(location, slice.jsArray)
   }
-  
+
   final def uniform1i(location: Token.UniformLocation, x: Int) = {
     gl.uniform1i(location, x)
   }
-  
+
   final def uniform1iv(location: Token.UniformLocation, values: Data.Int) = {
     val slice = values.slice
     require(slice.hasJsArray)
     gl.uniform1iv(location, slice.jsArray)
   }
-  
+
   final def uniform2f(location: Token.UniformLocation, x: Float, y: Float) = {
     gl.uniform2f(location, x, y)
   }
-  
+
   final def uniform2fv(location: Token.UniformLocation, values: Data.Float) = {
     val slice = values.slice
     require(slice.hasJsArray)
     gl.uniform2fv(location, slice.jsArray)
   }
-  
+
   final def uniform2i(location: Token.UniformLocation, x: Int, y: Int) = {
     gl.uniform2i(location, x, y)
   }
-  
+
   final def uniform2iv(location: Token.UniformLocation, values: Data.Int) = {
     val slice = values.slice
     require(slice.hasJsArray)
     gl.uniform2iv(location, slice.jsArray)
   }
-  
+
   final def uniform3f(location: Token.UniformLocation, x: Float, y: Float, z: Float) = {
     gl.uniform3f(location, x, y, z)
   }
-  
+
   final def uniform3fv(location: Token.UniformLocation, values: Data.Float) = {
     val slice = values.slice
     require(slice.hasJsArray)
     gl.uniform3fv(location, slice.jsArray)
   }
-  
+
   final def uniform3i(location: Token.UniformLocation, x: Int, y: Int, z: Int) = {
     gl.uniform3i(location, x, y, z)
   }
-  
+
   final def uniform3iv(location: Token.UniformLocation, values: Data.Int) = {
     val slice = values.slice
     require(slice.hasJsArray)
     gl.uniform3iv(location, slice.jsArray)
   }
-  
+
   final def uniform4f(location: Token.UniformLocation, x: Float, y: Float, z: Float, w: Float) = {
     gl.uniform4f(location, x, y, z, w)
   }
-  
+
   final def uniform4fv(location: Token.UniformLocation, values: Data.Float) = {
     val slice = values.slice
     require(slice.hasJsArray)
     gl.uniform4fv(location, slice.jsArray)
   }
-  
+
   final def uniform4i(location: Token.UniformLocation, x: Int, y: Int, z: Int, w: Int) = {
     gl.uniform4i(location, x, y, z, w)
   }
-  
+
   final def uniform4iv(location: Token.UniformLocation, values: Data.Int) = {
     val slice = values.slice
     require(slice.hasJsArray)
     gl.uniform4iv(location, slice.jsArray)
   }
-  
+
   final def uniformMatrix2fv(location: Token.UniformLocation, transpose: Boolean, matrices: Data.Float) = {
     val slice = matrices.slice
     require(slice.hasJsArray)
     gl.uniformMatrix2fv(location, transpose, slice.jsArray)
   }
-  
+
   final def uniformMatrix3fv(location: Token.UniformLocation, transpose: Boolean, matrices: Data.Float) = {
     val slice = matrices.slice
     require(slice.hasJsArray)
     gl.uniformMatrix3fv(location, transpose, slice.jsArray)
   }
-  
+
   final def uniformMatrix4fv(location: Token.UniformLocation, transpose: Boolean, matrices: Data.Float) = {
     val slice = matrices.slice
     require(slice.hasJsArray)
     gl.uniformMatrix4fv(location, transpose, slice.jsArray)
   }
-  
+
   final def useProgram(program: Token.Program) = {
     gl.useProgram(program)
   }
-  
+
   final def validateProgram(program: Token.Program) = {
     gl.validateProgram(program)
   }
-  
+
   final def vertexAttrib1f(index: Int, x: Float) = {
     gl.vertexAttrib1f(index, x)
   }
-  
+
   final def vertexAttrib1fv(index: Int, values: Data.Float) = {
     val slice = values.slice
     require(slice.hasJsArray)
     gl.vertexAttrib1fv(index, slice.jsArray)
   }
-  
+
   final def vertexAttrib2f(index: Int, x: Float, y: Float) = {
     gl.vertexAttrib2f(index, x, y)
   }
-  
+
   final def vertexAttrib2fv(index: Int, values: Data.Float) = {
     val slice = values.slice
     require(slice.hasJsArray)
     gl.vertexAttrib2fv(index, slice.jsArray)
   }
-  
+
   final def vertexAttrib3f(index: Int, x: Float, y: Float, z: Float) = {
     gl.vertexAttrib3f(index, x, y, z)
   }
-  
+
   final def vertexAttrib3fv(index: Int, values: Data.Float) = {
     val slice = values.slice
     require(slice.hasJsArray)
     gl.vertexAttrib3fv(index, slice.jsArray)
   }
-  
+
   final def vertexAttrib4f(index: Int, x: Float, y: Float, z: Float, w: Float) = {
     gl.vertexAttrib4f(index, x, y, z, w)
   }
-  
+
   final def vertexAttrib4fv(index: Int, values: Data.Float) = {
     val slice = values.slice
     require(slice.hasJsArray)
     gl.vertexAttrib4fv(index, slice.jsArray)
   }
-  
+
   /*
    * Method vertexAttribPointer with signature glVertexAttribPointer(int index, int size, boolean normalized,
    * int stride, *Buffer buffer) discarded
@@ -815,47 +819,47 @@ class Macrogl (implicit gl: org.scalajs.dom.WebGLRenderingContext) {
    * Note: available in the API GLES20 of Android
    * Note: the following available method requires the use of an array buffer currently bound to ARRAY_BUFFER
    */
-  
+
   final def vertexAttribPointer(index: Int, size: Int, `type`: Int, normalized: Boolean, stride: Int, offset: Long) = {
     gl.vertexAttribPointer(index, size, `type`, normalized, stride, offset)
   }
-  
+
   final def viewport(x: Int, y: Int, width: Int, height: Int) = {
     gl.viewport(x, y, width, height)
   }
-  
+
   // Helper methods
-  
+
   final def checkError() {
     val code = this.getError()
-    if(code != Macrogl.NO_ERROR) {
+    if (code != Macrogl.NO_ERROR) {
       val msg = this.errorMessage(code)
-      throw new MacroglException("Error "+code+" : "+msg)
+      throw new MacroglException("Error " + code + " : " + msg)
     }
   }
-  
+
   final def errorMessage(code: Int) = {
     val msg: String = g.WebGLDebugUtils.glEnumToString(code).asInstanceOf[js.String]
     msg
   }
-  
+
   final def errorMessage(): String = {
     val code = this.getError()
     this.errorMessage(code)
   }
-  
+
   final def getCurrentProgram(): Token.Program = {
     this.getParameterProgram(Macrogl.CURRENT_PROGRAM)
   }
-  
+
   final def getCurrentRenderbufferBinding(): Token.RenderBuffer = {
     this.getParameterRenderbuffer(Macrogl.RENDERBUFFER_BINDING)
   }
-  
+
   final def shaderSource(shader: Token.Shader, srcarray: Array[CharSequence]) {
     this.shaderSource(shader, srcarray.mkString("\n"))
   }
-  
+
   final def validProgram(program: Token.Program): Boolean = {
     (program != null) && this.isProgram(program)
   }
@@ -879,125 +883,565 @@ class Macrogl (implicit gl: org.scalajs.dom.WebGLRenderingContext) {
   final def validRenderbuffer(rb: Token.RenderBuffer): Boolean = {
     (rb != null) && this.isRenderbuffer(rb)
   }
-  
+
   final def differentPrograms(p1: Token.Program, p2: Token.Program): Boolean = {
     p1 != p2
   }
 }
 
 private object JSTypeHelper {
-  // TODO complete this with some on-the-fly conversions
-
   def toBoolean(value: js.Any): Boolean = {
-    value.asInstanceOf[js.Boolean]
+    val typeName = org.scalajs.nio.JsUtils.typeName(value)
+    typeName match {
+      case "Boolean" => value.asInstanceOf[js.Boolean]
+      case "Number" => this.jsNumberToBoolean(value.asInstanceOf[js.Number])
+      case "Array" => {
+        val jsArray = value.asInstanceOf[js.Array[js.Any]]
+        toBoolean(jsArray(0))
+      }
+      case "Int8Array" => this.jsNumberToBoolean(value.asInstanceOf[dom.Int8Array](0))
+      case "Uint8Array" => this.jsNumberToBoolean(value.asInstanceOf[dom.Uint8Array](0))
+      case "Int16Array" => this.jsNumberToBoolean(value.asInstanceOf[dom.Int16Array](0))
+      case "Uint16Array" => this.jsNumberToBoolean(value.asInstanceOf[dom.Uint16Array](0))
+      case "Int32Array" => this.jsNumberToBoolean(value.asInstanceOf[dom.Int32Array](0))
+      case "Uint32Array" => this.jsNumberToBoolean(value.asInstanceOf[dom.Uint32Array](0))
+      case "Float32Array" => this.jsNumberToBoolean(value.asInstanceOf[dom.Float32Array](0))
+      case "Float64Array" => this.jsNumberToBoolean(value.asInstanceOf[dom.Float64Array](0))
+      case _ => throw new RuntimeException("Cannot convert type " + typeName + " to boolean")
+    }
   }
 
   def toInt(value: js.Any): Int = {
-    value.asInstanceOf[js.Number].toInt
+    val typeName = org.scalajs.nio.JsUtils.typeName(value)
+    typeName match {
+      case "Boolean" => this.booleanToInt(value.asInstanceOf[js.Boolean])
+      case "Number" => value.asInstanceOf[js.Number].toInt
+      case "Array" => {
+        val jsArray = value.asInstanceOf[js.Array[js.Any]]
+        toInt(jsArray(0))
+      }
+      case "Int8Array" => value.asInstanceOf[dom.Int8Array](0).toInt
+      case "Uint8Array" => value.asInstanceOf[dom.Uint8Array](0).toInt
+      case "Int16Array" => value.asInstanceOf[dom.Int16Array](0).toInt
+      case "Uint16Array" => value.asInstanceOf[dom.Uint16Array](0).toInt
+      case "Int32Array" => value.asInstanceOf[dom.Int32Array](0).toInt
+      case "Uint32Array" => value.asInstanceOf[dom.Uint32Array](0).toInt
+      case "Float32Array" => value.asInstanceOf[dom.Float32Array](0).toInt
+      case "Float64Array" => value.asInstanceOf[dom.Float64Array](0).toInt
+      case _ => throw new RuntimeException("Cannot convert type " + typeName + " to int")
+    }
   }
 
   def toShort(value: js.Any): Short = {
-    value.asInstanceOf[js.Number].toShort
+    val typeName = org.scalajs.nio.JsUtils.typeName(value)
+    typeName match {
+      case "Boolean" => this.booleanToShort(value.asInstanceOf[js.Boolean])
+      case "Number" => value.asInstanceOf[js.Number].toShort
+      case "Array" => {
+        val jsArray = value.asInstanceOf[js.Array[js.Any]]
+        toShort(jsArray(0))
+      }
+      case "Int8Array" => value.asInstanceOf[dom.Int8Array](0).toShort
+      case "Uint8Array" => value.asInstanceOf[dom.Uint8Array](0).toShort
+      case "Int16Array" => value.asInstanceOf[dom.Int16Array](0).toShort
+      case "Uint16Array" => value.asInstanceOf[dom.Uint16Array](0).toShort
+      case "Int32Array" => value.asInstanceOf[dom.Int32Array](0).toShort
+      case "Uint32Array" => value.asInstanceOf[dom.Uint32Array](0).toShort
+      case "Float32Array" => value.asInstanceOf[dom.Float32Array](0).toShort
+      case "Float64Array" => value.asInstanceOf[dom.Float64Array](0).toShort
+      case _ => throw new RuntimeException("Cannot convert type " + typeName + " to short")
+    }
   }
 
   def toFloat(value: js.Any): Float = {
-    value.asInstanceOf[js.Number].toFloat
+    val typeName = org.scalajs.nio.JsUtils.typeName(value)
+    typeName match {
+      case "Boolean" => this.booleanToFloat(value.asInstanceOf[js.Boolean])
+      case "Number" => value.asInstanceOf[js.Number].toFloat
+      case "Array" => {
+        val jsArray = value.asInstanceOf[js.Array[js.Any]]
+        toFloat(jsArray(0))
+      }
+      case "Int8Array" => value.asInstanceOf[dom.Int8Array](0).toFloat
+      case "Uint8Array" => value.asInstanceOf[dom.Uint8Array](0).toFloat
+      case "Int16Array" => value.asInstanceOf[dom.Int16Array](0).toFloat
+      case "Uint16Array" => value.asInstanceOf[dom.Uint16Array](0).toFloat
+      case "Int32Array" => value.asInstanceOf[dom.Int32Array](0).toFloat
+      case "Uint32Array" => value.asInstanceOf[dom.Uint32Array](0).toFloat
+      case "Float32Array" => value.asInstanceOf[dom.Float32Array](0).toFloat
+      case "Float64Array" => value.asInstanceOf[dom.Float64Array](0).toFloat
+      case _ => throw new RuntimeException("Cannot convert type " + typeName + " to float")
+    }
   }
 
   def toDouble(value: js.Any): Double = {
-    value.asInstanceOf[js.Number].toDouble
+    val typeName = org.scalajs.nio.JsUtils.typeName(value)
+    typeName match {
+      case "Boolean" => this.booleanToFloat(value.asInstanceOf[js.Boolean])
+      case "Number" => value.asInstanceOf[js.Number].toDouble
+      case "Array" => {
+        val jsArray = value.asInstanceOf[js.Array[js.Any]]
+        toDouble(jsArray(0))
+      }
+      case "Int8Array" => value.asInstanceOf[dom.Int8Array](0).toDouble
+      case "Uint8Array" => value.asInstanceOf[dom.Uint8Array](0).toDouble
+      case "Int16Array" => value.asInstanceOf[dom.Int16Array](0).toDouble
+      case "Uint16Array" => value.asInstanceOf[dom.Uint16Array](0).toDouble
+      case "Int32Array" => value.asInstanceOf[dom.Int32Array](0).toDouble
+      case "Uint32Array" => value.asInstanceOf[dom.Uint32Array](0).toDouble
+      case "Float32Array" => value.asInstanceOf[dom.Float32Array](0).toDouble
+      case "Float64Array" => value.asInstanceOf[dom.Float64Array](0).toDouble
+      case _ => throw new RuntimeException("Cannot convert type " + typeName + " to double")
+    }
   }
 
   def toBooleans(value: js.Any, data: Data.Byte) = {
     val slice = data.slice
-    
-    val jsArrayBool = value.asInstanceOf[js.Array[js.Boolean]]
-    val jsArrayLength = jsArrayBool.length.toInt
 
-    require(slice.remaining >= jsArrayLength)
+    val typeName = org.scalajs.nio.JsUtils.typeName(value)
+    typeName match {
+      case "Boolean" => slice.put(this.booleanToByte(value.asInstanceOf[js.Boolean]))
+      case "Number" => slice.put(this.booleanToByte(this.jsNumberToBoolean(value.asInstanceOf[js.Number])))
+      case "Array" => {
+        val jsArray = value.asInstanceOf[js.Array[js.Any]]
+        val length = jsArray.length.toInt
+        val containedType = org.scalajs.nio.JsUtils.typeName(jsArray(0))
 
-    jsArrayBool.foreach { bool =>
-      slice.put(
-        if (bool)
-          1.toByte
-        else
-          0.toByte)
+        require(slice.remaining >= length)
+
+        containedType match {
+          case "Boolean" => {
+            jsArray.foreach { e => slice.put(this.booleanToByte(e.asInstanceOf[js.Boolean])) }
+          }
+          case "Number" => {
+            jsArray.foreach { e => slice.put(this.booleanToByte(this.jsNumberToBoolean(e.asInstanceOf[js.Number]))) }
+          }
+          case _ => throw new RuntimeException("Cannot convert array of " + containedType + " to booleans")
+        }
+      }
+      case "Int8Array" => {
+        val length = value.asInstanceOf[js.Dynamic]
+        val array = value.asInstanceOf[dom.Int8Array]
+        val l = array
+      }
+      case "Uint8Array" => value.asInstanceOf[dom.Uint8Array](0).toDouble
+      case "Int16Array" => value.asInstanceOf[dom.Int16Array](0).toDouble
+      case "Uint16Array" => value.asInstanceOf[dom.Uint16Array](0).toDouble
+      case "Int32Array" => value.asInstanceOf[dom.Int32Array](0).toDouble
+      case "Uint32Array" => value.asInstanceOf[dom.Uint32Array](0).toDouble
+      case "Float32Array" => value.asInstanceOf[dom.Float32Array](0).toDouble
+      case "Float64Array" => value.asInstanceOf[dom.Float64Array](0).toDouble
+      case _ => throw new RuntimeException("Cannot convert type " + typeName + " to booleans")
     }
   }
 
   def toInts(value: js.Any, data: Data.Int) = {
     val slice = data.slice
-    
-    val jsArrayInt = value.asInstanceOf[dom.Int32Array]
-    // org.scalajs.dom does not provides .length() method
-    val jsArrayLength = value.asInstanceOf[js.Dynamic].length().asInstanceOf[js.Number].toInt
 
-    require(slice.remaining >= jsArrayLength)
+    val typeName = org.scalajs.nio.JsUtils.typeName(value)
+    typeName match {
+      case "Boolean" => slice.put(this.booleanToByte(value.asInstanceOf[js.Boolean]))
+      case "Number" => slice.put(value.asInstanceOf[js.Number].toInt) // Can't decide if this is a float or an int...
+      case "Array" => {
+        val jsArray = value.asInstanceOf[js.Array[js.Any]]
+        val length = jsArray.length.toInt
+        val containedType = org.scalajs.nio.JsUtils.typeName(jsArray(0))
 
-    if (slice.hasJsArray) { // optimized version for native buffer
-      slice.jsArray.set(jsArrayInt)
-    } else { // generic version
-      for (i <- 0 until jsArrayLength) {
-        slice.put(jsArrayInt(i).toInt)
+        require(slice.remaining >= length)
+
+        containedType match {
+          case "Boolean" => {
+            jsArray.foreach { e => slice.put(this.booleanToByte(e.asInstanceOf[js.Boolean])) }
+          }
+          case "Number" => {
+            jsArray.foreach { e => slice.put(e.asInstanceOf[js.Number].toInt) }
+          }
+          case _ => throw new RuntimeException("Cannot convert array of " + containedType + " to ints")
+        }
       }
+      case "Int8Array" => {
+        val array = value.asInstanceOf[dom.Int8Array]
+        val length = value.asInstanceOf[js.Dynamic].length.asInstanceOf[js.Number].toInt
+        require(slice.remaining >= length)
+
+        var i = 0
+        while (i < length) {
+          slice.put(array(i).toInt)
+          i += 1
+        }
+      }
+      case "Uint8Array" => {
+        val array = value.asInstanceOf[dom.Uint8Array]
+        val length = value.asInstanceOf[js.Dynamic].length.asInstanceOf[js.Number].toInt
+        require(slice.remaining >= length)
+
+        var i = 0
+        while (i < length) {
+          slice.put(array(i).toInt)
+          i += 1
+        }
+      }
+      case "Int16Array" => {
+        val array = value.asInstanceOf[dom.Int16Array]
+        val length = value.asInstanceOf[js.Dynamic].length.asInstanceOf[js.Number].toInt
+        require(slice.remaining >= length)
+
+        var i = 0
+        while (i < length) {
+          slice.put(array(i).toInt)
+          i += 1
+        }
+      }
+      case "Uint16Array" => {
+        val array = value.asInstanceOf[dom.Uint16Array]
+        val length = value.asInstanceOf[js.Dynamic].length.asInstanceOf[js.Number].toInt
+        require(slice.remaining >= length)
+
+        var i = 0
+        while (i < length) {
+          slice.put(array(i).toInt)
+          i += 1
+        }
+      }
+      case "Int32Array" => {
+        val array = value.asInstanceOf[dom.Int32Array]
+        val length = value.asInstanceOf[js.Dynamic].length.asInstanceOf[js.Number].toInt
+        require(slice.remaining >= length)
+
+        if (slice.hasJsArray) { // optimized version for native buffer
+          slice.jsArray.set(array)
+        } else { // generic version
+          var i = 0
+          while (i < length) {
+            slice.put(array(i).toInt)
+            i += 1
+          }
+        }
+      }
+      case "Uint32Array" => {
+        val array = value.asInstanceOf[dom.Uint32Array]
+        val length = value.asInstanceOf[js.Dynamic].length.asInstanceOf[js.Number].toInt
+        require(slice.remaining >= length)
+
+        var i = 0
+        while (i < length) {
+          slice.put(array(i).toInt)
+          i += 1
+        }
+      }
+      case "Float32Array" => {
+        val array = value.asInstanceOf[dom.Float32Array]
+        val length = value.asInstanceOf[js.Dynamic].length.asInstanceOf[js.Number].toInt
+        require(slice.remaining >= length)
+
+        var i = 0
+        while (i < length) {
+          slice.put(this.normalizedFloatToSignedInt(array(i).toFloat))
+          i += 1
+        }
+      }
+      case "Float64Array" => {
+        val array = value.asInstanceOf[dom.Float64Array]
+        val length = value.asInstanceOf[js.Dynamic].length.asInstanceOf[js.Number].toInt
+        require(slice.remaining >= length)
+
+        var i = 0
+        while (i < length) {
+          slice.put(this.normalizedFloatToSignedInt(array(i).toDouble))
+          i += 1
+        }
+      }
+      case _ => throw new RuntimeException("Cannot convert type " + typeName + " to ints")
     }
   }
 
   def toFloats(value: js.Any, data: Data.Float) = {
     val slice = data.slice
-    
-    val jsArrayInt = value.asInstanceOf[dom.Float32Array]
-    // org.scalajs.dom does not provides .length() method
-    val jsArrayLength = value.asInstanceOf[js.Dynamic].length().asInstanceOf[js.Number].toInt
 
-    require(slice.remaining >= jsArrayLength)
+    val typeName = org.scalajs.nio.JsUtils.typeName(value)
+    typeName match {
+      case "Boolean" => slice.put(this.booleanToByte(value.asInstanceOf[js.Boolean]))
+      case "Number" => slice.put(value.asInstanceOf[js.Number].toFloat) // Can't decide if this is a float or an int...
+      case "Array" => {
+        val jsArray = value.asInstanceOf[js.Array[js.Any]]
+        val length = jsArray.length.toInt
+        val containedType = org.scalajs.nio.JsUtils.typeName(jsArray(0))
 
-    if (slice.hasJsArray) { // optimized version for native buffer
-      slice.jsArray.set(jsArrayInt)
-    } else { // generic version
-      for (i <- 0 until jsArrayLength) {
-        slice.put(jsArrayInt(i).toFloat)
+        require(slice.remaining >= length)
+
+        containedType match {
+          case "Boolean" => {
+            jsArray.foreach { e => slice.put(this.booleanToByte(e.asInstanceOf[js.Boolean])) }
+          }
+          case "Number" => {
+            jsArray.foreach { e => slice.put(e.asInstanceOf[js.Number].toFloat) }
+          }
+          case _ => throw new RuntimeException("Cannot convert array of " + containedType + " to floats")
+        }
       }
+      case "Int8Array" => {
+        val array = value.asInstanceOf[dom.Int8Array]
+        val length = value.asInstanceOf[js.Dynamic].length.asInstanceOf[js.Number].toInt
+        require(slice.remaining >= length)
+
+        var i = 0
+        while (i < length) {
+          slice.put(this.signedByteToNormalizedFloat(array(i).toByte).toFloat)
+          i += 1
+        }
+      }
+      case "Uint8Array" => {
+        val array = value.asInstanceOf[dom.Uint8Array]
+        val length = value.asInstanceOf[js.Dynamic].length.asInstanceOf[js.Number].toInt
+        require(slice.remaining >= length)
+
+        var i = 0
+        while (i < length) {
+          slice.put(this.unsignedByteToNormalizedFloat(array(i).toByte).toFloat)
+          i += 1
+        }
+      }
+      case "Int16Array" => {
+        val array = value.asInstanceOf[dom.Int16Array]
+        val length = value.asInstanceOf[js.Dynamic].length.asInstanceOf[js.Number].toInt
+        require(slice.remaining >= length)
+
+        var i = 0
+        while (i < length) {
+          slice.put(this.signedShortToNormalizedFloat(array(i).toShort).toFloat)
+          i += 1
+        }
+      }
+      case "Uint16Array" => {
+        val array = value.asInstanceOf[dom.Uint16Array]
+        val length = value.asInstanceOf[js.Dynamic].length.asInstanceOf[js.Number].toInt
+        require(slice.remaining >= length)
+
+        var i = 0
+        while (i < length) {
+          slice.put(this.unsignedShortToNormalizedFloat(array(i).toShort).toFloat)
+          i += 1
+        }
+      }
+      case "Int32Array" => {
+        val array = value.asInstanceOf[dom.Int32Array]
+        val length = value.asInstanceOf[js.Dynamic].length.asInstanceOf[js.Number].toInt
+        require(slice.remaining >= length)
+
+        var i = 0
+        while (i < length) {
+          slice.put(this.signedIntToNormalizedFloat(array(i).toInt).toFloat)
+          i += 1
+        }
+      }
+      case "Uint32Array" => {
+        val array = value.asInstanceOf[dom.Uint32Array]
+        val length = value.asInstanceOf[js.Dynamic].length.asInstanceOf[js.Number].toInt
+        require(slice.remaining >= length)
+
+        var i = 0
+        while (i < length) {
+          slice.put(this.unsignedIntToNormalizedFloat(array(i).toInt).toFloat)
+          i += 1
+        }
+      }
+      case "Float32Array" => {
+        val array = value.asInstanceOf[dom.Float32Array]
+        val length = value.asInstanceOf[js.Dynamic].length.asInstanceOf[js.Number].toInt
+        require(slice.remaining >= length)
+
+        if (slice.hasJsArray) { // optimized version for native buffer
+          slice.jsArray.set(array)
+        } else { // generic version
+          var i = 0
+          while (i < length) {
+            slice.put(array(i).toFloat)
+            i += 1
+          }
+        }
+      }
+      case "Float64Array" => {
+        val array = value.asInstanceOf[dom.Float64Array]
+        val length = value.asInstanceOf[js.Dynamic].length.asInstanceOf[js.Number].toInt
+        require(slice.remaining >= length)
+
+        var i = 0
+        while (i < length) {
+          slice.put(array(i).toFloat)
+          i += 1
+        }
+      }
+      case _ => throw new RuntimeException("Cannot convert type " + typeName + " to floats")
     }
   }
-  
+
+  // Auxiliary methods
+
+  def jsNumberToBoolean(v: js.Number): Boolean = {
+    v != 0
+  }
+
+  def booleanToJsNumber(b: Boolean): js.Number = {
+    if (b) 1.0
+    else 0.0
+  }
+
+  def byteToBoolean(b: Byte): Boolean = {
+    b != 0
+  }
+
+  def booleanToByte(b: Boolean): Byte = {
+    if (b) 1
+    else 0
+  }
+
+  def shortToBoolean(s: Short): Boolean = {
+    s != 0
+  }
+
+  def booleanToShort(b: Boolean): Short = {
+    if (b) 1
+    else 0
+  }
+
+  def intToBoolean(i: Int): Boolean = {
+    i != 0
+  }
+
+  def booleanToInt(b: Boolean): Int = {
+    if (b) 1
+    else 0
+  }
+
+  def floatToBoolean(f: Float): Boolean = {
+    f != 0.0f
+  }
+
+  def booleanToFloat(b: Boolean): Float = {
+    if (b) 1.0f
+    else 0.0f
+  }
+
+  // Conversions algorithm taken from the official OpenGL ES 2.0 specifications (2.1.2)
+
   val maxUint32: Long = 0xFFFFFFFFL
-  val maxInt32: Int = Int.MaxValue
-  val minInt32: Int = Int.MinValue
-  
+  val maxUint32d: Double = maxUint32.toDouble // seems faster than Long for math operations in JavaScript
+
+  val maxUint16: Int = 0xFFFF
+  val maxUint16d: Double = maxUint16.toDouble
+
+  val maxUint8: Int = 0xFF
+  val maxUint8d: Double = maxUint8.toDouble
+
+  // From/To 32 bits values
+
   /*
    * Convert an unsigned int to a normalized floating-point value
    * [0, maxUint32] -> [0, 1]
    */
-  def unsignedIntToNormalizedFloat(c: Int): Float = {
-    val cl = (c.toLong & maxUint32)
-    (cl.toDouble / maxUint32).toFloat
+  def unsignedIntToNormalizedFloat(c: Int): Double = {
+    val cl = (c.toLong & maxUint32) // unsign the value
+    cl.toDouble / maxUint32d
   }
-  
+
   /*
    * Convert a signed int to a normalized floating-point value
    * [minInt32, maxInt32] -> [-1, 1]
    */
-  def signedIntToNormalizedFloat(c: Int): Float = {
-    if(c >= 0) (c.toDouble / maxInt32).toFloat
-    else (-(c.toDouble) / minInt32).toFloat
+  def signedIntToNormalizedFloat(c: Int): Double = {
+    (c.toDouble * 2 + 1) / maxUint32d
   }
-  
+
   /*
    * Convert a normalized floating-point value to an unsigned int
    * [0, 1] -> [0, maxUint32]
    */
-  def normalizedFloatToUnsignedInt(f: Float): Int = {
-    (f.toDouble * maxUint32).toInt
+  def normalizedFloatToUnsignedInt(f: Double): Int = {
+    val fb = if (f > 1.0) 1.0 else if (f < 0.0) 0.0 else f // clamp
+    (fb * maxUint32d).toInt
   }
-  
+
   /*
    * Convert a normalized floating-point value to a signed int
    * [-1, 1] -> [minInt32, maxInt32]
    */
-  def normalizedFloatToSignedInt(f: Float): Int = {
-    if(f >= 0) (f.toDouble * maxInt32).toInt
-    else (-(f.toDouble) * minInt32).toInt
+  def normalizedFloatToSignedInt(f: Double): Int = {
+    val fb = if (f > 1.0) 1.0 else if (f < 0.0) 0.0 else f // clamp
+    ((fb * maxUint32d - 1) / 2).toInt
+  }
+
+  // From/To 16 bits values
+
+  /*
+   * Convert an unsigned short to a normalized floating-point value
+   * [0, maxUint16] -> [0, 1]
+   */
+  def unsignedShortToNormalizedFloat(c: Short): Double = {
+    val cl = (c.toInt & maxUint16) // unsign the value
+    cl.toDouble / maxUint16d
+  }
+
+  /*
+   * Convert a signed short to a normalized floating-point value
+   * [minInt16, maxInt16] -> [-1, 1]
+   */
+  def signedShortToNormalizedFloat(c: Short): Double = {
+    (c.toDouble * 2 + 1) / maxUint16d
+  }
+
+  /*
+   * Convert a normalized floating-point value to an unsigned short
+   * [0, 1] -> [0, maxUint16]
+   */
+  def normalizedFloatToUnsignedShort(f: Double): Short = {
+    val fb = if (f > 1.0) 1.0 else if (f < 0.0) 0.0 else f // clamp
+    (fb * maxUint16d).toShort
+  }
+
+  /*
+   * Convert a normalized floating-point value to a signed short
+   * [-1, 1] -> [minInt16, maxInt16]
+   */
+  def normalizedFloatToSignedShort(f: Double): Short = {
+    val fb = if (f > 1.0) 1.0 else if (f < 0.0) 0.0 else f // clamp
+    ((fb * maxUint16d - 1) / 2).toShort
+  }
+
+  // From/To 8 bits values
+
+  /*
+   * Convert an unsigned byte to a normalized floating-point value
+   * [0, maxUint8] -> [0, 1]
+   */
+  def unsignedByteToNormalizedFloat(c: Byte): Double = {
+    val cl = (c.toShort & maxUint8) // unsign the value
+    c.toDouble / maxUint8d
+  }
+
+  /*
+   * Convert a signed byte to a normalized floating-point value
+   * [minInt8, maxInt8] -> [-1, 1]
+   */
+  def signedByteToNormalizedFloat(c: Byte): Double = {
+    (c.toDouble * 2 + 1) / maxUint8d
+  }
+
+  /*
+   * Convert a normalized floating-point value to an unsigned byte
+   * [0, 1] -> [0, maxUint8]
+   */
+  def normalizedFloatToUnsignedByte(f: Double): Byte = {
+    val fb = if (f > 1.0) 1.0 else if (f < 0.0) 0.0 else f // clamp
+    (fb * maxUint8d).toByte
+  }
+
+  /*
+   * Convert a normalized floating-point value to a signed byte
+   * [-1, 1] -> [minInt8, maxInt8]
+   */
+  def normalizedFloatToSignedByte(f: Double): Byte = {
+    val fb = if (f > 1.0) 1.0 else if (f < 0.0) 0.0 else f // clamp
+    ((fb * maxUint8d - 1) / 2).toByte
   }
 }
 
