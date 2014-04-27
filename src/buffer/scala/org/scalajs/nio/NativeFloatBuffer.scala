@@ -44,6 +44,23 @@ class NativeFloatBuffer(protected var mCapacity: Int, protected var mLimit: Int,
 
   override def toString = "NativeFloatBuffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
 
+  override def put(src: FloatBuffer): FloatBuffer = {
+    if (src.hasJsArray) { // optimized version
+      val srcLength = src.remaining
+      if (srcLength > this.remaining)
+        throw new BufferOverflowException
+        
+      val srcSlice = src.slice
+      val thisSlice = this.slice
+      
+      thisSlice.jsArray.set(srcSlice.jsArray)
+      this.position(this.position + srcLength)
+      this
+    } else { // Fall back to generic version
+      super.put(src)
+    }
+  }
+  
   // ScalaJS specifics
   def hasJsArray(): Boolean = true
   protected val typedArray = new dom.Float32Array(mBuffer, mBufferOffset, mCapacity)
@@ -66,8 +83,10 @@ object NativeFloatBuffer {
   def wrap(array: Array[Float], offset: Int, length: Int): NativeFloatBuffer = {
     val floatBuffer = allocate(length)
     val internalJsArray = floatBuffer.jsArray
-    for (i <- 0 until length) {
+    var i = 0
+    while (i < length) {
       internalJsArray(i) = array(i + offset)
+      i += 1
     }
     floatBuffer
   }

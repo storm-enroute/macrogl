@@ -47,8 +47,10 @@ trait TypedBufferBehaviour[ContentType <: AnyVal, BufferType <: TypedBuffer[Cont
   // Behaviour implementation
   def compact(): BufferType = {
     // Generic implementation, should override this for cases where it's possible to be optimized
-    for (i <- 0 until this.remaining) {
+    var i = 0
+    while (i < this.remaining) {
       this.iSet(i, this.iGet(this.position + i))
+      i += 1
     }
     this.mPosition = this.remaining
     this.mLimit = this.mCapacity
@@ -63,8 +65,10 @@ trait TypedBufferBehaviour[ContentType <: AnyVal, BufferType <: TypedBuffer[Cont
     if (length > this.remaining)
       throw new BufferUnderflowException
 
-    for (i <- 0 until length) {
+    var i = 0
+    while (i < length) {
       dst(offset + i) = this.iGet(this.mPosition + i)
+      i += 1
     }
     this.mPosition = this.mPosition + length
     this
@@ -86,8 +90,10 @@ trait TypedBufferBehaviour[ContentType <: AnyVal, BufferType <: TypedBuffer[Cont
     if (length > this.remaining)
       throw new BufferOverflowException
 
-    for (i <- 0 until length) {
+    var i = 0
+    while (i < length) {
       this.iSet(this.position + i, src(offset + i))
+      i += 1
     }
     this
   }
@@ -96,8 +102,10 @@ trait TypedBufferBehaviour[ContentType <: AnyVal, BufferType <: TypedBuffer[Cont
     val srcLength = src.remaining
     if (srcLength > this.remaining)
       throw new BufferOverflowException
-    for (i <- 0 until srcLength) {
+    var i = 0
+    while (i < srcLength) {
       this.iSet(this.mPosition + i, src.get)
+      i += 1
     }
     this.position(this.position + srcLength)
     this
@@ -114,7 +122,8 @@ trait TypedBufferBehaviour[ContentType <: AnyVal, BufferType <: TypedBuffer[Cont
     val i = this.position
     val j = that.position
 
-    for (k <- 0 until length) {
+    var k = 0
+    while (k < length) {
       val curI = this.get(i + k)
       val curJ = that.get(j + k)
 
@@ -122,6 +131,8 @@ trait TypedBufferBehaviour[ContentType <: AnyVal, BufferType <: TypedBuffer[Cont
 
       if (cmp != 0)
         return cmp
+        
+      k += 1
     }
 
     this.remaining - that.remaining
@@ -135,12 +146,15 @@ trait TypedBufferBehaviour[ContentType <: AnyVal, BufferType <: TypedBuffer[Cont
       val i = this.position
       val j = that.position
 
-      for (k <- 0 until length) {
+      var k = 0
+      while (k < length) {
         val curI = this.get(i + k)
         val curJ = that.get(j + k)
 
         if (iCmpElements(curI, curJ) != 0)
           return false
+          
+        k += 1
       }
 
       return true
@@ -151,8 +165,10 @@ trait TypedBufferBehaviour[ContentType <: AnyVal, BufferType <: TypedBuffer[Cont
     var h: Int = 1
     val length = this.remaining
 
-    for (i <- 0 until length) {
+    var i = 0
+    while (i < length) {
       h = 31 * h + this.contentTypeToInt(this.iGet(this.mPosition + i))
+      i += 1
     }
 
     (h | 0) // just making just the JavaScript Number (Double) doesn't play a trick on us here

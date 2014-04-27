@@ -68,8 +68,10 @@ object AdaptiveLongBuffer {
   def wrap(array: Array[Long], offset: Int, length: Int): NativeLongBuffer = this.wrap(array, offset, length, ByteOrder.nativeOrder)
   def wrap(array: Array[Long], offset: Int, length: Int, byteOrder: ByteOrder): NativeLongBuffer = {
     val longBuffer = this.allocate(length, byteOrder)
-    for (i <- 0 until length) {
+    var i = 0
+    while (i < length) {
       longBuffer.put(i, array(i + offset))
+      i += 1
     }
     longBuffer
   }

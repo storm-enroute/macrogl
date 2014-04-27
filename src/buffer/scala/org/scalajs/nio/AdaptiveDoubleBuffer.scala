@@ -34,6 +34,7 @@ class AdaptiveDoubleBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: dom.
   }
   
   override val hasJsArray = order() == ByteOrder.nativeOrder
+  override def jsArray(): dom.Float64Array = if(!hasJsArray) throw new UnsupportedOperationException else super.jsArray
 
   override def toString = "AdaptiveDoubleBuffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
 }
@@ -55,8 +56,10 @@ object AdaptiveDoubleBuffer {
   def wrap(array: Array[Double], offset: Int, length: Int): NativeDoubleBuffer = this.wrap(array, offset, length, ByteOrder.nativeOrder)
   def wrap(array: Array[Double], offset: Int, length: Int, byteOrder: ByteOrder): NativeDoubleBuffer = {
     val doubleBuffer = this.allocate(length, byteOrder)
-    for (i <- 0 until length) {
+    var i = 0
+    while (i < length) {
       doubleBuffer.put(i, array(i + offset))
+      i += 1
     }
     doubleBuffer
   }

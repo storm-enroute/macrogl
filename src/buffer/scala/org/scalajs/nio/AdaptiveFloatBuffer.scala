@@ -34,7 +34,8 @@ class AdaptiveFloatBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: dom.A
   }
   
   override val hasJsArray = order() == ByteOrder.nativeOrder
-
+  override def jsArray(): dom.Float32Array = if(!hasJsArray) throw new UnsupportedOperationException else super.jsArray
+  
   override def toString = "AdaptiveFloatBuffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
 }
 
@@ -55,8 +56,10 @@ object AdaptiveFloatBuffer {
   def wrap(array: Array[Float], offset: Int, length: Int): NativeFloatBuffer = this.wrap(array, offset, length, ByteOrder.nativeOrder)
   def wrap(array: Array[Float], offset: Int, length: Int, byteOrder: ByteOrder): NativeFloatBuffer = {
     val floatBuffer = this.allocate(length, byteOrder)
-    for (i <- 0 until length) {
+    var i = 0
+    while (i < length) {
       floatBuffer.put(i, array(i + offset))
+      i += 1
     }
     floatBuffer
   }

@@ -80,8 +80,10 @@ object NativeLongBuffer {
   def wrap(array: Array[Long]): NativeLongBuffer = wrap(array, 0, array.length)
   def wrap(array: Array[Long], offset: Int, length: Int): NativeLongBuffer = {
     val longBuffer = allocate(length)
-    for (i <- 0 until length) {
+    var i = 0
+    while (i < length) {
       longBuffer.put(array(i + offset))
+      i += 1
     }
     longBuffer.reset
     longBuffer

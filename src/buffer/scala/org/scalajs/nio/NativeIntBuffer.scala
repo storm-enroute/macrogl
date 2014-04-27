@@ -42,6 +42,23 @@ class NativeIntBuffer(protected var mCapacity: Int, protected var mLimit: Int, p
 
   override def toString = "NativeIntBuffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
 
+  override def put(src: IntBuffer): IntBuffer = {
+    if (src.hasJsArray) { // optimized version
+      val srcLength = src.remaining
+      if (srcLength > this.remaining)
+        throw new BufferOverflowException
+        
+      val srcSlice = src.slice
+      val thisSlice = this.slice
+      
+      thisSlice.jsArray.set(srcSlice.jsArray)
+      this.position(this.position + srcLength)
+      this
+    } else { // Fall back to generic version
+      super.put(src)
+    }
+  }
+  
   // ScalaJS specifics
   def hasJsArray(): Boolean = true
   protected val typedArray = new dom.Int32Array(mBuffer, mBufferOffset, mCapacity)
@@ -64,8 +81,10 @@ object NativeIntBuffer {
   def wrap(array: Array[Int], offset: Int, length: Int): NativeIntBuffer = {
     val intBuffer = allocate(length)
     val internalJsArray = intBuffer.jsArray
-    for (i <- 0 until length) {
+    var i = 0
+    while (i < length) {
       internalJsArray(i) = array(i + offset)
+      i += 1
     }
     intBuffer
   }

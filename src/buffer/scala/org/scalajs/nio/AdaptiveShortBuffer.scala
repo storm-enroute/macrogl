@@ -34,6 +34,7 @@ class AdaptiveShortBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: dom.A
   }
   
   override val hasJsArray = order() == ByteOrder.nativeOrder
+  override def jsArray(): dom.Int16Array = if(!hasJsArray) throw new UnsupportedOperationException else super.jsArray
 
   override def toString = "AdaptiveShortBuffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
 }
@@ -55,8 +56,10 @@ object AdaptiveShortBuffer {
   def wrap(array: Array[Short], offset: Int, length: Int): NativeShortBuffer = this.wrap(array, offset, length, ByteOrder.nativeOrder)
   def wrap(array: Array[Short], offset: Int, length: Int, byteOrder: ByteOrder): NativeShortBuffer = {
     val shortBuffer = this.allocate(length, byteOrder)
-    for (i <- 0 until length) {
+    var i = 0
+    while (i < length) {
       shortBuffer.put(i, array(i + offset))
+      i += 1
     }
     shortBuffer
   }

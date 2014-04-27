@@ -5,9 +5,9 @@ import js.Dynamic.{ global => g }
 import org.scalajs.dom
 
 class NativeByteBuffer(protected var mCapacity: Int, protected var mLimit: Int, protected var mPosition: Int,
-    protected var mMark: Int, mBuffer: dom.ArrayBuffer, mBufferOffset: Int, cByteOrder: ByteOrder) extends ByteBuffer
-    with TypedBufferBehaviour[Byte, ByteBuffer] with JsNativeBuffer[Byte] {
-  
+  protected var mMark: Int, mBuffer: dom.ArrayBuffer, mBufferOffset: Int, cByteOrder: ByteOrder) extends ByteBuffer
+  with TypedBufferBehaviour[Byte, ByteBuffer] with JsNativeBuffer[Byte] {
+
   protected var littleEndian: Boolean = _
   order(cByteOrder)
 
@@ -37,9 +37,9 @@ class NativeByteBuffer(protected var mCapacity: Int, protected var mLimit: Int, 
 
   // Completing public methods of TypedBufferBehaviour
   def duplicate(): ByteBuffer = new NativeByteBuffer(this.mCapacity, this.mLimit, this.mPosition, this.mMark,
-      this.mBuffer, this.mBufferOffset, this.order)
+    this.mBuffer, this.mBufferOffset, this.order)
   def slice(): ByteBuffer = new NativeByteBuffer(this.remaining, this.remaining, 0, -1,
-      this.mBuffer, this.mBufferOffset + (this.mPosition * this.bytes_per_element), this.order)
+    this.mBuffer, this.mBufferOffset + (this.mPosition * this.bytes_per_element), this.order)
   def asReadOnlyBuffer(): ByteBuffer = new ReadOnlyByteBuffer(this.duplicate)
 
   def order(): ByteOrder = {
@@ -181,6 +181,23 @@ class NativeByteBuffer(protected var mCapacity: Int, protected var mLimit: Int, 
     this
   }
 
+  override def put(src: ByteBuffer): ByteBuffer = {
+    if (src.hasJsArray) { // optimized version
+      val srcLength = src.remaining
+      if (srcLength > this.remaining)
+        throw new BufferOverflowException
+        
+      val srcSlice = src.slice
+      val thisSlice = this.slice
+      
+      thisSlice.jsArray.set(srcSlice.jsArray)
+      this.position(this.position + srcLength)
+      this
+    } else { // Fall back to generic version
+      super.put(src)
+    }
+  }
+
   // ScalaJS specifics
   def hasJsArray(): Boolean = true
   protected val typedArray = new dom.Int8Array(mBuffer, mBufferOffset, mCapacity)
@@ -210,8 +227,10 @@ object NativeByteBuffer {
   def wrap(array: Array[Byte], offset: Int, length: Int): NativeByteBuffer = {
     val byteBuffer = allocate(length)
     val internalJsArray = byteBuffer.jsArray
-    for (i <- 0 until length) {
+    var i = 0
+    while (i < length) {
       internalJsArray(i) = array(i + offset)
+      i += 1
     }
     byteBuffer
   }
