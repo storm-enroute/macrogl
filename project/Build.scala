@@ -148,6 +148,13 @@ object MacroGLBuild extends Build {
 	val macroglBufferSettings = Defaults.defaultSettings ++ scalaJSSettings ++ Seq(
   	name := "macrogl-buffer",
     version := "0.3-SNAPSHOT",
+    scalacOptions ++= Seq(
+      "-deprecation",
+      "-unchecked",
+      "-Xexperimental",
+      "-optimise",
+      "-feature"
+    ),
   	scalaSource in Compile := baseDirectory.value / ".." / "src" / "buffer" / "scala",
   	libraryDependencies ++= Seq(
   		"org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" % scalaJSVersion % "test",

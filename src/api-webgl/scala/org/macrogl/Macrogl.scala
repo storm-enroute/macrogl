@@ -283,14 +283,14 @@ class Macrogl(implicit gl: org.scalajs.dom.WebGLRenderingContext) {
 
   final def getActiveAttrib(program: Token.Program, index: Int): ActiveInfo = {
     val jsActiveInfo = gl.getActiveAttrib(program, index)
-    ActiveInfo(jsActiveInfo.size.toInt, jsActiveInfo.`type`.toInt, jsActiveInfo.name)
+    org.macrogl.ActiveInfo(jsActiveInfo.size.toInt, jsActiveInfo.`type`.toInt, jsActiveInfo.name)
   }
 
   final def getActiveUniform(program: Token.Program, index: Int): ActiveInfo = {
     // TODO org.scalajs.dom has the return type wrong, correct this once it's ok
     val jsActiveInfoDyn = gl.asInstanceOf[js.Dynamic].getActiveUniform(program, index)
     val jsActiveInfo = jsActiveInfoDyn.asInstanceOf[dom.WebGLActiveInfo]
-    ActiveInfo(jsActiveInfo.size.toInt, jsActiveInfo.`type`.toInt, jsActiveInfo.name)
+    org.macrogl.ActiveInfo(jsActiveInfo.size.toInt, jsActiveInfo.`type`.toInt, jsActiveInfo.name)
   }
 
   final def getAttachedShaders(program: Token.Program): Array[Token.Shader] = {
@@ -323,6 +323,10 @@ class Macrogl(implicit gl: org.scalajs.dom.WebGLRenderingContext) {
 
   final def getParameterBuffer(pname: Int): Token.Buffer = {
     gl.getParameter(pname).asInstanceOf[Token.Buffer]
+  }
+  
+  final def getParameterTexture(pname: Int): Token.Texture = {
+    gl.getParameter(pname).asInstanceOf[Token.Texture]
   }
 
   final def getParameterFramebuffer(pname: Int): Token.FrameBuffer = {
@@ -422,7 +426,7 @@ class Macrogl(implicit gl: org.scalajs.dom.WebGLRenderingContext) {
 
   final def getShaderPrecisionFormat(shadertype: Int, precisiontype: Int): PrecisionFormat = {
     val jsPrecisionFormat = gl.getShaderPrecisionFormat(shadertype, precisiontype)
-    PrecisionFormat(jsPrecisionFormat.rangeMin.toInt, jsPrecisionFormat.rangeMax.toInt, jsPrecisionFormat.precision.toInt)
+    org.macrogl.PrecisionFormat(jsPrecisionFormat.rangeMin.toInt, jsPrecisionFormat.rangeMax.toInt, jsPrecisionFormat.precision.toInt)
   }
 
   final def getShaderInfoLog(shader: Token.Shader): String = {
@@ -1278,7 +1282,8 @@ private object JSTypeHelper {
   // Auxiliary methods
 
   def jsNumberToBoolean(v: js.Number): Boolean = {
-    v != 0
+    val zero: js.Number = 0
+    v != zero
   }
 
   def booleanToJsNumber(b: Boolean): js.Number = {

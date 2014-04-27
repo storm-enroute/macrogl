@@ -6,14 +6,13 @@ import scala.collection._
 
 
 
-final class Texture(val target: Int)(val init: Texture => Unit)(implicit gl: Macroglex) extends Handle {
+class Texture(val target: Int)(val init: Texture => Unit)(implicit gl: Macrogl) extends Handle {
   private var ttoken = Token.Texture.invalid
 
   def token = ttoken
 
   def binding = target match {
     case Macrogl.TEXTURE_2D => Macrogl.TEXTURE_BINDING_2D
-    case Macroglex.TEXTURE_1D => Macroglex.TEXTURE_BINDING_1D
     case _ => throw new UnsupportedOperationException
   }
 
@@ -56,29 +55,6 @@ final class Texture(val target: Int)(val init: Texture => Unit)(implicit gl: Mac
 
   def wrapT_=(v: Int) = param(Macrogl.TEXTURE_WRAP_T) = v
 
-  def compareMode = param.int(Macroglex.TEXTURE_COMPARE_MODE)
-
-  def compareMode_=(v: Int) = param(Macroglex.TEXTURE_COMPARE_MODE) = v
-
-  def compareFunc = param.int(Macroglex.TEXTURE_COMPARE_FUNC)
-
-  def compareFunc_=(v: Int) = param(Macroglex.TEXTURE_COMPARE_FUNC) = v
-
-  def depthTextureMode = param.int(Macroglex.DEPTH_TEXTURE_MODE)
-
-  def depthTextureMode_=(v: Int) = param(Macroglex.DEPTH_TEXTURE_MODE) = v
-
-  def allocateImage1D(level: Int, internalFormat: Int, wdt: Int, border: Int, format: Int, dataType: Int, data: Data = null) {
-    target match {
-      case Macroglex.TEXTURE_1D => data match {
-        case null           => gl.texImage1D(target, level, internalFormat, wdt, border, format, dataType, null: Data.Int)
-        case data: Data.Int => gl.texImage1D(target, level, internalFormat, wdt, border, format, dataType, data)
-        case _ => throw new UnsupportedOperationException(s"Unknown data format: ${data.getClass}")
-      }
-      case _ => throw new UnsupportedOperationException("Texture is not 1D.")
-    }
-  }
-
   def allocateImage2D(level: Int, internalFormat: Int, wdt: Int, hgt: Int, border: Int, format: Int, dataType: Int, data: Data = null) {
     target match {
       case Macrogl.TEXTURE_2D => data match {
@@ -92,9 +68,8 @@ final class Texture(val target: Int)(val init: Texture => Unit)(implicit gl: Mac
   }
 
   def release() {
-    if (ttoken != -1) {
+    if (gl.isTexture(ttoken)) {
       gl.deleteTexture(ttoken)
-      ttoken = -1
     }
   }
 
@@ -103,6 +78,6 @@ final class Texture(val target: Int)(val init: Texture => Unit)(implicit gl: Mac
 
 object Texture {
 
-  def apply(target: Int)(init: Texture => Unit): Texture = new Texture(target)(init)
+  def apply(target: Int)(init: Texture => Unit)(implicit gl: Macrogl): Texture = new Texture(target)(init)(gl)
 
 }

@@ -8,10 +8,10 @@ import scala.collection._
 
 
 
-class MeshBuffer(val usage: Int, val capacityVertices: Int)(implicit gl: Macroglex)
+class MeshBuffer(val usage: Int, val capacityVertices: Int)(implicit gl: Macrogl)
 extends Handle {
-  private var vtoken = Token.Buffer.invalid
-  private var result = new Array[Int](2)
+  protected var vtoken = Token.Buffer.invalid
+  protected var result = new Array[Int](2)
 
   def acquire() {
     release()
@@ -40,12 +40,6 @@ extends Handle {
   def send(offset: Long, data: Data.Float) {
     gl.bindBuffer(Macrogl.ARRAY_BUFFER, vtoken)
     gl.bufferSubData(Macrogl.ARRAY_BUFFER, offset, data)
-    gl.bindBuffer(Macrogl.ARRAY_BUFFER, Token.Buffer.none)
-  }
-
-  def receive(offset: Long, data: Data.Float) {
-    gl.bindBuffer(Macrogl.ARRAY_BUFFER, vtoken)
-    gl.getBufferSubData(Macrogl.ARRAY_BUFFER, offset, data)
     gl.bindBuffer(Macrogl.ARRAY_BUFFER, Token.Buffer.none)
   }
 

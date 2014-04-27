@@ -7,7 +7,13 @@ import language.experimental.macros
 import scala.reflect.macros.whitebox.Context
 import scala.collection._
 
-
+class MeshBuffer(usage:Int, capacityVertices: Int)(implicit glex: Macroglex) extends org.macrogl.MeshBuffer(usage, capacityVertices)(glex) {
+  def receive(offset: Long, data: Data.Float) {
+    glex.bindBuffer(Macrogl.ARRAY_BUFFER, vtoken)
+    glex.getBufferSubData(Macrogl.ARRAY_BUFFER, offset, data)
+    glex.bindBuffer(Macrogl.ARRAY_BUFFER, Token.Buffer.none)
+  }
+}
 
 object MeshBuffer {
 

@@ -275,14 +275,14 @@ class Macrogl () {
     val nameMaxSize = this.getProgramParameteri(program, GL20.GL_ACTIVE_ATTRIBUTE_MAX_LENGTH)
     this.tmpInt.clear()
     val name = GL20.glGetActiveAttrib(program, index, nameMaxSize, this.tmpInt)
-    ActiveInfo(this.tmpInt.get(0), this.tmpInt.get(1), name)
+    org.macrogl.ActiveInfo(this.tmpInt.get(0), this.tmpInt.get(1), name)
   }
 
   final def getActiveUniform(program: Token.Program, index: Int): ActiveInfo = {
     val nameMaxSize = this.getProgramParameteri(program, GL20.GL_ACTIVE_UNIFORM_MAX_LENGTH)
     this.tmpInt.clear()
     val name = GL20.glGetActiveUniform(program, index, nameMaxSize, this.tmpInt)
-    ActiveInfo(this.tmpInt.get(0), this.tmpInt.get(1), name)
+    org.macrogl.ActiveInfo(this.tmpInt.get(0), this.tmpInt.get(1), name)
   }
 
   final def getAttachedShaders(program: Token.Program): Array[Token.Shader] = {
@@ -319,6 +319,10 @@ class Macrogl () {
    */
 
   final def getParameterBuffer(pname: Int): Token.Buffer = {
+    GL11.glGetInteger(pname)
+  }
+  
+  final def getParameterTexture(pname: Int): Token.Texture = {
     GL11.glGetInteger(pname)
   }
 
@@ -415,7 +419,7 @@ class Macrogl () {
     this.tmpInt.limit(8)
     
     ARBES2Compatibility.glGetShaderPrecisionFormat(shadertype, precisiontype, tmpInt, tmpInt2)
-    PrecisionFormat(tmpInt.get(0), tmpInt.get(1), tmpInt2.get(0))
+    org.macrogl.PrecisionFormat(tmpInt.get(0), tmpInt.get(1), tmpInt2.get(0))
   }
 
   final def getShaderInfoLog(shader: Token.Shader): String = {
