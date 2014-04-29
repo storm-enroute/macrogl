@@ -56,7 +56,7 @@ object BasicLighting {
 
     Mouse.setGrabbed(true)
 
-    val leftTransform = new Matrix.Plain(
+    val leftTransform = new macrogl.ex.Matrix.Plain(
       Array[Double](
          1, 0,  0, 0,
          0, 1,  0, 0,
@@ -65,7 +65,7 @@ object BasicLighting {
       )
     )
 
-    val rightTransform = new Matrix.Plain(
+    val rightTransform = new macrogl.ex.Matrix.Plain(
       Array[Double](
         1, 0,  0, 0,
         0, 1,  0, 0,

@@ -148,6 +148,27 @@ object MacroGLBuild extends Build {
     settings = macroglBufferSettings
   )
 
+  /* examples */
+  
+  val macroglExamplesSettings = Defaults.defaultSettings ++ LWJGLPlugin.lwjglSettings ++ Seq(
+    name := "macrogl-examples",
+    version := macroglVersion,
+    scalaVersion := macroglScalaVersion,
+    scalacOptions ++= Seq(
+      "-deprecation",
+      "-unchecked",
+      "-Xexperimental",
+      "-optimise",
+      "-feature"
+    ),
+    scalaSource in Compile := baseDirectory.value / ".." / "src" / "test" / "scala"
+  )
+  
+  lazy val macroglExample = Project(
+    "macroglExamples",
+    file("macrogl-examples"),
+    settings = macroglExamplesSettings
+  ) dependsOn(macrogl)
 }
 
 
