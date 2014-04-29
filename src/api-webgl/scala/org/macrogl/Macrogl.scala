@@ -1445,7 +1445,7 @@ private object JSTypeHelper {
    * [-1, 1] -> [minInt32, maxInt32]
    */
   def normalizedFloatToSignedInt(f: Double): Int = {
-    val fb = if (f > 1.0) 1.0 else if (f < 0.0) 0.0 else f // clamp
+    val fb = if (f > 1.0) 1.0 else if (f < -1.0) -1.0 else f // clamp
     ((fb * maxUint32d - 1) / 2).toInt
   }
 
@@ -1482,7 +1482,7 @@ private object JSTypeHelper {
    * [-1, 1] -> [minInt16, maxInt16]
    */
   def normalizedFloatToSignedShort(f: Double): Short = {
-    val fb = if (f > 1.0) 1.0 else if (f < 0.0) 0.0 else f // clamp
+    val fb = if (f > 1.0) 1.0 else if (f < -1.0) -1.0 else f // clamp
     ((fb * maxUint16d - 1) / 2).toShort
   }
 
@@ -1519,7 +1519,7 @@ private object JSTypeHelper {
    * [-1, 1] -> [minInt8, maxInt8]
    */
   def normalizedFloatToSignedByte(f: Double): Byte = {
-    val fb = if (f > 1.0) 1.0 else if (f < 0.0) 0.0 else f // clamp
+    val fb = if (f > 1.0) 1.0 else if (f < -1.0) -1.0 else f // clamp
     ((fb * maxUint8d - 1) / 2).toByte
   }
 }
