@@ -161,7 +161,8 @@ object MacroGLBuild extends Build {
       "-optimise",
       "-feature"
     ),
-    scalaSource in Compile := baseDirectory.value / ".." / "src" / "test" / "scala"
+    scalaSource in Compile := baseDirectory.value / ".." / "src" / "test" / "scala",
+    resourceDirectory in Compile := baseDirectory.value / ".." / "src" / "test" / "resources"
   )
   
   lazy val macroglExample = Project(
