@@ -15,6 +15,9 @@ object MacroGLBuild extends Build {
   
   val publishPass = "SONATYPE_PASS"
   
+  val macroglVersion = "0.4-SNAPSHOT"
+  val macroglScalaVersion = "2.11.0"
+  
   val userPass = for {
     user <- sys.env.get(publishUser)
     pass <- sys.env.get(publishPass)
@@ -31,8 +34,8 @@ object MacroGLBuild extends Build {
   val macroglSettings = Defaults.defaultSettings ++ publishCreds ++ LWJGLPlugin.lwjglSettings ++ Seq(
     name := "macrogl",
     organization := "com.storm-enroute",
-    version := "0.4-SNAPSHOT",
-    scalaVersion := "2.11.0-RC4",
+    version := macroglVersion,
+    scalaVersion := macroglScalaVersion,
 
     scalacOptions ++= Seq(
       "-deprecation",
@@ -93,7 +96,8 @@ object MacroGLBuild extends Build {
   
   val macroglWebglSettings = Defaults.defaultSettings ++ scalaJSSettings ++ Seq(
     name := "macrogl-webgl",
-    version := "0.3-SNAPSHOT",
+    version := macroglVersion,
+    scalaVersion := macroglScalaVersion,
     scalacOptions ++= Seq(
       "-deprecation",
       "-unchecked",
@@ -122,7 +126,8 @@ object MacroGLBuild extends Build {
 
   val macroglBufferSettings = Defaults.defaultSettings ++ scalaJSSettings ++ Seq(
     name := "macrogl-buffer",
-    version := "0.3-SNAPSHOT",
+    version := macroglVersion,
+    scalaVersion := macroglScalaVersion,
     scalacOptions ++= Seq(
       "-deprecation",
       "-unchecked",
