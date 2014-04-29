@@ -456,15 +456,6 @@ class Macrogl () {
     GL20.glGetUniform(program, location, outputs)
   }
 
-  /*final def getUniformb(program: Token.Program, location: Token.UniformLocation): Boolean = {
-    this.getUniformi(program, location) != Macrogl.FALSE
-  }
-
-  final def getUniformbv(program: Token.Program, location: Token.UniformLocation, outputs: Data.Byte) = {
-    // TODO probably gonna remove boolean getUniform stuff...
-    ???
-  }*/
-
   final def getUniformLocation(program: Token.Program, name: String): Token.UniformLocation = {
     GL20.glGetUniformLocation(program, name)
     
@@ -1185,16 +1176,4 @@ object Macrogl {
   /* implementation-specific methods */
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
 

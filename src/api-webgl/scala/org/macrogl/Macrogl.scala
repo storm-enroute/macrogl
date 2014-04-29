@@ -463,16 +463,6 @@ class Macrogl(implicit gl: org.scalajs.dom.WebGLRenderingContext) {
     JSTypeHelper.toFloats(ret, outputs)
   }
 
-  /*final def getUniformb(program: Token.Program, location: Token.UniformLocation): Boolean = {
-    val ret = gl.getUniform(program, location)
-    JSTypeHelper.toBoolean(ret)
-  }
-
-  final def getUniformbv(program: Token.Program, location: Token.UniformLocation, outputs: Data.Byte) = {
-    val ret = gl.getUniform(program, location)
-    JSTypeHelper.toBooleans(ret, outputs)
-  }*/
-
   final def getUniformLocation(program: Token.Program, name: String): Token.UniformLocation = {
     gl.getUniformLocation(program, name).asInstanceOf[Token.UniformLocation]
   }
@@ -930,8 +920,8 @@ private object JSTypeHelper {
       case "Uint16Array" => value.asInstanceOf[dom.Uint16Array](0).toInt
       case "Int32Array" => value.asInstanceOf[dom.Int32Array](0).toInt
       case "Uint32Array" => value.asInstanceOf[dom.Uint32Array](0).toInt
-      case "Float32Array" => value.asInstanceOf[dom.Float32Array](0).toInt
-      case "Float64Array" => value.asInstanceOf[dom.Float64Array](0).toInt
+      case "Float32Array" => this.normalizedFloatToSignedInt(value.asInstanceOf[dom.Float32Array](0).toDouble)
+      case "Float64Array" => this.normalizedFloatToSignedInt(value.asInstanceOf[dom.Float64Array](0).toDouble)
       case _ => throw new RuntimeException("Cannot convert type " + typeName + " to int")
     }
   }
@@ -951,8 +941,8 @@ private object JSTypeHelper {
       case "Uint16Array" => value.asInstanceOf[dom.Uint16Array](0).toShort
       case "Int32Array" => value.asInstanceOf[dom.Int32Array](0).toShort
       case "Uint32Array" => value.asInstanceOf[dom.Uint32Array](0).toShort
-      case "Float32Array" => value.asInstanceOf[dom.Float32Array](0).toShort
-      case "Float64Array" => value.asInstanceOf[dom.Float64Array](0).toShort
+      case "Float32Array" => this.normalizedFloatToSignedShort(value.asInstanceOf[dom.Float32Array](0).toDouble)
+      case "Float64Array" => this.normalizedFloatToSignedShort(value.asInstanceOf[dom.Float64Array](0).toDouble)
       case _ => throw new RuntimeException("Cannot convert type " + typeName + " to short")
     }
   }
@@ -966,12 +956,12 @@ private object JSTypeHelper {
         val jsArray = value.asInstanceOf[js.Array[js.Any]]
         toFloat(jsArray(0))
       }
-      case "Int8Array" => value.asInstanceOf[dom.Int8Array](0).toFloat
-      case "Uint8Array" => value.asInstanceOf[dom.Uint8Array](0).toFloat
-      case "Int16Array" => value.asInstanceOf[dom.Int16Array](0).toFloat
-      case "Uint16Array" => value.asInstanceOf[dom.Uint16Array](0).toFloat
-      case "Int32Array" => value.asInstanceOf[dom.Int32Array](0).toFloat
-      case "Uint32Array" => value.asInstanceOf[dom.Uint32Array](0).toFloat
+      case "Int8Array" => this.signedByteToNormalizedFloat(value.asInstanceOf[dom.Int8Array](0).toByte).toFloat
+      case "Uint8Array" => this.unsignedByteToNormalizedFloat(value.asInstanceOf[dom.Uint8Array](0).toByte).toFloat
+      case "Int16Array" => this.signedShortToNormalizedFloat(value.asInstanceOf[dom.Int16Array](0).toShort).toFloat
+      case "Uint16Array" => this.unsignedShortToNormalizedFloat(value.asInstanceOf[dom.Uint16Array](0).toShort).toFloat
+      case "Int32Array" => this.signedIntToNormalizedFloat(value.asInstanceOf[dom.Int32Array](0).toInt).toFloat
+      case "Uint32Array" => this.unsignedIntToNormalizedFloat(value.asInstanceOf[dom.Uint32Array](0).toInt).toFloat
       case "Float32Array" => value.asInstanceOf[dom.Float32Array](0).toFloat
       case "Float64Array" => value.asInstanceOf[dom.Float64Array](0).toFloat
       case _ => throw new RuntimeException("Cannot convert type " + typeName + " to float")
@@ -987,21 +977,21 @@ private object JSTypeHelper {
         val jsArray = value.asInstanceOf[js.Array[js.Any]]
         toDouble(jsArray(0))
       }
-      case "Int8Array" => value.asInstanceOf[dom.Int8Array](0).toDouble
-      case "Uint8Array" => value.asInstanceOf[dom.Uint8Array](0).toDouble
-      case "Int16Array" => value.asInstanceOf[dom.Int16Array](0).toDouble
-      case "Uint16Array" => value.asInstanceOf[dom.Uint16Array](0).toDouble
-      case "Int32Array" => value.asInstanceOf[dom.Int32Array](0).toDouble
-      case "Uint32Array" => value.asInstanceOf[dom.Uint32Array](0).toDouble
+      case "Int8Array" => this.signedByteToNormalizedFloat(value.asInstanceOf[dom.Int8Array](0).toByte).toDouble
+      case "Uint8Array" => this.unsignedByteToNormalizedFloat(value.asInstanceOf[dom.Uint8Array](0).toByte).toDouble
+      case "Int16Array" => this.signedShortToNormalizedFloat(value.asInstanceOf[dom.Int16Array](0).toShort).toDouble
+      case "Uint16Array" => this.unsignedShortToNormalizedFloat(value.asInstanceOf[dom.Uint16Array](0).toShort).toDouble
+      case "Int32Array" => this.signedIntToNormalizedFloat(value.asInstanceOf[dom.Int32Array](0).toInt).toDouble
+      case "Uint32Array" => this.unsignedIntToNormalizedFloat(value.asInstanceOf[dom.Uint32Array](0).toInt).toDouble
       case "Float32Array" => value.asInstanceOf[dom.Float32Array](0).toDouble
       case "Float64Array" => value.asInstanceOf[dom.Float64Array](0).toDouble
       case _ => throw new RuntimeException("Cannot convert type " + typeName + " to double")
     }
   }
 
-  def toBooleans(value: js.Any, data: Data.Byte) = {
+  def toBooleans(value: js.Any, data: Data.Byte): Unit = {
     val slice = data.slice
-
+    
     val typeName = org.scalajs.nio.JsUtils.typeName(value)
     typeName match {
       case "Boolean" => slice.put(this.booleanToByte(value.asInstanceOf[js.Boolean]))
@@ -1017,35 +1007,119 @@ private object JSTypeHelper {
           case "Boolean" => {
             jsArray.foreach { e => slice.put(this.booleanToByte(e.asInstanceOf[js.Boolean])) }
           }
-          case "Number" => {
+          case "Number" => { 
             jsArray.foreach { e => slice.put(this.booleanToByte(this.jsNumberToBoolean(e.asInstanceOf[js.Number]))) }
           }
           case _ => throw new RuntimeException("Cannot convert array of " + containedType + " to booleans")
         }
       }
       case "Int8Array" => {
-        val length = value.asInstanceOf[js.Dynamic]
+        val length = value.asInstanceOf[js.Dynamic].length.asInstanceOf[js.Number].toInt
         val array = value.asInstanceOf[dom.Int8Array]
         val l = array
+        require(slice.remaining >= length)
+        
+        var i = 0
+        while(i < length) {
+          data.put(this.booleanToByte(this.jsNumberToBoolean(array(i).asInstanceOf[js.Number])))
+          i += 1
+        }
       }
-      case "Uint8Array" => value.asInstanceOf[dom.Uint8Array](0).toDouble
-      case "Int16Array" => value.asInstanceOf[dom.Int16Array](0).toDouble
-      case "Uint16Array" => value.asInstanceOf[dom.Uint16Array](0).toDouble
-      case "Int32Array" => value.asInstanceOf[dom.Int32Array](0).toDouble
-      case "Uint32Array" => value.asInstanceOf[dom.Uint32Array](0).toDouble
-      case "Float32Array" => value.asInstanceOf[dom.Float32Array](0).toDouble
-      case "Float64Array" => value.asInstanceOf[dom.Float64Array](0).toDouble
+      case "Uint8Array" => {
+        val length = value.asInstanceOf[js.Dynamic].length.asInstanceOf[js.Number].toInt
+        val array = value.asInstanceOf[dom.Uint8Array]
+        val l = array
+        require(slice.remaining >= length)
+        
+        var i = 0
+        while(i < length) {
+          data.put(this.booleanToByte(this.jsNumberToBoolean(array(i).asInstanceOf[js.Number])))
+          i += 1
+        }
+      }
+      case "Int16Array" => {
+        val length = value.asInstanceOf[js.Dynamic].length.asInstanceOf[js.Number].toInt
+        val array = value.asInstanceOf[dom.Int16Array]
+        val l = array
+        require(slice.remaining >= length)
+        
+        var i = 0
+        while(i < length) {
+          data.put(this.booleanToByte(this.jsNumberToBoolean(array(i).asInstanceOf[js.Number])))
+          i += 1
+        }
+      }
+      case "Uint16Array" => {
+        val length = value.asInstanceOf[js.Dynamic].length.asInstanceOf[js.Number].toInt
+        val array = value.asInstanceOf[dom.Uint16Array]
+        val l = array
+        require(slice.remaining >= length)
+        
+        var i = 0
+        while(i < length) {
+          data.put(this.booleanToByte(this.jsNumberToBoolean(array(i).asInstanceOf[js.Number])))
+          i += 1
+        }
+      }
+      case "Int32Array" => {
+        val length = value.asInstanceOf[js.Dynamic].length.asInstanceOf[js.Number].toInt
+        val array = value.asInstanceOf[dom.Int32Array]
+        val l = array
+        require(slice.remaining >= length)
+        
+        var i = 0
+        while(i < length) {
+          data.put(this.booleanToByte(this.jsNumberToBoolean(array(i).asInstanceOf[js.Number])))
+          i += 1
+        }
+      }
+      case "Uint32Array" => {
+        val length = value.asInstanceOf[js.Dynamic].length.asInstanceOf[js.Number].toInt
+        val array = value.asInstanceOf[dom.Uint32Array]
+        val l = array
+        require(slice.remaining >= length)
+        
+        var i = 0
+        while(i < length) {
+          data.put(this.booleanToByte(this.jsNumberToBoolean(array(i).asInstanceOf[js.Number])))
+          i += 1
+        }
+      }
+      case "Float32Array" => {
+        val length = value.asInstanceOf[js.Dynamic].length.asInstanceOf[js.Number].toInt
+        val array = value.asInstanceOf[dom.Float32Array]
+        val l = array
+        require(slice.remaining >= length)
+        
+        var i = 0
+        while(i < length) {
+          data.put(this.booleanToByte(this.jsNumberToBoolean(array(i).asInstanceOf[js.Number])))
+          i += 1
+        }
+      }
+      case "Float64Array" => {
+        val length = value.asInstanceOf[js.Dynamic].length.asInstanceOf[js.Number].toInt
+        val array = value.asInstanceOf[dom.Float64Array]
+        val l = array
+        require(slice.remaining >= length)
+        
+        var i = 0
+        while(i < length) {
+          data.put(this.booleanToByte(this.jsNumberToBoolean(array(i).asInstanceOf[js.Number])))
+          i += 1
+        }
+      }
       case _ => throw new RuntimeException("Cannot convert type " + typeName + " to booleans")
     }
   }
 
-  def toInts(value: js.Any, data: Data.Int) = {
+  def toInts(value: js.Any, data: Data.Int): Unit = {
     val slice = data.slice
 
     val typeName = org.scalajs.nio.JsUtils.typeName(value)
     typeName match {
       case "Boolean" => slice.put(this.booleanToByte(value.asInstanceOf[js.Boolean]))
-      case "Number" => slice.put(value.asInstanceOf[js.Number].toInt) // Can't decide if this is a float or an int...
+      case "Number" => slice.put(value.asInstanceOf[js.Number].toInt)
       case "Array" => {
         val jsArray = value.asInstanceOf[js.Array[js.Any]]
         val length = jsArray.length.toInt
@@ -1159,13 +1233,13 @@ private object JSTypeHelper {
     }
   }
 
-  def toFloats(value: js.Any, data: Data.Float) = {
+  def toFloats(value: js.Any, data: Data.Float): Unit = {
     val slice = data.slice
 
     val typeName = org.scalajs.nio.JsUtils.typeName(value)
     typeName match {
       case "Boolean" => slice.put(this.booleanToByte(value.asInstanceOf[js.Boolean]))
-      case "Number" => slice.put(value.asInstanceOf[js.Number].toFloat) // Can't decide if this is a float or an int...
+      case "Number" => slice.put(value.asInstanceOf[js.Number].toFloat)
       case "Array" => {
         val jsArray = value.asInstanceOf[js.Array[js.Any]]
         val length = jsArray.length.toInt
@@ -1777,16 +1851,4 @@ object Macrogl {
   /* implementation-specific methods */
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
