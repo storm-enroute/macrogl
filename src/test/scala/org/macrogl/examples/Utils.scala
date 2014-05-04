@@ -1,6 +1,7 @@
 package org.macrogl.examples
 
-import org.macrogl._
+import org.{macrogl => gl}
+import org.macrogl.ex._
 
 object Utils {
   def readResource(path: String) = io.Source.fromURL(getClass.getResource(path)).mkString
@@ -67,7 +68,7 @@ object Utils {
            0,  0, 0,  1
         )
 
-      Matrix.multiply[Matrix.Plain](new Matrix.Plain(vRotate), new Matrix.Plain(hRotate))
+      gl.Matrix.multiply[Matrix.Plain](new Matrix.Plain(vRotate), new Matrix.Plain(hRotate))
     }
 
     def invertedOrientation = new Matrix.Plain(orientation.array.grouped(4).toArray.transpose.flatten)
@@ -115,7 +116,7 @@ object Utils {
           -position(0), -position(1), -position(2), 1
         )
       )
-      Matrix.multiply[Matrix.Plain](orientation, translation)
+      gl.Matrix.multiply[Matrix.Plain](orientation, translation)
     }
 
     def offsetOrientation(h: Double, v: Double): Unit = {

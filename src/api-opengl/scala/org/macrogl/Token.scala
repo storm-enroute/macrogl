@@ -36,12 +36,14 @@ object Token {
 
   object FrameBuffer {
     val invalid: FrameBuffer = -1
+    val none: FrameBuffer = 0
   }
 
   type RenderBuffer = Int
 
   object RenderBuffer {
     val invalid: RenderBuffer = -1
+    val none: RenderBuffer = 0
   }
 
   type Texture = Int

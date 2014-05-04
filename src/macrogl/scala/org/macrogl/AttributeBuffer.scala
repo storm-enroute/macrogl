@@ -16,16 +16,16 @@ extends Handle {
 
   def acquire() {
     release()
-    vtoken = gl.genBuffers()
-    gl.bindBuffer(Macrogl.GL_ARRAY_BUFFER, vtoken)
-    gl.bufferData(Macrogl.GL_ARRAY_BUFFER, totalBytes, usage)
-    gl.bindBuffer(Macrogl.GL_ARRAY_BUFFER, Token.Buffer.none)
+    vtoken = gl.createBuffer
+    gl.bindBuffer(Macrogl.ARRAY_BUFFER, vtoken)
+    gl.bufferData(Macrogl.ARRAY_BUFFER, totalBytes, usage)
+    gl.bindBuffer(Macrogl.ARRAY_BUFFER, Token.Buffer.none)
     gl.checkError()
   }
 
   def release() {
     if (gl.validBuffer(vtoken)) {
-      gl.deleteBuffers(vtoken)
+      gl.deleteBuffer(vtoken)
       vtoken = Token.Buffer.invalid
     }
   }
@@ -35,9 +35,9 @@ extends Handle {
   def totalBytes = capacity * attributes * gl.bytesPerFloat
 
   def send(offset: Long, data: Data.Float) {
-    gl.bindBuffer(Macrogl.GL_ARRAY_BUFFER, vtoken)
-    gl.bufferSubData(Macrogl.GL_ARRAY_BUFFER, offset, data)
-    gl.bindBuffer(Macrogl.GL_ARRAY_BUFFER, Token.Buffer.none)
+    gl.bindBuffer(Macrogl.ARRAY_BUFFER, vtoken)
+    gl.bufferSubData(Macrogl.ARRAY_BUFFER, offset, data)
+    gl.bindBuffer(Macrogl.ARRAY_BUFFER, Token.Buffer.none)
   }
 
   def enableAttributeArrays(attribs: Array[(Int, Int)]) {
@@ -62,7 +62,7 @@ extends Handle {
     while (i < attribs.length) {
       val byteOffset = attribs(i)._1 * gl.bytesPerFloat
       val num = attribs(i)._2
-      gl.vertexAttribPointer(i, num, Macrogl.GL_FLOAT, false, stride, byteOffset)
+      gl.vertexAttribPointer(i, num, Macrogl.FLOAT, false, stride, byteOffset)
       i += 1
     }
   }
@@ -97,10 +97,10 @@ object AttributeBuffer {
 
     val r = reify {
       val m = (c.Expr[AttributeBuffer](mesh)).splice
-      gl.splice.bindBuffer(Macrogl.GL_ARRAY_BUFFER, m.token)
+      gl.splice.bindBuffer(Macrogl.ARRAY_BUFFER, m.token)
       try f.splice(m.access)
       finally {
-        gl.splice.bindBuffer(Macrogl.GL_ARRAY_BUFFER, Token.Buffer.none)
+        gl.splice.bindBuffer(Macrogl.ARRAY_BUFFER, Token.Buffer.none)
       }
       ()
     }

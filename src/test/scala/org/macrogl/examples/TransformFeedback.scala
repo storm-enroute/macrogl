@@ -3,7 +3,10 @@ package org.macrogl.examples
 import org.lwjgl.opengl._
 import org.lwjgl.input.Keyboard
 import org.lwjgl.BufferUtils
+import org.{macrogl => gl}
 import org.macrogl._
+import org.macrogl.{ex => glex}
+import org.macrogl.ex._
 
 object TransformFeedback {
   def main(args: Array[String]) {
@@ -15,9 +18,9 @@ object TransformFeedback {
     val vao = GL30.glGenVertexArrays()
     GL30.glBindVertexArray(vao)
 
-    val drawTriangle = new Program("triangle")(
-      Program.Shader.Vertex  (Utils.readResource("/org/macrogl/examples/TransformFeedbackTriangle.vert")),
-      Program.Shader.Fragment(Utils.readResource("/org/macrogl/examples/SingleTriangle.frag"))
+    val drawTriangle = new glex.Program("triangle")(
+      gl.Program.Shader.Vertex  (Utils.readResource("/org/macrogl/examples/TransformFeedbackTriangle.vert")),
+      gl.Program.Shader.Fragment(Utils.readResource("/org/macrogl/examples/SingleTriangle.frag"))
     )
     drawTriangle.acquire()
 
@@ -27,14 +30,14 @@ object TransformFeedback {
     GL20.glValidateProgram(drawTriangle.token)
     Macrogl.default.checkError()
 
-    val drawParticles = new Program("draw-particles")(
-      Program.Shader.Vertex  (Utils.readResource("/org/macrogl/examples/TransformFeedbackTriangle.vert")),
-      Program.Shader.Fragment(Utils.readResource("/org/macrogl/examples/SingleTriangle.frag"))
+    val drawParticles = new glex.Program("draw-particles")(
+      gl.Program.Shader.Vertex  (Utils.readResource("/org/macrogl/examples/TransformFeedbackTriangle.vert")),
+      gl.Program.Shader.Fragment(Utils.readResource("/org/macrogl/examples/SingleTriangle.frag"))
     )
     drawParticles.acquire()
 
-    val updateParticles = new Program("update-particles")(
-      Program.Shader.Vertex(Utils.readResource("/org/macrogl/examples/TransformFeedback.vert"))
+    val updateParticles = new glex.Program("update-particles")(
+      gl.Program.Shader.Vertex(Utils.readResource("/org/macrogl/examples/TransformFeedback.vert"))
     )
     updateParticles.acquire()
 
@@ -81,7 +84,7 @@ object TransformFeedback {
     var prevTime = System.currentTimeMillis
     var frame = 0
 
-    val triangleTransform  = Matrix.identity[Matrix.Plain]
+    val triangleTransform  = gl.Matrix.identity[glex.Matrix.Plain]
 
     val rotationSpeed = 2.0f
 
@@ -91,7 +94,7 @@ object TransformFeedback {
     val projectionTransform = Utils.orthoProjection(-aspectRatio, aspectRatio, -1, 1, -1, 1)
 
     for (_ <- using.program(drawParticles)) {
-      drawParticles.uniform.transform  = Matrix.identity[Matrix.Plain]
+      drawParticles.uniform.transform  = gl.Matrix.identity[glex.Matrix.Plain]
       drawParticles.uniform.projection = projectionTransform
     }
 

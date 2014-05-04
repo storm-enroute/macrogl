@@ -3,9 +3,12 @@ package org.macrogl.examples
 import org.lwjgl.opengl._
 import org.lwjgl.input.{Keyboard, Mouse}
 import org.lwjgl.BufferUtils
+import org.macrogl
 import org.macrogl._
+import org.macrogl.ex._
 
 object BasicLighting {
+  
   def main(args: Array[String]) {
     val contextAttributes = new ContextAttribs(3, 2).withForwardCompatible(true).withProfileCore(true)
 
@@ -36,9 +39,9 @@ object BasicLighting {
 
     GL30.glBindVertexArray(0)
 
-    val pp = new Program("test")(
-      Program.Shader.Vertex  (Utils.readResource("/org/macrogl/examples/BasicLighting.vert")),
-      Program.Shader.Fragment(Utils.readResource("/org/macrogl/examples/BasicLighting.frag"))
+    val pp = new macrogl.Program("test")(
+      macrogl.Program.Shader.Vertex  (Utils.readResource("/org/macrogl/examples/BasicLighting.vert")),
+      macrogl.Program.Shader.Fragment(Utils.readResource("/org/macrogl/examples/BasicLighting.frag"))
     )
 
     pp.acquire()
@@ -53,7 +56,7 @@ object BasicLighting {
 
     Mouse.setGrabbed(true)
 
-    val leftTransform = new Matrix.Plain(
+    val leftTransform = new macrogl.ex.Matrix.Plain(
       Array[Double](
          1, 0,  0, 0,
          0, 1,  0, 0,
@@ -62,7 +65,7 @@ object BasicLighting {
       )
     )
 
-    val rightTransform = new Matrix.Plain(
+    val rightTransform = new macrogl.ex.Matrix.Plain(
       Array[Double](
         1, 0,  0, 0,
         0, 1,  0, 0,

@@ -1,7 +1,6 @@
 package org.macrogl
 
 
-
 import scala.collection._
 
 
@@ -26,24 +25,6 @@ abstract class Matrix(val array: Array[Double]) {
 
 
 object Matrix {
-
-  lazy val defaultModelview = {
-    val m = new Modelview
-    view(m)(0, 0, -1, 0, 0, 0, 0, 1, 0)
-    m
-  }
-
-  lazy val defaultProjection = {
-    val p = new Projection
-    orthoProjection(p)(-1, 1, -1, 1, 1, -1)
-    p
-  }
-
-  lazy val defaultSpace = {
-    val s = new Plain
-    multiply(defaultProjection, defaultModelview, s)
-    s
-  }
 
   def multiply[M <: Matrix: Matrix.Ctor](thiz: Matrix, that: Matrix): M = {
     val array = new Array[Double](16)
@@ -128,102 +109,11 @@ object Matrix {
     def newMatrix(array: Array[Double]): M
   }
 
-  final class Projection(a: Array[Double]) extends Matrix(a) {
-    def this() = this(new Array[Double](16))
-    def mode = Macrogl.GL_PROJECTION
-    def matrixMode = Macrogl.GL_PROJECTION_MATRIX
-  }
-
-  implicit val projectionCtor = new Ctor[Projection] {
-    def newMatrix(a: Array[Double]) = new Projection(a)
-  }
-
-  final class Modelview(a: Array[Double]) extends Matrix(a) {
-    def this() = this(new Array[Double](16))
-    def mode = Macrogl.GL_MODELVIEW
-    def matrixMode = Macrogl.GL_MODELVIEW_MATRIX
-  }
-
-  implicit val modelviewCtor = new Ctor[Modelview] {
-    def newMatrix(a: Array[Double]) = new Modelview(a)
-  }
-
-  final class Texture(a: Array[Double]) extends Matrix(a) {
-    def this() = this(new Array[Double](16))
-    def mode = Macrogl.GL_TEXTURE
-    def matrixMode = Macrogl.GL_TEXTURE_MATRIX
-  }
-
-  implicit val textureCtor = new Ctor[Texture] {
-    def newMatrix(a: Array[Double]) = new Texture(a)
-  }
-
-  final class Plain(a: Array[Double]) extends Matrix(a) {
-    def this() = this(new Array[Double](16))
-    def mode = ???
-    def matrixMode = ???
-  }
-
-  implicit val plainCtor = new Ctor[Plain] {
-    def newMatrix(a: Array[Double]) = new Plain(a)
-  }
-
   def identity[M <: Matrix: Ctor] = implicitly[Ctor[M]].newMatrix(Array[Double](
     1.0, 0.0, 0.0, 0.0,
     0.0, 1.0, 0.0, 0.0,
     0.0, 0.0, 1.0, 0.0,
     0.0, 0.0, 0.0, 1.0
   ))
-
-  def orthoProjection(m: Projection)(left: Double, right: Double, bottom: Double, top: Double, nearPlane: Double, farPlane: Double)(implicit gl: Macrogl) {
-    val oldmode = gl.getInteger(Macrogl.GL_MATRIX_MODE)
-    gl.matrixMode(Macrogl.GL_PROJECTION)
-    gl.pushMatrix()
-    try {
-      gl.loadIdentity()
-      gl.ortho(left, right, bottom, top, nearPlane, farPlane)
-      Results.doubleResult.rewind()
-      gl.getDouble(Macrogl.GL_PROJECTION_MATRIX, Results.doubleResult)
-      Results.doubleResult.get(m.array, 0, 16)
-    } finally {
-      gl.popMatrix()
-      gl.matrixMode(oldmode)
-      Macrogl.default.checkError()
-    }
-  }
-
-  def perspectiveProjection(m: Projection)(left: Double, right: Double, bottom: Double, top: Double, nearPlane: Double, farPlane: Double)(implicit gl: Macrogl) {
-    val oldmode = gl.getInteger(Macrogl.GL_MATRIX_MODE)
-    gl.matrixMode(Macrogl.GL_PROJECTION)
-    gl.pushMatrix()
-    try {
-      gl.loadIdentity()
-      gl.frustum(left, right, bottom, top, nearPlane, farPlane)
-      Results.doubleResult.rewind()
-      gl.getDouble(Macrogl.GL_PROJECTION_MATRIX, Results.doubleResult)
-      Results.doubleResult.get(m.array, 0, 16)
-    } finally {
-      gl.popMatrix()
-      gl.matrixMode(oldmode)
-      Macrogl.default.checkError()
-    }
-  }
-
-  def view(m: Modelview)(xfrom: Float, yfrom: Float, zfrom: Float, xto: Float, yto: Float, zto: Float, xup: Float, yup: Float, zup: Float)(implicit gl: Macrogl) {
-    val oldmode = gl.getInteger(Macrogl.GL_MATRIX_MODE)
-    gl.matrixMode(Macrogl.GL_MODELVIEW)
-    gl.pushMatrix()
-    try {
-      gl.loadIdentity()
-      gl.lookAt(xfrom, yfrom, zfrom, xto, yto, zto, xup, yup, zup)
-      Results.doubleResult.rewind()
-      gl.getDouble(Macrogl.GL_MODELVIEW_MATRIX, Results.doubleResult)
-      Results.doubleResult.get(m.array, 0, 16)
-    } finally {
-      gl.popMatrix()
-      gl.matrixMode(oldmode)
-      Macrogl.default.checkError()
-    }
-  }
 
 }

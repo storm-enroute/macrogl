@@ -41,7 +41,7 @@ class Program(val name: String)(val shaders: Program.Shader*)(implicit val gl: M
             i += 1
           }
           floatData.clear()
-          gl.uniformMatrix4(l, false, floatData)
+          gl.uniformMatrix4fv(l, false, floatData)
       }
     }
   }
@@ -79,20 +79,18 @@ object Program {
 
     private def processShaderErrors(shname: String, flag: Int, phase: String, stoken: Token.Shader, p: Program)(implicit gl: Macrogl) {
       val pname = p.name
-      val res = gl.getShaderi(stoken, flag)
-      if (res == Macrogl.GL_FALSE) {
-        val len = gl.getShaderi(stoken, Macrogl.GL_INFO_LOG_LENGTH)
-        val errormsg = gl.getShaderInfoLog(stoken, len)
+      val res = gl.getShaderParameteri(stoken, flag)
+      if (res == Macrogl.FALSE) {
+        val errormsg = gl.getShaderInfoLog(stoken)
         throw new Program.Exception(p, "error %s %s in shader %s\n%s".format(phase, shname, pname, errormsg))
       }
     }
 
     private def processProgramErrors(flag: Int, phase: String, p: Program)(implicit gl: Macrogl) {
       val pname = p.name
-      val res = gl.getProgrami(p.token, flag)
-      if (res == Macrogl.GL_FALSE) {
-        val len = gl.getProgrami(p.token, Macrogl.GL_INFO_LOG_LENGTH)
-        val errormsg = gl.getProgramInfoLog(p.token, len)
+      val res = gl.getProgramParameteri(p.token, flag)
+      if (res == Macrogl.FALSE) {
+        val errormsg = gl.getProgramInfoLog(p.token)
         throw new Program.Exception(p, "error %s program %s\n%s".format(phase, pname, errormsg))
       }
     }
@@ -109,13 +107,13 @@ object Program {
       val s = gl.createShader(mode)
       gl.shaderSource(s, srcarray)
       gl.compileShader(s)
-      processShaderErrors(name, Macrogl.GL_COMPILE_STATUS, "compiling", s, p)
+      processShaderErrors(name, Macrogl.COMPILE_STATUS, "compiling", s, p)
       gl.attachShader(p.token, s)
       afterAttach(p.token)
       gl.linkProgram(p.token)
-      processProgramErrors(Macrogl.GL_LINK_STATUS, "linking", p)
+      processProgramErrors(Macrogl.LINK_STATUS, "linking", p)
       gl.validateProgram(p.token)
-      processProgramErrors(Macrogl.GL_VALIDATE_STATUS, "validating", p)
+      processProgramErrors(Macrogl.VALIDATE_STATUS, "validating", p)
       gl.checkError()
     }
 
@@ -131,12 +129,12 @@ object Program {
 
     case class Vertex(source: String, afterAttach: Token.Program => Unit = x => {}) extends Shader {
       def name = "Vertex shader"
-      def mode = Macrogl.GL_VERTEX_SHADER
+      def mode = Macrogl.VERTEX_SHADER
     }
   
     case class Fragment(source: String, afterAttach: Token.Program => Unit = x => {}) extends Shader {
       def name = "Fragment shader"
-      def mode = Macrogl.GL_FRAGMENT_SHADER
+      def mode = Macrogl.FRAGMENT_SHADER
     }
 
   }
