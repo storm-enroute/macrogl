@@ -76,6 +76,14 @@ package macrogl {
     object MeshBufferObject {
       def foreach[U](f: MeshBuffer.Access => U)(implicit gl: Macrogl): Unit = macro MeshBuffer.using[U]
     }
+    object VertexBuffer {
+      def foreach(f: VertexBufferAccess # VertexBufferAccessInner => Unit)(implicit gl: Macrogl): Unit = macro Buffer.Macros.vertexBuffer
+      def apply  (f: VertexBufferAccess # VertexBufferAccessInner => Unit)(implicit gl: Macrogl): Unit = macro Buffer.Macros.vertexBuffer
+    }
+    object IndexBuffer {
+      def foreach(f: IndexBufferAccess # IndexBufferAccessInner => Unit)(implicit gl: Macrogl): Unit = macro Buffer.Macros.indexBuffer
+      def apply  (f: IndexBufferAccess # IndexBufferAccessInner => Unit)(implicit gl: Macrogl): Unit = macro Buffer.Macros.indexBuffer
+    }
 
     def program(p: Program) = ShaderProgram
     def texture(texnum: Int, t: Texture) = TextureObject
@@ -83,6 +91,9 @@ package macrogl {
     def framebuffer(fb: FrameBuffer) = FrameBufferObject
     def attributebuffer(mesh: AttributeBuffer) = AttributeBufferObject
     def meshbuffer(mesh: MeshBuffer) = MeshBufferObject
+
+    def vertexbuffer(buffer: Buffer with VertexBufferAccess) = VertexBuffer
+    def indexbuffer (buffer: Buffer with IndexBufferAccess)  = IndexBuffer
   }
 
   /* macros */
@@ -291,6 +302,18 @@ package macrogl {
 
     private[macrogl] class Util[C <: Context](val c: C) {
       import c.universe._
+
+      def inlineAndSubstituteArguments(func: c.Tree, params: c.Tree*) = {
+        val f = c untypecheck func
+        val q"(..$args) => $body" = f
+        val decls = for {
+          (arg, value) <- args zip params
+        } yield {
+          val q"$_ val $name: $_" = arg
+          q"val $name = $value"
+        }
+        q"..$decls; $body"
+      }
 
       def inlineAndReset[T](expr: c.Expr[T]): c.Expr[T] =
         c.Expr[T](inlineApplyRecursive(c untypecheck expr.tree))

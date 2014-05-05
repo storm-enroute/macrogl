@@ -19,10 +19,17 @@ object BasicLighting {
     ibb.put(Cube.indices)
     ibb.flip()
 
-    val indexBuffer = GL15.glGenBuffers()
-    GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, indexBuffer)
-    GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, ibb, GL15.GL_STATIC_DRAW)
-    GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0)
+    val indexBuffer = new Buffer with IndexBufferAccess {
+      val elementCount = Cube.indices.length
+      val elementType  = Macrogl.UNSIGNED_BYTE
+      val capacity = elementCount
+      acquire()
+    }
+
+    using.indexbuffer(indexBuffer) { acc =>
+      acc.allocate(Macrogl.STATIC_DRAW)
+      acc.send(0, ibb)
+    }
 
     val vao = GL30.glGenVertexArrays()
     GL30.glBindVertexArray(vao)
@@ -31,11 +38,19 @@ object BasicLighting {
     cfb.put(Cube.vertices)
     cfb.flip()
 
-    val vertexBuffer = new AttributeBuffer(GL15.GL_STATIC_DRAW, Cube.vertices.length / Cube.components, Cube.components)
-    vertexBuffer.acquire()
-    vertexBuffer.send(0, cfb)
+    val vertexBuffer = new Buffer with VertexBufferAccess {
+      val vertexCount = Cube.vertices.length / Cube.components
+      val attributeCount = Cube.components
+      val capacity = vertexCount * attributeCount * gl.bytesPerFloat
+      acquire()
+    }
+
     val attrsCfg = Array((0, 3), (3, 3), (6, 3))
-    for (_ <- using.attributebuffer(vertexBuffer)) vertexBuffer.setAttributePointers(attrsCfg)
+    using.vertexbuffer(vertexBuffer) { acc =>
+      acc.allocate(Macrogl.STATIC_DRAW)
+      acc.send(0, cfb)
+      acc.setAttributePointers(attrsCfg)
+    }
 
     GL30.glBindVertexArray(0)
 
@@ -138,28 +153,27 @@ object BasicLighting {
       rightTransform.array(10) =  c
 
       // draw
-      for (_ <- using.program(pp)) {
+      GL30.glBindVertexArray(vao)
+      for {
+        _   <- using.program(pp)
+        acc <- using.indexbuffer(indexBuffer)
+      }{
         GL11.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
         raster.clear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT)
 
         pp.uniform.viewTransform = camera.transform
 
-        GL30.glBindVertexArray(vao)
-
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, indexBuffer)
-        vertexBuffer.enableAttributeArrays(attrsCfg)
+        vertexBuffer.vertexBufferAccess.enableAttributeArrays(attrsCfg)
 
         pp.uniform.worldTransform = leftTransform
-        GL11.glDrawElements(GL11.GL_TRIANGLES, Cube.indices.length, GL11.GL_UNSIGNED_BYTE, 0)
+        acc.draw(Macrogl.TRIANGLES, 0)
 
         pp.uniform.worldTransform = rightTransform
-        GL11.glDrawElements(GL11.GL_TRIANGLES, Cube.indices.length, GL11.GL_UNSIGNED_BYTE, 0)
+        acc.draw(Macrogl.TRIANGLES, 0)
         
-        vertexBuffer.disableAttributeArrays(attrsCfg)
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0)
-
-        GL30.glBindVertexArray(0)
+        vertexBuffer.vertexBufferAccess.disableAttributeArrays(attrsCfg)
       }
+      GL30.glBindVertexArray(0)
 
       Display.update()
     }
@@ -167,7 +181,7 @@ object BasicLighting {
     pp.release()
     vertexBuffer.release()
     GL30.glDeleteVertexArrays(vao)
-    GL15.glDeleteBuffers(indexBuffer)
+    indexBuffer.release()
     Display.destroy()
   }
 
