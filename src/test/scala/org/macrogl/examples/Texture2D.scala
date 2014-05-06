@@ -31,9 +31,15 @@ object Texture2D {
     fb.put(vertices)
     fb.flip()
 
-    val mb = new AttributeBuffer(GL15.GL_DYNAMIC_DRAW, 3, 5)
-    mb.acquire()
-    mb.send(0, fb)
+    val mb = new Buffer with VertexBufferAccess {
+      val vertexCount    = 3
+      val attributeCount = 5
+      acquire()
+    }
+    using.vertexbuffer(mb) { acc =>
+      acc.allocate(Macrogl.DYNAMIC_DRAW)
+      acc.send(0, fb)
+    }
 
     val textureSize = 16
 
@@ -80,7 +86,7 @@ object Texture2D {
         vertices(13) = texCoord
         fb.put(vertices)
         fb.flip()
-        mb.send(0, fb)
+        using.vertexbuffer(mb) { acc => acc.send(0, fb) }
 
         texture.wrapS = wrapS
         texture.minFilter = minFilter
@@ -90,14 +96,14 @@ object Texture2D {
       for {
         _   <- using.program(pp)
         _   <- using.texture(GL13.GL_TEXTURE0, texture)
-        acc <- using.attributebuffer(mb)
+        acc <- using.vertexbuffer(mb)
       } {
         GL11.glClearColor(0.0f, 0.64f, 0.91f, 1.0f)
         raster.clear(GL11.GL_COLOR_BUFFER_BIT)
 
         pp.uniform.testTexture = 0
 
-        acc.render(GL11.GL_TRIANGLES, attr)
+        acc.render(Macrogl.TRIANGLES, attr)
       }
 
       Display.update()

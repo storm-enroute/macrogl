@@ -41,7 +41,6 @@ object BasicLighting {
     val vertexBuffer = new Buffer with VertexBufferAccess {
       val vertexCount = Cube.vertices.length / Cube.components
       val attributeCount = Cube.components
-      val capacity = vertexCount * attributeCount * gl.bytesPerFloat
       acquire()
     }
 

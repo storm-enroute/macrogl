@@ -57,7 +57,6 @@ object TransformFeedback {
       val buf = new Buffer with VertexBufferAccess with TransformFeedbackBufferAccess {
         val vertexCount    = Particles.count
         val attributeCount = Particles.components
-        val capacity = vertexCount * attributeCount * gl.bytesPerFloat
         acquire()
       }
       using.vertexbuffer(buf) { acc =>
@@ -67,7 +66,6 @@ object TransformFeedback {
       buf
     }
 
-    println("wat")
     val triangleTexture = GL11.glGenTextures()
     val triangleFeedback = new Buffer with TextureBufferAccess with TransformFeedbackBufferAccess {
       val capacity = Triangle.count * (Triangle.components + 1) * gl.bytesPerFloat
@@ -87,7 +85,6 @@ object TransformFeedback {
     val triangleBuffer = new Buffer with VertexBufferAccess {
       val vertexCount = Triangle.count
       val attributeCount = Triangle.components
-      val capacity = vertexCount * attributeCount * gl.bytesPerFloat
       acquire()
     }
     using.vertexbuffer(triangleBuffer) { acc =>
@@ -147,9 +144,9 @@ object TransformFeedback {
         GL11.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
         raster.clear(GL11.GL_COLOR_BUFFER_BIT)
 
-        GL30.glBeginTransformFeedback(GL11.GL_TRIANGLES)
+        GL30.glBeginTransformFeedback(Macrogl.TRIANGLES)
 
-        acc.render(GL11.GL_TRIANGLES, drawAttr)
+        acc.render(Macrogl.TRIANGLES, drawAttr)
 
         GL30.glEndTransformFeedback()
       }
@@ -168,9 +165,9 @@ object TransformFeedback {
         updateParticles.uniform.triangleVertices = 0
 
         GL15.glBeginQuery(GL30.GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, query)
-        GL30.glBeginTransformFeedback(GL11.GL_POINTS)
+        GL30.glBeginTransformFeedback(Macrogl.POINTS)
 
-        acc.render(GL11.GL_POINTS, updateAttr)
+        acc.render(Macrogl.POINTS, updateAttr)
 
         GL30.glEndTransformFeedback()
         GL15.glEndQuery(GL30.GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN)
@@ -181,7 +178,7 @@ object TransformFeedback {
       for {
         _   <- using.program(drawParticles)
         acc <- using.vertexbuffer(output)
-      } acc.render(GL11.GL_POINTS, drawAttr)
+      } acc.render(Macrogl.POINTS, drawAttr)
 
       Display.update()
     }

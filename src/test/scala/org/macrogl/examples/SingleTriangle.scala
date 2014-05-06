@@ -27,7 +27,6 @@ object SingleTriangle {
     val mb = new Buffer with VertexBufferAccess {
       val vertexCount    = 3
       val attributeCount = 6
-      val capacity = vertexCount * attributeCount * gl.bytesPerFloat
       acquire()
     }
     using.vertexbuffer(mb) { acc =>
@@ -54,7 +53,7 @@ object SingleTriangle {
         GL11.glClearColor(1.0f, 1.0f, 1.0f, 1.0f)
         raster.clear(GL11.GL_COLOR_BUFFER_BIT)
 
-        acc.render(GL11.GL_TRIANGLES, attr)
+        acc.render(Macrogl.TRIANGLES, attr)
       }
 
       Display.update()
