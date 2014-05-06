@@ -48,6 +48,26 @@ trait BufferAccess {
   }
 }
 
+trait TextureBufferAccess extends BufferAccess {
+  this: Buffer =>
+
+  object textureBufferAccess extends TextureBufferAccessInner
+
+  trait TextureBufferAccessInner extends BufferAccessInner {
+    val target = Macrogl.TEXTURE_BUFFER
+  }
+}
+
+trait TransformFeedbackBufferAccess extends BufferAccess {
+  this: Buffer =>
+
+  object transformFeedbackBufferAccess extends TransformFeedbackBufferAccessInner
+
+  trait TransformFeedbackBufferAccessInner extends BufferAccessInner {
+    val target = Macrogl.TRANSFORM_FEEDBACK_BUFFER
+  }
+}
+
 trait IndexBufferAccess extends BufferAccess {
   this: Buffer =>
 
@@ -241,13 +261,49 @@ object Buffer {
       reifyBinding(reify(Macrogl.ELEMENT_ARRAY_BUFFER), buffer, inlined, gl)
     }
 
+    def textureBuffer(f: c.Expr[TextureBufferAccess # TextureBufferAccessInner => Unit])(gl: c.Expr[Macrogl]) = {
+      import c.universe._
+
+      val q"$_($texnum, $buffer).$_($func)($_)" = c.macroApplication
+
+      val inlined: c.Tree = c inlineAndSubstituteArguments(func, q"$buffer.textureBufferAccess")
+
+      val binding = reifyBinding(reify(Macrogl.TEXTURE_BUFFER), buffer, inlined, gl)
+
+      reify {
+        gl.splice.activeTexture(c.Expr[Int](texnum).splice)
+        binding.splice
+      }
+    }
+
+    def transformFeedbackBuffer(f: c.Expr[TransformFeedbackBufferAccess # TransformFeedbackBufferAccessInner => Unit])(gl: c.Expr[Macrogl]) = {
+      import c.universe._
+
+      val q"$_($index, $buffer).$_($func)($_)" = c.macroApplication
+
+      val inlined: c.Tree = c inlineAndSubstituteArguments(func, q"$buffer.transformFeedbackBufferAccess")
+      reifyIndexedBinding(reify(Macrogl.TRANSFORM_FEEDBACK_BUFFER), buffer, index, inlined, gl)
+    }
+
     def reifyBinding(target: c.Expr[Int], buffer: c.Tree, func: c.Tree, gl: c.Expr[Macrogl]) = {
       import c.universe._
       reify {
         gl.splice.bindBuffer(target.splice, c.Expr[Buffer](buffer).splice.token)
         try c.Expr[Unit](func).splice
         finally {
-          gl.splice.bindBuffer(Macrogl.ELEMENT_ARRAY_BUFFER, Token.Buffer.none)
+          gl.splice.bindBuffer(target.splice, Token.Buffer.none)
+        }
+        ()
+      }
+    }
+
+    def reifyIndexedBinding(target: c.Expr[Int], buffer: c.Tree, index: c.Tree, func: c.Tree, gl: c.Expr[Macrogl]) = {
+      import c.universe._
+      reify {
+        gl.splice.bindBufferBase(target.splice, c.Expr[Int](index).splice, c.Expr[Buffer](buffer).splice.token)
+        try c.Expr[Unit](func).splice
+        finally {
+          gl.splice.bindBuffer(target.splice, Token.Buffer.none)
         }
         ()
       }

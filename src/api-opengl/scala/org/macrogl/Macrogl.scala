@@ -28,6 +28,10 @@ class Macrogl () {
     GL15.glBindBuffer(target, buffer)
   }
 
+  final def bindBufferBase(target: Int, index: Int, buffer: Token.Buffer) = {
+    GL30.glBindBufferBase(target, index, buffer)
+  }
+
   final def bindFramebuffer(target: Int, framebuffer: Token.FrameBuffer) = {
     GL30.glBindFramebuffer(target, framebuffer)
   }
@@ -892,6 +896,8 @@ object Macrogl {
   val BLEND_COLOR = GL14.GL_BLEND_COLOR
   val ARRAY_BUFFER = GL15.GL_ARRAY_BUFFER
   val ELEMENT_ARRAY_BUFFER = GL15.GL_ELEMENT_ARRAY_BUFFER
+  val TRANSFORM_FEEDBACK_BUFFER = GL30.GL_TRANSFORM_FEEDBACK_BUFFER
+  val TEXTURE_BUFFER = GL31.GL_TEXTURE_BUFFER
   val ARRAY_BUFFER_BINDING = GL15.GL_ARRAY_BUFFER_BINDING
   val ELEMENT_ARRAY_BUFFER_BINDING = GL15.GL_ELEMENT_ARRAY_BUFFER_BINDING
   val STREAM_DRAW = GL15.GL_STREAM_DRAW

@@ -53,30 +53,47 @@ object TransformFeedback {
     fb.put(Particles.vertices)
     fb.flip()
 
-    val evenBuffer = new AttributeBuffer(GL15.GL_STREAM_DRAW, Particles.count, Particles.components)
-    evenBuffer.acquire()
-    evenBuffer.send(0, fb)
+    val Seq(evenBuffer, oddBuffer) = for (i <- 1 to 2) yield {
+      val buf = new Buffer with VertexBufferAccess with TransformFeedbackBufferAccess {
+        val vertexCount    = Particles.count
+        val attributeCount = Particles.components
+        val capacity = vertexCount * attributeCount * gl.bytesPerFloat
+        acquire()
+      }
+      using.vertexbuffer(buf) { acc =>
+        acc.allocate(Macrogl.STREAM_DRAW)
+        acc.send(0, fb)
+      }
+      buf
+    }
 
-    val oddBuffer = new AttributeBuffer(GL15.GL_STREAM_DRAW, Particles.count, Particles.components)
-    oddBuffer.acquire()
-
-    val triangleFeedback = new AttributeBuffer(GL15.GL_STREAM_DRAW, Triangle.count, Triangle.components + 1)
-    triangleFeedback.acquire()
-
-    GL13.glActiveTexture(GL13.GL_TEXTURE0)
-    GL15.glBindBuffer(GL31.GL_TEXTURE_BUFFER, triangleFeedback.token)
-
+    println("wat")
     val triangleTexture = GL11.glGenTextures()
-    GL11.glBindTexture(GL31.GL_TEXTURE_BUFFER, triangleTexture)
-    GL31.glTexBuffer(GL31.GL_TEXTURE_BUFFER, GL30.GL_RGBA32F, triangleFeedback.token)
+    val triangleFeedback = new Buffer with TextureBufferAccess with TransformFeedbackBufferAccess {
+      val capacity = Triangle.count * (Triangle.components + 1) * gl.bytesPerFloat
+      acquire()
+    }
+    using.texturebuffer(GL13.GL_TEXTURE0, triangleFeedback) { acc =>
+      acc.allocate(Macrogl.STREAM_DRAW)
+
+      GL11.glBindTexture(GL31.GL_TEXTURE_BUFFER, triangleTexture)
+      GL31.glTexBuffer(GL31.GL_TEXTURE_BUFFER, GL30.GL_RGBA32F, triangleFeedback.token)
+    }
 
     val tb = BufferUtils.createFloatBuffer(Triangle.vertices.length)
     tb.put(Triangle.vertices)
     tb.flip()
 
-    val triangleBuffer = new AttributeBuffer(GL15.GL_STATIC_DRAW, Triangle.count, Triangle.components)
-    triangleBuffer.acquire()
-    triangleBuffer.send(0, tb)
+    val triangleBuffer = new Buffer with VertexBufferAccess {
+      val vertexCount = Triangle.count
+      val attributeCount = Triangle.components
+      val capacity = vertexCount * attributeCount * gl.bytesPerFloat
+      acquire()
+    }
+    using.vertexbuffer(triangleBuffer) { acc =>
+      acc.allocate(Macrogl.STATIC_DRAW)
+      acc.send(0, tb)
+    }
 
     val updateAttr = Array((0, 3), (3, 3), (6, 3))
     val drawAttr   = Array((0, 3), (3, 3))
@@ -121,7 +138,8 @@ object TransformFeedback {
 
       for {
         _   <- using.program(drawTriangle)
-        acc <- using.attributebuffer(triangleBuffer)
+        acc <- using.vertexbuffer(triangleBuffer)
+        _   <- using.transformfeedbackbuffer(0, triangleFeedback)
       } {
         drawTriangle.uniform.transform = triangleTransform
         drawTriangle.uniform.projection = projectionTransform
@@ -129,13 +147,11 @@ object TransformFeedback {
         GL11.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
         raster.clear(GL11.GL_COLOR_BUFFER_BIT)
 
-        GL30.glBindBufferBase(GL30.GL_TRANSFORM_FEEDBACK_BUFFER, 0, triangleFeedback.token)
         GL30.glBeginTransformFeedback(GL11.GL_TRIANGLES)
 
         acc.render(GL11.GL_TRIANGLES, drawAttr)
 
         GL30.glEndTransformFeedback()
-        GL15.glBindBuffer(GL30.GL_TRANSFORM_FEEDBACK_BUFFER, 0)
       }
 
       val (input, output) = if (frame % 2 == 0) (evenBuffer, oddBuffer) else (oddBuffer, evenBuffer)
@@ -143,16 +159,13 @@ object TransformFeedback {
 
       for {
         _   <- using.program(updateParticles)
-        acc <- using.attributebuffer(input)
+        acc <- using.vertexbuffer(input)
         _   <- enabling(GL30.GL_RASTERIZER_DISCARD)
+        _   <- using.texturebuffer(GL13.GL_TEXTURE0, triangleFeedback)
+        _   <- using.transformfeedbackbuffer(0, output)
       } {
-        GL13.glActiveTexture(GL13.GL_TEXTURE0)
-        GL15.glBindBuffer(GL31.GL_TEXTURE_BUFFER, triangleFeedback.token)
-
         updateParticles.uniform.dtSeconds = dtSeconds
         updateParticles.uniform.triangleVertices = 0
-
-        GL30.glBindBufferBase(GL30.GL_TRANSFORM_FEEDBACK_BUFFER, 0, output.token)
 
         GL15.glBeginQuery(GL30.GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, query)
         GL30.glBeginTransformFeedback(GL11.GL_POINTS)
@@ -162,16 +175,12 @@ object TransformFeedback {
         GL30.glEndTransformFeedback()
         GL15.glEndQuery(GL30.GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN)
 
-        GL15.glBindBuffer(GL30.GL_TRANSFORM_FEEDBACK_BUFFER, 0)
-
         val written = GL15.glGetQueryObjectui(query, GL15.GL_QUERY_RESULT)
-
-        GL15.glBindBuffer(GL31.GL_TEXTURE_BUFFER, 0)
       }
 
       for {
         _   <- using.program(drawParticles)
-        acc <- using.attributebuffer(output)
+        acc <- using.vertexbuffer(output)
       } acc.render(GL11.GL_POINTS, drawAttr)
 
       Display.update()

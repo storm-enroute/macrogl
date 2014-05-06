@@ -84,6 +84,14 @@ package macrogl {
       def foreach(f: IndexBufferAccess # IndexBufferAccessInner => Unit)(implicit gl: Macrogl): Unit = macro Buffer.Macros.indexBuffer
       def apply  (f: IndexBufferAccess # IndexBufferAccessInner => Unit)(implicit gl: Macrogl): Unit = macro Buffer.Macros.indexBuffer
     }
+    object TransformFeedbackBuffer {
+      def foreach(f: TransformFeedbackBufferAccess # TransformFeedbackBufferAccessInner => Unit)(implicit gl: Macrogl): Unit = macro Buffer.Macros.transformFeedbackBuffer
+      def apply  (f: TransformFeedbackBufferAccess # TransformFeedbackBufferAccessInner => Unit)(implicit gl: Macrogl): Unit = macro Buffer.Macros.transformFeedbackBuffer
+    }
+    object TextureBuffer {
+      def foreach(f: TextureBufferAccess # TextureBufferAccessInner => Unit)(implicit gl: Macrogl): Unit = macro Buffer.Macros.textureBuffer
+      def apply  (f: TextureBufferAccess # TextureBufferAccessInner => Unit)(implicit gl: Macrogl): Unit = macro Buffer.Macros.textureBuffer
+    }
 
     def program(p: Program) = ShaderProgram
     def texture(texnum: Int, t: Texture) = TextureObject
@@ -94,6 +102,9 @@ package macrogl {
 
     def vertexbuffer(buffer: Buffer with VertexBufferAccess) = VertexBuffer
     def indexbuffer (buffer: Buffer with IndexBufferAccess)  = IndexBuffer
+
+    def texturebuffer(texnum: Int, buffer: Buffer with TextureBufferAccess) = TextureBuffer
+    def transformfeedbackbuffer(index: Int, buffer: Buffer with TransformFeedbackBufferAccess) = TransformFeedbackBuffer
   }
 
   /* macros */
