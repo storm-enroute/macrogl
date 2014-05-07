@@ -31,11 +31,9 @@ object Texture2D {
     fb.put(vertices)
     fb.flip()
 
-    val mb = new Buffer with VertexBufferAccess {
-      val vertexCount    = 3
-      val attributeCount = 5
-      acquire()
-    }
+    val mb = new VertexBuffer(3, 5)
+    mb.acquire()
+
     using.vertexbuffer(mb) { acc =>
       acc.allocate(Macrogl.DYNAMIC_DRAW)
       acc.send(0, fb)

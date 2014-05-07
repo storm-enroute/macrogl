@@ -24,11 +24,8 @@ object SingleTriangle {
     fb.put(vertices)
     fb.flip()
 
-    val mb = new Buffer with VertexBufferAccess {
-      val vertexCount    = 3
-      val attributeCount = 6
-      acquire()
-    }
+    val mb = new VertexBuffer(3, 6)
+    mb.acquire()
     using.vertexbuffer(mb) { acc =>
       acc.allocate(Macrogl.STATIC_DRAW)
       acc.send(0, fb)

@@ -54,11 +54,8 @@ object TransformFeedback {
     fb.flip()
 
     val Seq(evenBuffer, oddBuffer) = for (i <- 1 to 2) yield {
-      val buf = new Buffer with VertexBufferAccess with TransformFeedbackBufferAccess {
-        val vertexCount    = Particles.count
-        val attributeCount = Particles.components
-        acquire()
-      }
+      val buf = new VertexBuffer(Particles.count, Particles.components) with TransformFeedbackBufferAccess
+      buf.acquire()
       using.vertexbuffer(buf) { acc =>
         acc.allocate(Macrogl.STREAM_DRAW)
         acc.send(0, fb)
@@ -82,11 +79,9 @@ object TransformFeedback {
     tb.put(Triangle.vertices)
     tb.flip()
 
-    val triangleBuffer = new Buffer with VertexBufferAccess {
-      val vertexCount = Triangle.count
-      val attributeCount = Triangle.components
-      acquire()
-    }
+    val triangleBuffer = new VertexBuffer(Triangle.count, Triangle.components)
+    triangleBuffer.acquire()
+    
     using.vertexbuffer(triangleBuffer) { acc =>
       acc.allocate(Macrogl.STATIC_DRAW)
       acc.send(0, tb)

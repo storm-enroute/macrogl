@@ -38,11 +38,8 @@ object BasicLighting {
     cfb.put(Cube.vertices)
     cfb.flip()
 
-    val vertexBuffer = new Buffer with VertexBufferAccess {
-      val vertexCount = Cube.vertices.length / Cube.components
-      val attributeCount = Cube.components
-      acquire()
-    }
+    val vertexBuffer = new VertexBuffer(Cube.vertices.length / Cube.components, Cube.components)
+    vertexBuffer.acquire()
 
     val attrsCfg = Array((0, 3), (3, 3), (6, 3))
     using.vertexbuffer(vertexBuffer) { acc =>

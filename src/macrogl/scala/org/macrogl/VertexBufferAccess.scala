@@ -5,8 +5,6 @@ trait VertexBufferAccess extends BufferAccess {
 
   val vertexCount: Int
   val attributeCount: Int
-  
-  override lazy val capacity = vertexCount * attributeCount * gl.bytesPerFloat
 
   object vertexBufferAccess extends VertexBufferAccessInner
 

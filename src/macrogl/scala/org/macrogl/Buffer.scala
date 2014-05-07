@@ -20,6 +20,10 @@ class Buffer(implicit protected val gl: Macrogl) extends Handle {
   }
 }
 
+class VertexBuffer(val vertexCount: Int, val attributeCount: Int) extends Buffer with VertexBufferAccess {
+  val capacity = vertexCount * attributeCount * gl.bytesPerFloat
+}
+
 object Buffer {
 
   import Macros._
