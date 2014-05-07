@@ -24,9 +24,12 @@ object SingleTriangle {
     fb.put(vertices)
     fb.flip()
 
-    val mb = new AttributeBuffer(GL15.GL_STATIC_DRAW, 3, 6)
+    val mb = new VertexBuffer(3, 6)
     mb.acquire()
-    mb.send(0, fb)
+    using.vertexbuffer(mb) { acc =>
+      acc.allocate(Macrogl.STATIC_DRAW)
+      acc.send(0, fb)
+    }
     
     def readResource(path: String) = io.Source.fromURL(getClass.getResource(path)).mkString
 
@@ -42,12 +45,12 @@ object SingleTriangle {
     while (!Display.isCloseRequested) {
       for {
         _   <- using.program(pp)
-        acc <- using.attributebuffer(mb)
+        acc <- using.vertexbuffer(mb)
       } {
         GL11.glClearColor(1.0f, 1.0f, 1.0f, 1.0f)
         raster.clear(GL11.GL_COLOR_BUFFER_BIT)
 
-        acc.render(GL11.GL_TRIANGLES, attr)
+        acc.render(Macrogl.TRIANGLES, attr)
       }
 
       Display.update()

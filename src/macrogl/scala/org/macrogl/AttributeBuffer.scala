@@ -109,6 +109,3 @@ object AttributeBuffer {
   }
 
 }
-
-
-
