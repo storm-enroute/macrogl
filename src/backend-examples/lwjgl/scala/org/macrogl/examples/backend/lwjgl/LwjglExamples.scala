@@ -16,8 +16,8 @@ object LwjglExamples {
     
     var i = 0
     
-    Utils.loopUntil{i == 5} {
-      println("Log " + i)
+    Utils.loopUntil{i == 5} { e:org.macrogl.FrameEvent =>
+      println("Log " + i + " with elapsed time " + e.elapsedTime)
       i += 1
     }
     

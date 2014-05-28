@@ -17,8 +17,8 @@ object WebglExamples {
     
     var i = 0
     
-    Utils.loopUntil{i == 5} {
-      g.console.log("Log " + i)
+    Utils.loopUntil{i == 5} { e:org.macrogl.FrameEvent =>
+      g.console.log("Log " + i + " with elapsed time " + e.elapsedTime)
       i += 1
     }
     

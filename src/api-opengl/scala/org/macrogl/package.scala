@@ -3,6 +3,8 @@ package org
 
 package object macrogl {
   
+  case class FrameEvent(elapsedTime: Float)
+  
   case class ActiveInfo(size: Int, tpe: Int, name: String)
   case class PrecisionFormat(rangeMin: Int, rangeMax: Int, precision: Int)
 

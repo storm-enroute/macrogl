@@ -56,10 +56,19 @@ object Utils {
       current()
     }
   }
-
-  def loopUntil(cond: => Boolean)(onLoop: => Unit): Unit = {
+  
+  private var lastLoopTime:Long = 0
+  def loopUntil(cond: => Boolean)(onLoop:FrameEvent => Unit): Unit = {
+    lastLoopTime = System.nanoTime()
+    
     while(!cond) {
-      onLoop
+      val currentTime:Long = System.nanoTime()
+      val diff = ((currentTime - lastLoopTime)/1e9).toFloat
+      lastLoopTime = currentTime
+      
+      val frameEvent = FrameEvent(diff)
+      
+      onLoop(frameEvent)
       flushExecutionList
     }
   }
