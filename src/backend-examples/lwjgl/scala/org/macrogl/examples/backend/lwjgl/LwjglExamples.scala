@@ -22,6 +22,10 @@ object LwjglExamples {
   def macroGLTest():Unit = {
     val mgl:Macrogl = Macrogl.default
     
+    def myInit:Boolean = {
+      new SharedDrawable(Display.getDrawable())
+      true
+    }
     def myPrint(msg:String) = println(msg)
     def myUpdate:Boolean = {
       Display.update()

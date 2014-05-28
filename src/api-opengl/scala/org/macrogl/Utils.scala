@@ -5,7 +5,21 @@ import ExecutionContext.Implicits.global
 import javax.imageio.ImageIO
 import java.util.concurrent.ConcurrentLinkedQueue
 
+import org.lwjgl.opengl._
+
 object Utils {
+  object LWJGLSettings {
+    private var context: Option[SharedDrawable] = None
+    def storeCurrentThreadContext = {
+      val ctx = new SharedDrawable(Display.getDrawable())
+      context = Some(ctx)
+    }
+    def useStoredContextForCurrentThread = context match {
+      case Some(ctx) => ctx.makeCurrent()
+      case None => throw new RuntimeException("There is no context currently stored")
+    }
+  }
+  
   def WebGLSettings: Nothing = throw new UnsupportedOperationException("Available only when using Scala.js")
 
   def loadTexture2DFromResources(resourceName: String, gl: Macrogl, texture: Token.Texture, textureInternalFormat: Int, preload: => Boolean = { true }): Unit = {
@@ -59,10 +73,14 @@ object Utils {
 
   private var lastLoopTime: Long = 0
   def setRenderingLoop(cond: => Boolean)(onLoop: FrameEvent => Unit)(close: => Unit): Unit = {
+    LWJGLSettings.storeCurrentThreadContext
+    
     lastLoopTime = System.nanoTime()
 
-    //val renderingThread = new Thread(new Runnable {
-      //def run() {
+    val renderingThread = new Thread(new Runnable {
+      def run() {
+        LWJGLSettings.useStoredContextForCurrentThread
+        
         while (cond) {
           val currentTime: Long = System.nanoTime()
           val diff = ((currentTime - lastLoopTime) / 1e9).toFloat
@@ -76,9 +94,9 @@ object Utils {
         }
 
         close
-      //}
-    //})
+      }
+    })
     
-    //renderingThread.start()
+    renderingThread.start()
   }
 }
