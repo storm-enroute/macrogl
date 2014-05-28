@@ -5,24 +5,24 @@ import org.macrogl.{ Macrogl => GL }
 
 class BasicTriangle(mgl: Macrogl, print: String => Unit) {
   val vertexSource = """
-	    attribute vec3 position;
-	    
-	    void main(void) {
-			  gl_Position = vec4(position, 1.0);
-	    }
-	    """
+  attribute vec3 position;
+  
+  void main(void) {
+    gl_Position = vec4(position, 1.0);
+  }
+  """
 
   val fragmentSource = """
-		#ifdef GL_ES
-		precision mediump float;
-		#endif
-      
-      	uniform vec3 color;
-      
-	    void main(void) {
-	    	gl_FragColor = vec4(color, 1.0);
-	    }
-	    """
+  #ifdef GL_ES
+  precision mediump float;
+  #endif
+ 
+  uniform vec3 color;
+  
+  void main(void) {
+    gl_FragColor = vec4(color, 1.0);
+  }
+  """
 
   val program = mgl.createProgram()
   val vertex = mgl.createShader(GL.VERTEX_SHADER)

@@ -13,10 +13,7 @@ object LwjglExamples {
     Display.setDisplayMode(new DisplayMode(1280, 720))
     Display.create(new PixelFormat, contextAttributes)
     
-    val mgl:Macrogl = Macrogl.default
-    
-    val basicTriangle = new BasicTriangle(mgl, msg => println(msg))
-    basicTriangle.draw()
+    macroGLTest()
     
     while (!Display.isCloseRequested) {
       Display.update()
@@ -24,5 +21,12 @@ object LwjglExamples {
     }
     
     Display.destroy()
+  }
+  
+  def macroGLTest():Unit = {
+    val mgl:Macrogl = Macrogl.default
+    
+    val basicTriangle = new BasicTriangle(mgl, msg => println(msg))
+    basicTriangle.draw()
   }
 }
