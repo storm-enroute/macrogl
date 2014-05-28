@@ -22,6 +22,8 @@ object WebglExamples {
     val mgl: Macrogl = new Macrogl()(gl)
 
     val basicTriangle = new BasicTriangle(mgl, msg => g.console.log(msg))
-    basicTriangle.draw()
+    basicTriangle.render(0)
+    
+    basicTriangle.close()
   }
 }

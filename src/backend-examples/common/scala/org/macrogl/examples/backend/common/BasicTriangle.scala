@@ -3,7 +3,7 @@ package org.macrogl.examples.backend.common
 import org.macrogl.Macrogl
 import org.macrogl.{ Macrogl => GL }
 
-class BasicTriangle(mgl: Macrogl, print: String => Unit) {
+class BasicTriangle(mgl: Macrogl, print: String => Unit) extends DemoRenderable {
   val vertexSource = """
   attribute vec3 position;
   
@@ -86,9 +86,21 @@ class BasicTriangle(mgl: Macrogl, print: String => Unit) {
 
   mgl.uniform3fv(uniformColorLocation, colorData)
 
-  def draw(): Unit = {
+  def render(elapsedTime: Float): Boolean = {
     mgl.enableVertexAttribArray(attribPosLocation)
     mgl.drawElements(GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
     mgl.disableVertexAttribArray(attribPosLocation)
+    
+    true
+  }
+  
+  def close(): Unit = {
+    mgl.deleteBuffer(indicesBuffer)
+    mgl.deleteBuffer(vertexBuffer)
+    
+    mgl.deleteShader(vertex)
+    mgl.deleteShader(fragment)
+    
+    mgl.deleteProgram(program)
   }
 }
