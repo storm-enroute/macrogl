@@ -6,8 +6,6 @@ import js.annotation.JSExport
 import org.scalajs.dom
 
 object Utils {
-  def LWJGLSettings: Nothing = throw new UnsupportedOperationException("Available only when using LWJGL")
-  
   object WebGLSettings {
     private var resourceRelativePath: String = "."
 

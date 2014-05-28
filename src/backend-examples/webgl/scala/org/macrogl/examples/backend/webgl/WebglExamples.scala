@@ -14,7 +14,6 @@ import org.macrogl.examples.backend.common.BasicTriangle
 object WebglExamples {
   @JSExport
   def main(): Unit = {
-    
     macroGLTest()
   }
 
