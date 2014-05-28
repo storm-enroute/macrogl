@@ -170,6 +170,60 @@ object MacroGLBuild extends Build {
     file("macrogl-examples"),
     settings = macroglExamplesSettings
   ) dependsOn(macrogl)
+
+  /* back-end examples */
+  /* back-end examples using WebGL */
+
+  val backendExamplesWebglSettings = Defaults.defaultSettings ++ scalaJSSettings ++ Seq(
+    name := "backend-examples-webgl",
+    version := macroglVersion,
+    scalaVersion := macroglScalaVersion,
+    scalacOptions ++= Seq(
+      "-deprecation",
+      "-unchecked",
+      "-Xexperimental",
+      "-optimise",
+      "-feature"
+    ),
+    scalaSource in Compile := baseDirectory.value / ".." / "src" / "backend-examples" / "webgl" / "scala",
+    unmanagedSourceDirectories in Compile += baseDirectory.value / ".." / "src" / "backend-examples" / "common" / "scala",
+    resourceDirectory in Compile := baseDirectory.value / ".." / "src" / "backend-examples" / "common" / "resources",
+    libraryDependencies ++= Seq(
+      "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" % scalaJSVersion % "test",
+      "org.scala-lang.modules.scalajs" %% "scalajs-dom" % "0.4"
+    )
+  )
+
+  lazy val backendExamplesWebgl = Project(
+    "backendExamplesWebgl",
+    file("backend-examples-webgl"),
+    settings = backendExamplesWebglSettings
+  ) dependsOn (macroglWebgl)
+
+  /* back-end examples using LWJGL */
+
+  val backendExamplesLwjglSettings = Defaults.defaultSettings ++ LWJGLPlugin.lwjglSettings ++ Seq(
+    name := "backend-examples-lwjgl",
+    version := macroglVersion,
+    scalaVersion := macroglScalaVersion,
+    scalacOptions ++= Seq(
+      "-deprecation",
+      "-unchecked",
+      "-Xexperimental",
+      "-optimise",
+      "-feature"
+    ),
+    scalaSource in Compile := baseDirectory.value / ".." / "src" / "backend-examples" / "lwjgl" / "scala",
+    unmanagedSourceDirectories in Compile += baseDirectory.value / ".." / "src" / "backend-examples" / "common" / "scala",
+    resourceDirectory in Compile := baseDirectory.value / ".." / "src" / "backend-examples" / "common" / "resources"
+  )
+
+  lazy val backendExamplesLwjgl = Project(
+    "backendExamplesLwjgl",
+    file("backend-examples-lwjgl"),
+    settings = backendExamplesLwjglSettings
+  ) dependsOn (macrogl)
+  
 }
 
 
