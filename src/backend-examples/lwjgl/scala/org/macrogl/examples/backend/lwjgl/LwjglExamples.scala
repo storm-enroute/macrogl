@@ -14,19 +14,7 @@ object LwjglExamples {
     Display.setDisplayMode(new DisplayMode(1280, 720))
     Display.create(new PixelFormat, contextAttributes)
     
-    var i = 0
-    
-    Utils.loopUntil{i == 5} { e:org.macrogl.FrameEvent =>
-      println("Log " + i + " with elapsed time " + e.elapsedTime)
-      i += 1
-    }
-    
     macroGLTest()
-    
-    while (!Display.isCloseRequested) {
-      Display.update()
-      Thread.sleep(50);
-    }
     
     Display.destroy()
   }
@@ -34,9 +22,14 @@ object LwjglExamples {
   def macroGLTest():Unit = {
     val mgl:Macrogl = Macrogl.default
     
-    val basicTriangle = new BasicTriangle(mgl, msg => println(msg))
-    basicTriangle.render(0)
+    def myPrint(msg:String) = println(msg)
+    def myUpdate:Boolean = {
+      Display.update()
+      !Display.isCloseRequested()
+    }
     
-    basicTriangle.close()
+    val basicTriangle = new BasicTriangle(mgl, myPrint, myUpdate)
+    
+    basicTriangle.start()
   }
 }

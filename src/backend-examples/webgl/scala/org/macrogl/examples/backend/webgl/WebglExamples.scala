@@ -15,13 +15,6 @@ object WebglExamples {
   @JSExport
   def main(): Unit = {
     
-    var i = 0
-    
-    Utils.loopUntil{i == 5} { e:org.macrogl.FrameEvent =>
-      g.console.log("Log " + i + " with elapsed time " + e.elapsedTime)
-      i += 1
-    }
-    
     macroGLTest()
   }
 
@@ -29,10 +22,12 @@ object WebglExamples {
     val canvas = g.document.getElementById("playground-canvas")
     val gl = canvas.getContext("webgl").asInstanceOf[dom.WebGLRenderingContext]
     val mgl: Macrogl = new Macrogl()(gl)
-
-    val basicTriangle = new BasicTriangle(mgl, msg => g.console.log(msg))
-    basicTriangle.render(0)
     
-    basicTriangle.close()
+    def myPrint(msg: String):Unit = g.console.log(msg)
+    def myUpdate: Boolean = true
+
+    val basicTriangle = new BasicTriangle(mgl, myPrint, myUpdate)
+    
+    basicTriangle.start()
   }
 }

@@ -31,13 +31,12 @@ object Utils {
   }
 
   private def now():Double = g.Date.now().asInstanceOf[js.Number].toDouble
-  
   private var lastLoopTime:Double = 0
-  def loopUntil(cond: => Boolean)(onLoop:FrameEvent => Unit): Unit = {
+  def setRenderingLoop(cond: => Boolean)(onLoop:FrameEvent => Unit)(close: => Unit): Unit = {
     lastLoopTime = now()
     
     def loop(timeStamp: js.Any): Unit = {
-      if(!cond) {
+      if(cond) {
         val currentTime = now()
         val diff = ((currentTime - lastLoopTime)/1e3).toFloat
         lastLoopTime = currentTime
@@ -45,7 +44,10 @@ object Utils {
         val frameEvent = FrameEvent(diff)
         
         onLoop(frameEvent)
+        
         g.window.requestAnimationFrame(loop _)
+      } else {
+        close
       }
     }
 
