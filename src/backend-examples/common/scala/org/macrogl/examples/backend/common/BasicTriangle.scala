@@ -54,9 +54,6 @@ class BasicTriangle(mgl: Macrogl, print: String => Unit) extends DemoRenderable 
 
   mgl.useProgram(program)
 
-  mgl.clearColor(1, 0, 0, 1)
-  mgl.clear(GL.COLOR_BUFFER_BIT)
-
   val attribPosLocation = mgl.getAttribLocation(program, "position")
   val uniformColorLocation = mgl.getUniformLocation(program, "color")
 
@@ -87,20 +84,23 @@ class BasicTriangle(mgl: Macrogl, print: String => Unit) extends DemoRenderable 
   mgl.uniform3fv(uniformColorLocation, colorData)
 
   def render(elapsedTime: Float): Boolean = {
+    mgl.clearColor(1, 0, 0, 1)
+    mgl.clear(GL.COLOR_BUFFER_BIT)
+
     mgl.enableVertexAttribArray(attribPosLocation)
     mgl.drawElements(GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
     mgl.disableVertexAttribArray(attribPosLocation)
-    
+
     true
   }
-  
+
   def close(): Unit = {
     mgl.deleteBuffer(indicesBuffer)
     mgl.deleteBuffer(vertexBuffer)
-    
+
     mgl.deleteShader(vertex)
     mgl.deleteShader(fragment)
-    
+
     mgl.deleteProgram(program)
   }
 }
