@@ -9,9 +9,11 @@ import js.Dynamic.{ global => g }
 // See https://github.com/scala-js/scala-js-dom/blob/master/src/main/scala/org/scalajs/dom/WebGL.scala for documentation
 // about the WebGL DOM for ScalaJS
 
-class Macrogl(implicit gl: org.scalajs.dom.WebGLRenderingContext) {
+class Macrogl(implicit gl: dom.WebGLRenderingContext) {
 
   /* public API */
+  final def getWebGLRenderingContext(): dom.WebGLRenderingContext = gl
+  
   final def bytesPerShort = 2
   final def bytesPerInt = 4
   final def bytesPerFloat = 4

@@ -7,6 +7,8 @@ import org.lwjgl.util.glu._
 class Macrogl () {
 
   /* public API */
+  final def getWebGLRenderingContext(): Nothing = throw new UnsupportedOperationException("Available only when using Scala.js")
+  
   final def bytesPerShort = 2
   final def bytesPerInt = 4
   final def bytesPerFloat = 4

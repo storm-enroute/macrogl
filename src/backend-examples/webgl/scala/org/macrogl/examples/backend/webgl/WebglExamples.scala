@@ -6,6 +6,7 @@ import js.annotation.JSExport
 import org.scalajs.dom
 
 import org.macrogl.Macrogl
+import org.macrogl.Utils
 
 import org.macrogl.examples.backend.common.BasicTriangle
 
@@ -13,6 +14,14 @@ import org.macrogl.examples.backend.common.BasicTriangle
 object WebglExamples {
   @JSExport
   def main(): Unit = {
+    
+    var i = 0
+    
+    Utils.loopUntil{i == 5} {
+      g.console.log("Log " + i)
+      i += 1
+    }
+    
     macroGLTest()
   }
 

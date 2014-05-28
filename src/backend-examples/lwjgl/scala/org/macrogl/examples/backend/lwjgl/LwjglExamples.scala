@@ -3,6 +3,7 @@ package org.macrogl.examples.backend.lwjgl
 import org.lwjgl.opengl._
 
 import org.macrogl.Macrogl
+import org.macrogl.Utils
 
 import org.macrogl.examples.backend.common.BasicTriangle
 
@@ -12,6 +13,13 @@ object LwjglExamples {
     
     Display.setDisplayMode(new DisplayMode(1280, 720))
     Display.create(new PixelFormat, contextAttributes)
+    
+    var i = 0
+    
+    Utils.loopUntil{i == 5} {
+      println("Log " + i)
+      i += 1
+    }
     
     macroGLTest()
     
