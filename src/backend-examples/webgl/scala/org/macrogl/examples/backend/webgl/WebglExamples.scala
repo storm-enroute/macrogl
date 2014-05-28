@@ -5,17 +5,30 @@ import js.Dynamic.{ global => g }
 import js.annotation.JSExport
 import org.scalajs.dom
 
+import org.macrogl.Macrogl
+
+import org.macrogl.examples.backend.common.BasicTriangle
+
 @JSExport
-object ScalaJSExample {
+object WebglExamples {
   @JSExport
   def main(): Unit = {
     val paragraph = g.document.createElement("p")
-    paragraph.innerHTML = "<strong>It works!</strong>"
+
+    macroGLTest()
+
+    paragraph.innerHTML = "<strong>End of macroGL test reached.</strong>"
     g.document.getElementById("playground").appendChild(paragraph)
   }
 
-  /** Computes the square of an integer.
-* This demonstrates unit testing.
-*/
-  def square(x: Int): Int = x*x
+  def macroGLTest() {
+    val canvas = g.document.getElementById("playground-canvas")
+    val gl = canvas.getContext("webgl").asInstanceOf[dom.WebGLRenderingContext]
+    val mgl: Macrogl = new Macrogl()(gl)
+
+    val basicTriangle = new BasicTriangle(mgl, msg => g.console.log(msg))
+    
+    basicTriangle.draw()
+    
+  }
 }
