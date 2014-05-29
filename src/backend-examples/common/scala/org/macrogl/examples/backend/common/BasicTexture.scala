@@ -9,9 +9,6 @@ class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: 
   class BasicTextureListener extends org.macrogl.FrameListener {
     // (continue, render, close)
     var funcs: Option[(() => Boolean, org.macrogl.FrameEvent => Unit, () => Unit)] = None
-    var continueCondition: Boolean = _
-
-    var textureReady: Boolean = _
 
     def init(): Unit = {
       print("Init example")
@@ -125,7 +122,7 @@ class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: 
       mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE)
       mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE)
 
-      textureReady = false
+      var textureReady = false
       org.macrogl.Utils.loadTexture2DFromResources("/org/macrogl/examples/backend/common/testTexture.jpg", texture, mgl, { textureReady = true; print("Texture ready"); true })
       
       mgl.clearColor(1, 0, 0, 1)
@@ -135,6 +132,8 @@ class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: 
 
       print("Example ready")
 
+      var continueCondition: Boolean = true
+      
       def continue(): Boolean = {
         continueCondition
       }
@@ -171,8 +170,6 @@ class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: 
       }
 
       funcs = Some(continue, render, close)
-
-      continueCondition = true
     }
 
     def continue(): Boolean = {

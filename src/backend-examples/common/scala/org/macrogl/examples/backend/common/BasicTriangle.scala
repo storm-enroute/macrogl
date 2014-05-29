@@ -9,7 +9,6 @@ class BasicTriangle(print: String => Unit, systemUpdate: => Boolean, systemInit:
   class BasicTriangleListener extends org.macrogl.FrameListener {
     // (continue, render, close)
     var funcs: Option[(() => Boolean, org.macrogl.FrameEvent => Unit, () => Unit)] = None
-    var continueCondition: Boolean = _
 
     def init(): Unit = {
       print("Init example")
@@ -101,6 +100,8 @@ class BasicTriangle(print: String => Unit, systemUpdate: => Boolean, systemInit:
 
       print("Example ready")
       
+      var continueCondition: Boolean = true
+      
       def continue(): Boolean = {
         continueCondition
       }
@@ -133,8 +134,6 @@ class BasicTriangle(print: String => Unit, systemUpdate: => Boolean, systemInit:
       }
       
       funcs = Some(continue, render, close)
-      
-      continueCondition = true
     }
     
     def continue(): Boolean = {
