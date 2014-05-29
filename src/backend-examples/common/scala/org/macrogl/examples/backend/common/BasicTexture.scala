@@ -4,23 +4,29 @@ import org.macrogl.Utils
 import org.macrogl.Macrogl
 import org.macrogl.{ Macrogl => GL }
 
-class BasicTriangle(print: String => Unit, systemUpdate: => Boolean, systemInit: => Macrogl, systemClose: => Unit) extends DemoRenderable {
-  
-  class BasicTriangleListener extends org.macrogl.FrameListener {
+class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: => Macrogl, systemClose: => Unit) extends DemoRenderable {
+
+  class BasicTextureListener extends org.macrogl.FrameListener {
     // (continue, render, close)
     var funcs: Option[(() => Boolean, org.macrogl.FrameEvent => Unit, () => Unit)] = None
     var continueCondition: Boolean = _
 
+    var textureReady: Boolean = _
+
     def init(): Unit = {
       print("Init example")
-      
+
       val mgl = systemInit
 
       val vertexSource = """
         attribute vec3 position;
+        attribute vec2 texCoord;
+        
+        varying vec2 vTexCoord;
   
         void main(void) {
           gl_Position = vec4(position, 1.0);
+          vTexCoord = texCoord;
         }
         """
 
@@ -29,10 +35,12 @@ class BasicTriangle(print: String => Unit, systemUpdate: => Boolean, systemInit:
         precision mediump float;
         #endif
  
-        uniform vec3 color;
+        varying vec2 vTexCoord;
+        
+        uniform sampler2D texSampler;
   
         void main(void) {
-          gl_FragColor = vec4(color, 1.0);
+          gl_FragColor = texture2D(texSampler, vTexCoord);
         }
         """
 
@@ -67,58 +75,84 @@ class BasicTriangle(print: String => Unit, systemUpdate: => Boolean, systemInit:
       mgl.useProgram(program)
 
       val attribPosLocation = mgl.getAttribLocation(program, "position")
-      val uniformColorLocation = mgl.getUniformLocation(program, "color")
+      val attribCoordLocation = mgl.getAttribLocation(program, "texCoord")
+      val uniformTexSamplerLocation = mgl.getUniformLocation(program, "texSampler")
 
       val vertexBuffer = mgl.createBuffer
       val indicesBuffer = mgl.createBuffer
+      val textureCoordBuffer = mgl.createBuffer
 
-      val vertexBufferData = Macrogl.createFloatData(3 * 3)
-      vertexBufferData.put(-0.2f).put(-0.2f).put(0)
-      vertexBufferData.put(0.2f).put(-0.2f).put(0)
-      vertexBufferData.put(0).put(0.2f).put(0)
-      vertexBufferData.rewind
+      val vertexBufferData = Macrogl.createFloatData(4 * 3) // 4 vertices (3 components each)
+      vertexBufferData.put(-0.2f).put(-0.3f).put(0)
+      vertexBufferData.put(0.2f).put(-0.3f).put(0)
+      vertexBufferData.put(0.2f).put(0.3f).put(0)
+      vertexBufferData.put(-0.2f).put(0.3f).put(0)
+      vertexBufferData.rewind()
 
-      val indicesBufferData = Macrogl.createShortData(3 * 1)
+      val indicesBufferData = Macrogl.createShortData(2 * 3) // 2 triangles (3 vertices each)
       indicesBufferData.put(0.toShort).put(1.toShort).put(2.toShort)
-      indicesBufferData.rewind
+      indicesBufferData.put(0.toShort).put(2.toShort).put(3.toShort)
+      indicesBufferData.rewind()
 
-      val colorData = Macrogl.createFloatData(3)
-      colorData.put(0).put(0).put(1)
-      colorData.rewind
+      val textureCoordBufferData = Macrogl.createFloatData(4 * 2) // 4 vertices (2 components each)
+      textureCoordBufferData.put(0).put(0)
+      textureCoordBufferData.put(1).put(0)
+      textureCoordBufferData.put(1).put(1)
+      textureCoordBufferData.put(0).put(1)
+      textureCoordBufferData.rewind()
 
       mgl.bindBuffer(GL.ARRAY_BUFFER, vertexBuffer)
       mgl.bufferData(GL.ARRAY_BUFFER, vertexBufferData, GL.STATIC_DRAW)
       mgl.vertexAttribPointer(attribPosLocation, 3, GL.FLOAT, false, 0, 0)
 
+      mgl.bindBuffer(GL.ARRAY_BUFFER, textureCoordBuffer)
+      mgl.bufferData(GL.ARRAY_BUFFER, textureCoordBufferData, GL.STATIC_DRAW)
+      mgl.vertexAttribPointer(attribCoordLocation, 2, GL.FLOAT, false, 0, 0)
+
       mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indicesBuffer)
       mgl.bufferData(GL.ELEMENT_ARRAY_BUFFER, indicesBufferData, GL.STATIC_DRAW)
 
-      mgl.uniform3fv(uniformColorLocation, colorData)
+      val texture = mgl.createTexture()
+      mgl.activeTexture(GL.TEXTURE0)
+      mgl.bindTexture(GL.TEXTURE_2D, texture)
+      mgl.uniform1i(uniformTexSamplerLocation, 0)
+
+      // WebGL requires mip-maping
+      mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR)
+      mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR)
+
+      textureReady = false
+      org.macrogl.Utils.loadTexture2DFromResources("/org/macrogl/examples/backend/common/testTexture.jpg", texture, mgl, { textureReady = true; print("Texture ready"); true })
 
       mgl.clearColor(1, 0, 0, 1)
 
       mgl.enableVertexAttribArray(attribPosLocation)
+      mgl.enableVertexAttribArray(attribCoordLocation)
 
       print("Example ready")
-      
+
       def continue(): Boolean = {
         continueCondition
       }
-      
+
       def render(fe: org.macrogl.FrameEvent): Unit = {
-        print("Elapsed seconds since last frame: " + fe.elapsedTime)
+        //print("Elapsed seconds since last frame: " + fe.elapsedTime)
 
         mgl.clear(GL.COLOR_BUFFER_BIT)
+        //if (textureReady) {
         mgl.drawElements(GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
+        //}
 
         continueCondition = systemUpdate
       }
-      
+
       def close(): Unit = {
         print("Closing example")
-        
+
+        mgl.disableVertexAttribArray(attribCoordLocation)
         mgl.disableVertexAttribArray(attribPosLocation)
 
+        mgl.deleteBuffer(textureCoordBuffer)
         mgl.deleteBuffer(indicesBuffer)
         mgl.deleteBuffer(vertexBuffer)
 
@@ -128,15 +162,15 @@ class BasicTriangle(print: String => Unit, systemUpdate: => Boolean, systemInit:
         mgl.deleteProgram(program)
 
         systemClose
-        
+
         print("Example closed")
       }
-      
+
       funcs = Some(continue, render, close)
-      
+
       continueCondition = true
     }
-    
+
     def continue(): Boolean = {
       funcs match {
         case Some((continueFunc, _, _)) => continueFunc()
@@ -160,6 +194,6 @@ class BasicTriangle(print: String => Unit, systemUpdate: => Boolean, systemInit:
   }
 
   def start(): Unit = {
-    org.macrogl.Utils.startFrameListener(new BasicTriangleListener)
+    org.macrogl.Utils.startFrameListener(new BasicTextureListener)
   }
 }

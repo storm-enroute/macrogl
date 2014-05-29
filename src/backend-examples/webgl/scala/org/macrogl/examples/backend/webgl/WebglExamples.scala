@@ -8,7 +8,7 @@ import org.scalajs.dom
 import org.macrogl.Macrogl
 import org.macrogl.Utils
 
-import org.macrogl.examples.backend.common.BasicTriangle
+import org.macrogl.examples.backend.common._
 
 @JSExport
 object WebglExamples {
@@ -18,7 +18,8 @@ object WebglExamples {
   }
 
   def macroGLTest(): Unit = {
-
+    org.macrogl.Utils.WebGLSettings.setResourcePath("./target/scala-2.11/classes")
+    
     def myPrint(msg: String): Unit = g.console.log(msg)
     def myUpdate(): Boolean = true
     def myInit(): Macrogl = {
@@ -30,8 +31,8 @@ object WebglExamples {
       // Nothing to do
     }
 
-    val basicTriangle = new BasicTriangle(myPrint, myUpdate, myInit, myClose)
+    val example: DemoRenderable = new BasicTexture(myPrint, myUpdate, myInit, myClose)
 
-    basicTriangle.start
+    example.start
   }
 }

@@ -10,7 +10,7 @@ import org.lwjgl.opengl._
 object Utils {
   def WebGLSettings: Nothing = throw new UnsupportedOperationException("Available only when using Scala.js")
 
-  def loadTexture2DFromResources(resourceName: String, gl: Macrogl, texture: Token.Texture, textureInternalFormat: Int, preload: => Boolean = { true }): Unit = {
+  def loadTexture2DFromResources(resourceName: String, texture: Token.Texture, gl: Macrogl, preload: => Boolean = { true }): Unit = {
     val stream = this.getClass().getClassLoader().getResourceAsStream(resourceName)
 
     // TODO should we have our own ExecutionContext?
@@ -44,7 +44,7 @@ object Utils {
         if (preload) {
           val previousTexture = gl.getParameterTexture(Macrogl.TEXTURE_BINDING_2D)
           gl.bindTexture(Macrogl.TEXTURE_2D, texture)
-          gl.texImage2D(Macrogl.TEXTURE_2D, 0, textureInternalFormat, width, height, 0, Macrogl.RGBA, Macrogl.UNSIGNED_BYTE, byteBuffer)
+          gl.texImage2D(Macrogl.TEXTURE_2D, 0, Macrogl.RGBA, width, height, 0, Macrogl.RGBA, Macrogl.UNSIGNED_BYTE, byteBuffer)
           gl.bindTexture(Macrogl.TEXTURE_2D, previousTexture)
         }
       })

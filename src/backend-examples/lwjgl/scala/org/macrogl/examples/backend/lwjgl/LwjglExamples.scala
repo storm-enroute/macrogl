@@ -5,7 +5,7 @@ import org.lwjgl.opengl._
 import org.macrogl.Macrogl
 import org.macrogl.Utils
 
-import org.macrogl.examples.backend.common.BasicTriangle
+import org.macrogl.examples.backend.common._
 
 object LwjglExamples {
   def main(args: Array[String]): Unit = {
@@ -29,8 +29,8 @@ object LwjglExamples {
       Display.destroy()
     }
 
-    val basicTriangle = new BasicTriangle(myPrint, myUpdate, myInit, myClose)
+    val example: DemoRenderable = new BasicTexture(myPrint, myUpdate, myInit, myClose)
 
-    basicTriangle.start
+    example.start
   }
 }

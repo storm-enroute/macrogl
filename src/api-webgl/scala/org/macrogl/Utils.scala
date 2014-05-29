@@ -16,14 +16,15 @@ object Utils {
     def getResourcePath = resourceRelativePath
   }
 
-  def loadTexture2DFromResources(resourceName: String, gl: Macrogl, texture: Token.Texture, textureInternalFormat: Int, preload: => Boolean = { true }): Unit = {
+  def loadTexture2DFromResources(resourceName: String, texture: Token.Texture, gl: Macrogl, preload: => Boolean = { true }): Unit = {
     val image = dom.document.createElement("img").asInstanceOf[js.Dynamic]
     image.onload = ({ (e: dom.Event) =>
       if (preload) {
         val previousTexture = gl.getParameterTexture(Macrogl.TEXTURE_BINDING_2D)
         gl.bindTexture(Macrogl.TEXTURE_2D, texture)
         val webglRenderingContext = gl.getWebGLRenderingContext().asInstanceOf[js.Dynamic]
-        webglRenderingContext.texImage2D(Macrogl.TEXTURE_2D, 0, textureInternalFormat, Macrogl.RGBA, Macrogl.UNSIGNED_BYTE, image)
+        webglRenderingContext.pixelStorei(webglRenderingContext.UNPACK_FLIP_Y_WEBGL, true)
+        webglRenderingContext.texImage2D(Macrogl.TEXTURE_2D, 0, Macrogl.RGBA, Macrogl.RGBA, Macrogl.UNSIGNED_BYTE, image)
         gl.bindTexture(Macrogl.TEXTURE_2D, previousTexture)
       }
     })
