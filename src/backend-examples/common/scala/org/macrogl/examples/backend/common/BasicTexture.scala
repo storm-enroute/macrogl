@@ -4,8 +4,6 @@ import org.macrogl.Utils
 import org.macrogl.Macrogl
 import org.macrogl.{ Macrogl => GL }
 
-import org.macrogl.math._
-
 class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: => Macrogl, systemClose: => Unit) extends DemoRenderable {
 
   class BasicTextureListener extends org.macrogl.FrameListener {
@@ -119,14 +117,14 @@ class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: 
       // Be careful about WebGL and textures: http://www.khronos.org/webgl/wiki/WebGL_and_OpenGL_Differences
       mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR)
       mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR)
-      
+
       // Not mandatory, but good to have
       mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE)
       mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE)
 
       var textureReady = false
       org.macrogl.Utils.loadTexture2DFromResources("/org/macrogl/examples/backend/common/testTexture.jpg", texture, mgl, { textureReady = true; print("Texture ready"); true })
-      
+
       mgl.clearColor(1, 0, 0, 1)
 
       mgl.enableVertexAttribArray(attribPosLocation)
@@ -135,7 +133,7 @@ class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: 
       print("Example ready")
 
       var continueCondition: Boolean = true
-      
+
       def continue(): Boolean = {
         continueCondition
       }
