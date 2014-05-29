@@ -17,16 +17,21 @@ object WebglExamples {
     macroGLTest()
   }
 
-  def macroGLTest():Unit = {
-    val canvas = g.document.getElementById("playground-canvas")
-    val gl = canvas.getContext("webgl").asInstanceOf[dom.WebGLRenderingContext]
-    val mgl: Macrogl = new Macrogl()(gl)
-    
-    def myPrint(msg: String):Unit = g.console.log(msg)
-    def myUpdate: Boolean = true
+  def macroGLTest(): Unit = {
 
-    val basicTriangle = new BasicTriangle(mgl, myPrint, myUpdate)
-    
-    basicTriangle.start()
+    def myPrint(msg: String): Unit = g.console.log(msg)
+    def myUpdate: Boolean = true
+    def myInit: Macrogl = {
+      val canvas = g.document.getElementById("playground-canvas")
+      val gl = canvas.getContext("webgl").asInstanceOf[dom.WebGLRenderingContext]
+      new Macrogl()(gl)
+    }
+    def myClose: Unit = {
+      // Nothing to do
+    }
+
+    val basicTriangle = new BasicTriangle(myPrint, myUpdate, myInit, myClose)
+
+    basicTriangle.start
   }
 }

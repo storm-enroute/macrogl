@@ -59,7 +59,7 @@ object Utils {
     }
   }
 
-  private var lastLoopTime: Long = 0
+  /*private var lastLoopTime: Long = 0
   def setRenderingLoop(cond: => Boolean)(onLoop: FrameEvent => Unit)(close: => Unit): Unit = {
     lastLoopTime = System.nanoTime()
 
@@ -76,5 +76,32 @@ object Utils {
     }
 
     close
+  }*/
+
+  def setFrameListener(fl: FrameListener): Unit = {
+
+    val frameListenerThread = new Thread(new Runnable {
+      def run() {
+
+        fl.init
+
+        var lastLoopTime: Long = System.nanoTime()
+        while (fl.continue) {
+          val currentTime: Long = System.nanoTime()
+          val diff = ((currentTime - lastLoopTime) / 1e9).toFloat
+          lastLoopTime = currentTime
+
+          val frameEvent = FrameEvent(diff)
+
+          fl.render(frameEvent)
+
+          flushExecutionList
+        }
+
+        fl.close
+      }
+    })
+    
+    frameListenerThread.start()
   }
 }

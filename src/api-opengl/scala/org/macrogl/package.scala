@@ -1,10 +1,16 @@
 package org
 
-
 package object macrogl {
-  
+
   case class FrameEvent(elapsedTime: Float)
-  
+
+  trait FrameListener {
+    def init(): Unit
+    def continue(): Boolean
+    def render(fe: FrameEvent): Unit
+    def close(): Unit
+  }
+
   case class ActiveInfo(size: Int, tpe: Int, name: String)
   case class PrecisionFormat(rangeMin: Int, rangeMax: Int, precision: Int)
 
