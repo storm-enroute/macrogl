@@ -14,18 +14,18 @@ object LwjglExamples {
 
   def macroGLTest(): Unit = {
     def myPrint(msg: String) = println(msg)
-    def myUpdate: Boolean = {
+    def myUpdate(): Boolean = {
       Display.update()
       !Display.isCloseRequested()
     }
-    def myInit: Macrogl = {
+    def myInit(): Macrogl = {
       val contextAttributes = new ContextAttribs(2, 1)
       Display.setDisplayMode(new DisplayMode(1280, 720))
       Display.create(new PixelFormat, contextAttributes)
 
       Macrogl.default
     }
-    def myClose: Unit = {
+    def myClose(): Unit = {
       Display.destroy()
     }
 

@@ -20,13 +20,13 @@ object WebglExamples {
   def macroGLTest(): Unit = {
 
     def myPrint(msg: String): Unit = g.console.log(msg)
-    def myUpdate: Boolean = true
-    def myInit: Macrogl = {
+    def myUpdate(): Boolean = true
+    def myInit(): Macrogl = {
       val canvas = g.document.getElementById("playground-canvas")
       val gl = canvas.getContext("webgl").asInstanceOf[dom.WebGLRenderingContext]
       new Macrogl()(gl)
     }
-    def myClose: Unit = {
+    def myClose(): Unit = {
       // Nothing to do
     }
 
