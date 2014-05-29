@@ -29,35 +29,11 @@ object Utils {
     })
     image.src = WebGLSettings.getResourcePath + resourceName
   }
-
-  /*private def now():Double = g.Date.now().asInstanceOf[js.Number].toDouble
-  private var lastLoopTime:Double = 0
-  def setRenderingLoop(cond: => Boolean)(onLoop:FrameEvent => Unit)(close: => Unit): Unit = {
-    lastLoopTime = now()
-    
-    def loop(timeStamp: js.Any): Unit = {
-      if(cond) {
-        val currentTime = now()
-        val diff = ((currentTime - lastLoopTime)/1e3).toFloat
-        lastLoopTime = currentTime
-        
-        val frameEvent = FrameEvent(diff)
-        
-        onLoop(frameEvent)
-        
-        g.window.requestAnimationFrame(loop _)
-      } else {
-        close
-      }
-    }
-
-    g.window.requestAnimationFrame(loop _)
-  }*/
   
   private def now():Double = g.Date.now().asInstanceOf[js.Number].toDouble
   
   private class FrameListenerLoopContext {
-    var lastLoopTime: Double = 0
+    var lastLoopTime: Double = now()
   }
   
   def setFrameListener(fl: FrameListener): Unit = {
@@ -84,6 +60,7 @@ object Utils {
       loop(timeStamp)
     }
 
+    // Start listener
     g.window.requestAnimationFrame(loopInit _)
   }
 }

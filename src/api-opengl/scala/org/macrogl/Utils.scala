@@ -102,6 +102,7 @@ object Utils {
       }
     })
     
+    // Start listener
     frameListenerThread.start()
   }
 }

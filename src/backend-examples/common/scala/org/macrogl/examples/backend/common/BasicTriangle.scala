@@ -6,8 +6,9 @@ import org.macrogl.{ Macrogl => GL }
 import org.macrogl.FrameListener
 
 class BasicTriangle(print: String => Unit, systemUpdate: => Boolean, systemInit: => Macrogl, systemClose: => Unit) extends DemoRenderable {
+  
   class BasicTriangleListener extends org.macrogl.FrameListener {
-    
+    // (continue, render, close)
     var funcs: Option[(() => Boolean, org.macrogl.FrameEvent => Unit, () => Unit)] = None
     var continueCondition: Boolean = _
 
@@ -106,7 +107,7 @@ class BasicTriangle(print: String => Unit, systemUpdate: => Boolean, systemInit:
       }
       
       def render(fe: org.macrogl.FrameEvent): Unit = {
-        print("Elapsed time since last frame: " + fe.elapsedTime)
+        print("Elapsed seconds since last frame: " + fe.elapsedTime)
 
         mgl.clear(GL.COLOR_BUFFER_BIT)
         mgl.drawElements(GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
@@ -136,21 +137,22 @@ class BasicTriangle(print: String => Unit, systemUpdate: => Boolean, systemInit:
       
       continueCondition = true
     }
+    
     def continue(): Boolean = {
       funcs match {
-        case Some((f, _, _)) => f()
+        case Some((continueFunc, _, _)) => continueFunc()
         case None => throw new RuntimeException("Not ready")
       }
     }
     def render(fe: org.macrogl.FrameEvent): Unit = {
       funcs match {
-        case Some((_, f, _)) => f(fe)
+        case Some((_, renderFunc, _)) => renderFunc(fe)
         case None => throw new RuntimeException("Not ready")
       }
     }
     def close(): Unit = {
       funcs match {
-        case Some((_, _, f)) => f()
+        case Some((_, _, closeFunc)) => closeFunc()
         case None => throw new RuntimeException("Not ready")
       }
 
@@ -159,6 +161,6 @@ class BasicTriangle(print: String => Unit, systemUpdate: => Boolean, systemInit:
   }
 
   def start(): Unit = {
-    Utils.setFrameListener(new BasicTriangleListener)
+    org.macrogl.Utils.setFrameListener(new BasicTriangleListener)
   }
 }
