@@ -4,6 +4,8 @@ import org.macrogl.Utils
 import org.macrogl.Macrogl
 import org.macrogl.{ Macrogl => GL }
 
+import org.macrogl.math._
+
 class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: => Macrogl, systemClose: => Unit) extends DemoRenderable {
 
   class BasicTextureListener extends org.macrogl.FrameListener {
