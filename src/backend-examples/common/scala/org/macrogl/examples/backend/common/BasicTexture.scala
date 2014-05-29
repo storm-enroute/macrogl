@@ -127,7 +127,7 @@ class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: 
 
       textureReady = false
       org.macrogl.Utils.loadTexture2DFromResources("/org/macrogl/examples/backend/common/testTexture.jpg", texture, mgl, { textureReady = true; print("Texture ready"); true })
-
+      
       mgl.clearColor(1, 0, 0, 1)
 
       mgl.enableVertexAttribArray(attribPosLocation)

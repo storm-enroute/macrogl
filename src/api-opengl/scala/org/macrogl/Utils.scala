@@ -11,8 +11,8 @@ object Utils {
   def WebGLSettings: Nothing = throw new UnsupportedOperationException("Available only when using Scala.js")
 
   def loadTexture2DFromResources(resourceName: String, texture: Token.Texture, gl: Macrogl, preload: => Boolean = { true }): Unit = {
-    val stream = this.getClass().getClassLoader().getResourceAsStream(resourceName)
-
+    val stream = this.getClass().getResourceAsStream(resourceName)
+    
     // TODO should we have our own ExecutionContext?
 
     Future {
@@ -24,20 +24,28 @@ object Utils {
 
       val byteBuffer = Macrogl.createByteData(4 * width * height) // Stored as RGBA value: 4 bytes per pixel
 
-      var y = 0
-      while (y < height) {
+      var y = height-1
+      while (y >= 0) {
 
         var x = 0
         while (x < width) {
 
-          val rgba = image.getRGB(x, y)
-          byteBuffer.putInt(rgba)
+          val argb = image.getRGB(x, y)
+          
+          val blue = argb.toByte
+          val green = (argb >> 8).toByte
+          val red = (argb >> 16).toByte
+          val alpha = (argb >> 24).toByte
+          
+          byteBuffer.put(red).put(green).put(blue).put(alpha)
 
           x += 1
         }
 
-        y += 1
+        y -= 1
       }
+      
+      byteBuffer.rewind
 
       // Don't load it now, we want it done synchronously in the main loop to avoid concurrency issue
       executionList.add({ () =>
