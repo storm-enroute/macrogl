@@ -161,6 +161,6 @@ class BasicTriangle(print: String => Unit, systemUpdate: => Boolean, systemInit:
   }
 
   def start(): Unit = {
-    org.macrogl.Utils.setFrameListener(new BasicTriangleListener)
+    org.macrogl.Utils.startFrameListener(new BasicTriangleListener)
   }
 }

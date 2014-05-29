@@ -36,7 +36,7 @@ object Utils {
     var lastLoopTime: Double = now()
   }
   
-  def setFrameListener(fl: FrameListener): Unit = {
+  def startFrameListener(fl: FrameListener): Unit = {
     val ctx = new FrameListenerLoopContext
     
     def loop(timeStamp: js.Any): Unit = {
