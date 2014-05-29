@@ -7,12 +7,8 @@ import org.macrogl.FrameListener
 
 class BasicTriangle(print: String => Unit, systemUpdate: => Boolean, systemInit: => Macrogl, systemClose: => Unit) extends DemoRenderable {
   class BasicTriangleListener extends org.macrogl.FrameListener {
-    /*var myCont: Option[() => Boolean] = None
-    var myRender: Option[org.macrogl.FrameEvent => Unit] = None
-    var myClose: Option[() => Unit] = None*/
     
     var funcs: Option[(() => Boolean, org.macrogl.FrameEvent => Unit, () => Unit)] = None
-
     var continueCondition: Boolean = _
 
     def init(): Unit = {
