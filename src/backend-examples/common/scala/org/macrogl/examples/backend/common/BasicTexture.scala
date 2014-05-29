@@ -83,10 +83,10 @@ class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: 
       val textureCoordBuffer = mgl.createBuffer
 
       val vertexBufferData = Macrogl.createFloatData(4 * 3) // 4 vertices (3 components each)
-      vertexBufferData.put(-0.2f).put(-0.3f).put(0)
-      vertexBufferData.put(0.2f).put(-0.3f).put(0)
-      vertexBufferData.put(0.2f).put(0.3f).put(0)
-      vertexBufferData.put(-0.2f).put(0.3f).put(0)
+      vertexBufferData.put(-0.2f).put(-0.35f).put(0)
+      vertexBufferData.put(0.2f).put(-0.35f).put(0)
+      vertexBufferData.put(0.2f).put(0.35f).put(0)
+      vertexBufferData.put(-0.2f).put(0.35f).put(0)
       vertexBufferData.rewind()
 
       val indicesBufferData = Macrogl.createShortData(2 * 3) // 2 triangles (3 vertices each)
@@ -117,9 +117,13 @@ class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: 
       mgl.bindTexture(GL.TEXTURE_2D, texture)
       mgl.uniform1i(uniformTexSamplerLocation, 0)
 
-      // WebGL requires mip-maping
+      // Be careful about WebGL and textures: http://www.khronos.org/webgl/wiki/WebGL_and_OpenGL_Differences
       mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR)
       mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR)
+      
+      // Not mandatory, but good to have
+      mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE)
+      mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE)
 
       textureReady = false
       org.macrogl.Utils.loadTexture2DFromResources("/org/macrogl/examples/backend/common/testTexture.jpg", texture, mgl, { textureReady = true; print("Texture ready"); true })
