@@ -24,6 +24,8 @@ object Utils {
 
       val byteBuffer = Macrogl.createByteData(4 * width * height) // Stored as RGBA value: 4 bytes per pixel
 
+      val tmp = new Array[Byte](4)
+      
       var y = height-1
       while (y >= 0) {
 
@@ -32,12 +34,12 @@ object Utils {
 
           val argb = image.getRGB(x, y)
           
-          val blue = argb.toByte
-          val green = (argb >> 8).toByte
-          val red = (argb >> 16).toByte
-          val alpha = (argb >> 24).toByte
+          tmp(2) = argb.toByte // blue
+          tmp(1) = (argb >> 8).toByte // green
+          tmp(0) = (argb >> 16).toByte // red
+          tmp(3) = (argb >> 24).toByte // alpha
           
-          byteBuffer.put(red).put(green).put(blue).put(alpha)
+          byteBuffer.put(tmp)
 
           x += 1
         }
