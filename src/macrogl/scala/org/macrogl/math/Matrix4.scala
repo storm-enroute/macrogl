@@ -246,22 +246,10 @@ class Matrix4 extends Matrix {
   }
 
   def determinant(): Float = {
-    val f0 = m00 * ((m11 * m22 * m33 + m12 * m23 * m31 + m13 * m21 * m32)
-      - m13 * m22 * m31
-      - m11 * m23 * m32
-      - m12 * m21 * m33)
-    val f1 = m01 * ((m10 * m22 * m33 + m12 * m23 * m30 + m13 * m20 * m32)
-      - m13 * m22 * m30
-      - m10 * m23 * m32
-      - m12 * m20 * m33)
-    val f2 = m02 * ((m10 * m21 * m33 + m11 * m23 * m30 + m13 * m20 * m31)
-      - m13 * m21 * m30
-      - m10 * m23 * m31
-      - m11 * m20 * m33)
-    val f3 = m03 * ((m10 * m21 * m32 + m11 * m22 * m30 + m12 * m20 * m31)
-      - m12 * m21 * m30
-      - m10 * m22 * m31
-      - m11 * m20 * m32)
+    val f0 = m00 * ((m11 * m22 * m33 + m12 * m23 * m31 + m13 * m21 * m32) - m13 * m22 * m31 - m11 * m23 * m32 - m12 * m21 * m33)
+    val f1 = m01 * ((m10 * m22 * m33 + m12 * m23 * m30 + m13 * m20 * m32) - m13 * m22 * m30 - m10 * m23 * m32 - m12 * m20 * m33)
+    val f2 = m02 * ((m10 * m21 * m33 + m11 * m23 * m30 + m13 * m20 * m31) - m13 * m21 * m30 - m10 * m23 * m31 - m11 * m20 * m33)
+    val f3 = m03 * ((m10 * m21 * m32 + m11 * m22 * m30 + m12 * m20 * m31) - m12 * m21 * m30 - m10 * m22 * m31 - m11 * m20 * m32)
 
     (f0 - f1 + f2 - f3)
   }
@@ -367,9 +355,7 @@ object Matrix4 {
   }
 
   private def determinant3x3(t00: Float, t01: Float, t02: Float, t10: Float, t11: Float, t12: Float, t20: Float, t21: Float, t22: Float): Float = {
-    t00 * (t11 * t22 - t12 * t21)
-    +t01 * (t12 * t20 - t10 * t22)
-    +t02 * (t10 * t21 - t11 * t20)
+    t00 * (t11 * t22 - t12 * t21) + t01 * (t12 * t20 - t10 * t22) + t02 * (t10 * t21 - t11 * t20)
   }
 
   def invert(src: Matrix4, dst: Matrix4): Unit = {
@@ -539,5 +525,43 @@ object Matrix4 {
     dst.y = y;
     dst.z = z;
     dst.w = w;
+  }
+
+  /**
+   * Generate the homogeneous rotation matrix for a given angle and a given unitary axis
+   */
+  def rotation(angle: Float, axis: Vector3): Matrix4 = {
+    val ret = new Matrix4
+    setRotation(angle, axis, ret)
+    ret
+  }
+  
+  def setRotation(angle: Float, axis: Vector3, dst: Matrix4): Unit = {
+    val c = Math.cos(angle).toFloat
+    val s = Math.sin(angle).toFloat
+
+    val x = axis.x
+    val y = axis.y
+    val z = axis.z
+
+    dst.m00 = x * x * (1 - c) + c
+    dst.m01 = x * y * (1 - c) - z * s
+    dst.m02 = x * z * (1 - c) + y * s
+    dst.m03 = 0f
+
+    dst.m10 = y * x * (1 - c) + z * s
+    dst.m11 = y * y * (1 - c) + c
+    dst.m12 = y * z * (1 - c) - x * s
+    dst.m13 = 0f
+
+    dst.m20 = x * z * (1 - c) - y * s
+    dst.m21 = y * z * (1 - c) - x * s
+    dst.m22 = z * z * (1 - c) + c
+    dst.m23 = 0f
+
+    dst.m30 = 0f
+    dst.m31 = 0f
+    dst.m32 = 0f
+    dst.m33 = 1f
   }
 }

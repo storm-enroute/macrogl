@@ -4,6 +4,8 @@ import org.macrogl.Utils
 import org.macrogl.Macrogl
 import org.macrogl.{ Macrogl => GL }
 
+import org.macrogl.math._
+
 class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: => Macrogl, systemClose: => Unit) extends DemoRenderable {
 
   class BasicTextureListener extends org.macrogl.FrameListener {
@@ -11,6 +13,34 @@ class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: 
     var funcs: Option[(() => Boolean, org.macrogl.FrameEvent => Unit, () => Unit)] = None
 
     def init(): Unit = {
+
+      val base = new Matrix4(1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1)
+
+      val mul = new Matrix4(1, 0, 0, 0,
+        0, 2, 0, 0,
+        0, 0, 4, 0,
+        0, 0, 0, 1)
+
+      val stack = new MatrixStack[Matrix4](base)
+      print("" + stack.current)
+      stack.push
+      
+      stack.current *= mul
+      print("" + stack.current)
+      stack.push
+      
+      stack.current.invert
+      print("" + stack.current)
+      
+      stack.pop
+      print("" + stack.current)
+      
+      stack.pop
+      print("" + stack.current)
+
       print("Init example")
 
       val mgl = systemInit

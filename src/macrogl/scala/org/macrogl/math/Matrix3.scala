@@ -174,9 +174,7 @@ class Matrix3 extends Matrix {
   }
 
   def determinant(): Float = {
-    m00 * (m11 * m22 - m12 * m21)
-    +m01 * (m12 * m20 - m10 * m22)
-    +m02 * (m10 * m21 - m11 * m20)
+    m00 * (m11 * m22 - m12 * m21) + m01 * (m12 * m20 - m10 * m22) + m02 * (m10 * m21 - m11 * m20)
   }
 
   def copy(): Matrix3 = {
