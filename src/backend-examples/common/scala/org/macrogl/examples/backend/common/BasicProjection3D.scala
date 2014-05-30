@@ -4,6 +4,8 @@ import org.macrogl.Utils
 import org.macrogl.Macrogl
 import org.macrogl.{ Macrogl => GL }
 
+import org.macrogl.math._
+
 class BasicProjection3D(print: String => Unit, systemUpdate: => Boolean, systemInit: => Macrogl, systemClose: => Unit) extends DemoRenderable {
   
   class BasicProjection3DListener extends org.macrogl.FrameListener {
@@ -16,10 +18,17 @@ class BasicProjection3D(print: String => Unit, systemUpdate: => Boolean, systemI
       val mgl = systemInit
 
       val vertexSource = """
+        uniform mat4 projection;
+        uniform mat4 transform;
+        
         attribute vec3 position;
+        attribute vec3 color;
   
+        varying vec3 vColor;
+        
         void main(void) {
-          gl_Position = vec4(position, 1.0);
+          gl_Position = projection * transform * vec4(position, 1.0);
+          vColor = color;
         }
         """
 
@@ -28,10 +37,10 @@ class BasicProjection3D(print: String => Unit, systemUpdate: => Boolean, systemI
         precision mediump float;
         #endif
  
-        uniform vec3 color;
+        varying vec3 vColor;
   
         void main(void) {
-          gl_FragColor = vec4(color, 1.0);
+          gl_FragColor = vec4(vColor, 1.0);
         }
         """
 
@@ -66,37 +75,60 @@ class BasicProjection3D(print: String => Unit, systemUpdate: => Boolean, systemI
       mgl.useProgram(program)
 
       val attribPosLocation = mgl.getAttribLocation(program, "position")
-      val uniformColorLocation = mgl.getUniformLocation(program, "color")
+      val attribColorLocation = mgl.getAttribLocation(program, "color")
+      val uniformProjectionLocation = mgl.getUniformLocation(program, "projection")
+      val uniformTransformLocation = mgl.getUniformLocation(program, "transform")
 
       val vertexBuffer = mgl.createBuffer
+      val colorBuffer = mgl.createBuffer
       val indicesBuffer = mgl.createBuffer
 
-      val vertexBufferData = Macrogl.createFloatData(3 * 3)
-      vertexBufferData.put(-0.2f).put(-0.2f).put(0)
-      vertexBufferData.put(0.2f).put(-0.2f).put(0)
-      vertexBufferData.put(0).put(0.2f).put(0)
+      // position: 1 face (4 vertices)
+      val vertexBufferData = Macrogl.createFloatData(4 * 3)
+      vertexBufferData.put(-1f).put(-0.5f).put(0f)
+      vertexBufferData.put(1f).put(-0.5f).put(0f)
+      vertexBufferData.put(1f).put(0.5f).put(0f)
+      vertexBufferData.put(-1f).put(0.5f).put(0f)
       vertexBufferData.rewind
+      
+      // color: 1 face (4 vertices)
+      val colorBufferData = Macrogl.createFloatData(4 * 3)
+      colorBufferData.put(1f).put(0f).put(0f)
+      colorBufferData.put(0f).put(1f).put(0f)
+      colorBufferData.put(1f).put(0f).put(0f)
+      colorBufferData.put(0f).put(0f).put(1f)
+      colorBufferData.rewind
 
-      val indicesBufferData = Macrogl.createShortData(3 * 1)
+      // 1 faces = 2 triangles
+      val indicesBufferData = Macrogl.createShortData(2 * 3)
       indicesBufferData.put(0.toShort).put(1.toShort).put(2.toShort)
+      indicesBufferData.put(0.toShort).put(2.toShort).put(3.toShort)
       indicesBufferData.rewind
 
-      val colorData = Macrogl.createFloatData(3)
-      colorData.put(0).put(0).put(1)
-      colorData.rewind
-
+      // Fill the OpenGL buffers with the data
       mgl.bindBuffer(GL.ARRAY_BUFFER, vertexBuffer)
       mgl.bufferData(GL.ARRAY_BUFFER, vertexBufferData, GL.STATIC_DRAW)
       mgl.vertexAttribPointer(attribPosLocation, 3, GL.FLOAT, false, 0, 0)
+      
+      mgl.bindBuffer(GL.ARRAY_BUFFER, colorBuffer)
+      mgl.bufferData(GL.ARRAY_BUFFER, colorBufferData, GL.STATIC_DRAW)
+      mgl.vertexAttribPointer(attribColorLocation, 3, GL.FLOAT, false, 0, 0)
 
       mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indicesBuffer)
       mgl.bufferData(GL.ELEMENT_ARRAY_BUFFER, indicesBufferData, GL.STATIC_DRAW)
 
-      mgl.uniform3fv(uniformColorLocation, colorData)
-
-      mgl.clearColor(1, 0, 0, 1)
+      // Grey background
+      mgl.clearColor(0.5f, 0.5f, 0.5f, 1)
 
       mgl.enableVertexAttribArray(attribPosLocation)
+      mgl.enableVertexAttribArray(attribColorLocation)
+      
+      // Setup matrices
+      val projection = Matrix4.perspective3D(70f, 1280f/720f, 0.01f, 10f)
+      val transformStack = new MatrixStack(new Matrix4)
+      
+      // Send the projection to the shader (it will not change anymore)
+      mgl.uniformMatrix4f(uniformProjectionLocation, projection)
 
       print("Example ready")
       
@@ -106,21 +138,35 @@ class BasicProjection3D(print: String => Unit, systemUpdate: => Boolean, systemI
         continueCondition
       }
       
+      var currentRotation: Float = 0f
+      val rotationVelocity: Float = 90f
+      
       def render(fe: org.macrogl.FrameEvent): Unit = {
         //print("Elapsed seconds since last frame: " + fe.elapsedTime)
+        transformStack.push // Save the current transformation matrix
+        
+        // Anime the rotation using the data from the FrameEvent
+        currentRotation += rotationVelocity * fe.elapsedTime
+        
+        transformStack.current = Matrix4.translate3D(new Vector3(0, 0, -3)) * Matrix4.rotation3D(currentRotation, new Vector3(0, 1, 0))
+        // Send the current transformation to the shader
+        mgl.uniformMatrix4f(uniformTransformLocation, transformStack.current)
 
         mgl.clear(GL.COLOR_BUFFER_BIT)
         mgl.drawElements(GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
 
+        transformStack.pop // Restore the transformation matrix 
         continueCondition = systemUpdate
       }
       
       def close(): Unit = {
         print("Closing example")
         
+        mgl.disableVertexAttribArray(attribColorLocation)
         mgl.disableVertexAttribArray(attribPosLocation)
 
         mgl.deleteBuffer(indicesBuffer)
+        mgl.deleteBuffer(colorBuffer)
         mgl.deleteBuffer(vertexBuffer)
 
         mgl.deleteShader(vertex)
