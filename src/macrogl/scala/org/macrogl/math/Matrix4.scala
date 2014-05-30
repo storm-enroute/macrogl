@@ -1,8 +1,8 @@
 package org.macrogl.math
 
 class Matrix4 extends Matrix {
-  var m00, m11, m22, m33: Float = 1
-  var m01, m02, m03, m10, m12, m13, m20, m21, m23, m30, m31, m32: Float = 0
+  private var m00, m11, m22, m33: Float = 1
+  private var m01, m02, m03, m10, m12, m13, m20, m21, m23, m30, m31, m32: Float = 0
 
   def this(a00: Float, a01: Float, a02: Float, a03: Float, a10: Float, a11: Float, a12: Float, a13: Float, a20: Float, a21: Float, a22: Float, a23: Float, a30: Float, a31: Float, a32: Float, a33: Float) = {
     this()
@@ -528,40 +528,161 @@ object Matrix4 {
   }
 
   /**
-   * Generate the homogeneous rotation matrix for a given angle and a given unitary axis
+   * Generates the homogeneous rotation matrix for a given angle (in degrees) and a given unitary axis
+   * See: https://www.opengl.org/sdk/docs/man2/xhtml/glRotate.xml
    */
-  def rotation(angle: Float, axis: Vector3): Matrix4 = {
+  def rotation3D(angle: Float, axis: Vector3): Matrix4 = {
     val ret = new Matrix4
-    setRotation(angle, axis, ret)
+    setRotation3D(angle, axis, ret)
     ret
   }
-  
-  def setRotation(angle: Float, axis: Vector3, dst: Matrix4): Unit = {
-    val c = Math.cos(angle).toFloat
-    val s = Math.sin(angle).toFloat
+
+  def setRotation3D(angle: Float, axis: Vector3, dst: Matrix4): Unit = {
+    val radAngle = Utils.degToRad(angle)
+
+    val c = Math.cos(radAngle).toFloat
+    val s = Math.sin(radAngle).toFloat
 
     val x = axis.x
     val y = axis.y
     val z = axis.z
 
     dst.m00 = x * x * (1 - c) + c
-    dst.m01 = x * y * (1 - c) - z * s
-    dst.m02 = x * z * (1 - c) + y * s
-    dst.m03 = 0f
-
-    dst.m10 = y * x * (1 - c) + z * s
-    dst.m11 = y * y * (1 - c) + c
-    dst.m12 = y * z * (1 - c) - x * s
-    dst.m13 = 0f
-
-    dst.m20 = x * z * (1 - c) - y * s
-    dst.m21 = y * z * (1 - c) - x * s
-    dst.m22 = z * z * (1 - c) + c
-    dst.m23 = 0f
-
+    dst.m10 = x * y * (1 - c) - z * s
+    dst.m20 = x * z * (1 - c) + y * s
     dst.m30 = 0f
+
+    dst.m01 = y * x * (1 - c) + z * s
+    dst.m11 = y * y * (1 - c) + c
+    dst.m21 = y * z * (1 - c) - x * s
     dst.m31 = 0f
+
+    dst.m02 = x * z * (1 - c) - y * s
+    dst.m12 = y * z * (1 - c) + x * s
+    dst.m22 = z * z * (1 - c) + c
     dst.m32 = 0f
+
+    dst.m03 = 0f
+    dst.m13 = 0f
+    dst.m23 = 0f
     dst.m33 = 1f
+  }
+
+  /**
+   * Generates the homogeneous translation matrix for a given translation vector
+   * See: http://www.opengl.org/sdk/docs/man2/xhtml/glTranslate.xml
+   */
+  def translate3D(mov: Vector3): Matrix4 = {
+    val ret = new Matrix4
+    setTranslate3D(mov, ret)
+    ret
+  }
+
+  def setTranslate3D(mov: Vector3, dst: Matrix4): Unit = {
+    dst.m00 = 1f
+    dst.m10 = 0f
+    dst.m20 = 0f
+    dst.m30 = mov.x
+
+    dst.m01 = 0f
+    dst.m11 = 1f
+    dst.m21 = 0f
+    dst.m31 = mov.y
+
+    dst.m02 = 0f
+    dst.m12 = 0f
+    dst.m22 = 1f
+    dst.m32 = mov.z
+
+    dst.m03 = 0f
+    dst.m13 = 0f
+    dst.m23 = 0f
+    dst.m33 = 1f
+  }
+
+  /**
+   * Generates the homogeneous scaling matrix for a given scale vector
+   * See: https://www.opengl.org/sdk/docs/man2/xhtml/glScale.xml
+   */
+  def scale3D(scale: Vector3): Matrix4 = {
+    val ret = new Matrix4
+    setScale3D(scale, ret)
+    ret
+  }
+
+  def setScale3D(scale: Vector3, dst: Matrix4): Unit = {
+    dst.m00 = scale.x
+    dst.m10 = 0f
+    dst.m20 = 0f
+    dst.m30 = 0f
+
+    dst.m01 = 0f
+    dst.m11 = scale.y
+    dst.m21 = 0f
+    dst.m31 = 0f
+
+    dst.m02 = 0f
+    dst.m12 = 0f
+    dst.m22 = scale.z
+    dst.m32 = 0f
+
+    dst.m03 = 0f
+    dst.m13 = 0f
+    dst.m23 = 0f
+    dst.m33 = 1f
+  }
+
+  /**
+   * Generates the homogeneous projection matrix given the properties of the frustum
+   * See: http://www.opengl.org/sdk/docs/man2/xhtml/glFrustum.xml
+   */
+  def frustum3D(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float): Matrix4 = {
+    val ret = new Matrix4
+    setFrustum3D(left, right, bottom, top, near, far, ret)
+    ret
+  }
+
+  def setFrustum3D(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float, dst: Matrix4): Unit = {
+    val a = (right + left) / (right - left)
+    val b = (top + bottom) / (top - bottom)
+    val c = -(far + near) / (far - near)
+    val d = -(2 * far * near) / (far - near)
+
+    val e = (2 * near * far) / (right - left)
+    val f = (2 * near * far) / (top - bottom)
+
+    dst.m00 = e
+    dst.m10 = 0f
+    dst.m20 = a
+    dst.m30 = 0f
+
+    dst.m01 = 0f
+    dst.m11 = f
+    dst.m21 = b
+    dst.m31 = 0f
+
+    dst.m02 = 0f
+    dst.m12 = 0f
+    dst.m22 = c
+    dst.m32 = d
+
+    dst.m03 = 0f
+    dst.m13 = 0f
+    dst.m23 = -1f
+    dst.m33 = 0f
+  }
+  
+  /**
+   * Generates the homogeneous projection matrix given the basic properties of the frustum
+   * See: http://www.opengl.org/sdk/docs/man2/xhtml/gluPerspective.xml
+   */
+  def perspective3D(fovy: Float, aspect: Float, near: Float, far: Float): Matrix4 = {
+    val ret = new Matrix4
+    setPerspective3D(fovy, aspect, near, far, ret)
+    ret
+  }
+  
+  def setPerspective3D(fovy: Float, aspect: Float, near: Float, far: Float, dst: Matrix4): Unit = {
+    // TODO
   }
 }

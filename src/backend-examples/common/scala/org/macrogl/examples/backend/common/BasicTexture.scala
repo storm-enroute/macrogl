@@ -13,34 +13,6 @@ class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: 
     var funcs: Option[(() => Boolean, org.macrogl.FrameEvent => Unit, () => Unit)] = None
 
     def init(): Unit = {
-
-      val base = new Matrix4(1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, 1, 0,
-        0, 0, 0, 1)
-
-      val mul = new Matrix4(1, 0, 0, 0,
-        0, 2, 0, 0,
-        0, 0, 4, 0,
-        0, 0, 0, 1)
-
-      val stack = new MatrixStack[Matrix4](base)
-      print("" + stack.current)
-      stack.push
-      
-      stack.current *= mul
-      print("" + stack.current)
-      stack.push
-      
-      stack.current.invert
-      print("" + stack.current)
-      
-      stack.pop
-      print("" + stack.current)
-      
-      stack.pop
-      print("" + stack.current)
-
       print("Init example")
 
       val mgl = systemInit
@@ -71,6 +43,7 @@ class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: 
         }
         """
 
+      // Prepare the shader program
       val program = mgl.createProgram()
       val vertex = mgl.createShader(GL.VERTEX_SHADER)
       val fragment = mgl.createShader(GL.FRAGMENT_SHADER)
@@ -101,6 +74,7 @@ class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: 
 
       mgl.useProgram(program)
 
+      // Prepare the data to send to the GPU
       val attribPosLocation = mgl.getAttribLocation(program, "position")
       val attribCoordLocation = mgl.getAttribLocation(program, "texCoord")
       val uniformTexSamplerLocation = mgl.getUniformLocation(program, "texSampler")
@@ -110,10 +84,10 @@ class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: 
       val textureCoordBuffer = mgl.createBuffer
 
       val vertexBufferData = Macrogl.createFloatData(4 * 3) // 4 vertices (3 components each)
-      vertexBufferData.put(-0.2f).put(-0.35f).put(0)
-      vertexBufferData.put(0.2f).put(-0.35f).put(0)
-      vertexBufferData.put(0.2f).put(0.35f).put(0)
-      vertexBufferData.put(-0.2f).put(0.35f).put(0)
+      vertexBufferData.put(-0.4f).put(-0.25f).put(0)
+      vertexBufferData.put(0.4f).put(-0.25f).put(0)
+      vertexBufferData.put(0.4f).put(0.25f).put(0)
+      vertexBufferData.put(-0.4f).put(0.25f).put(0)
       vertexBufferData.rewind()
 
       val indicesBufferData = Macrogl.createShortData(2 * 3) // 2 triangles (3 vertices each)
@@ -138,7 +112,7 @@ class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: 
 
       mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indicesBuffer)
       mgl.bufferData(GL.ELEMENT_ARRAY_BUFFER, indicesBufferData, GL.STATIC_DRAW)
-
+      
       val texture = mgl.createTexture()
       mgl.activeTexture(GL.TEXTURE0)
       mgl.bindTexture(GL.TEXTURE_2D, texture)
@@ -151,11 +125,16 @@ class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: 
       // Not mandatory, but good to have
       mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE)
       mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE)
+      
+      // Enable transparency (looks better for textures that support it)
+      mgl.enable(GL.BLEND)
+      mgl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
 
+      // Load the texture
       var textureReady = false
-      org.macrogl.Utils.loadTexture2DFromResources("/org/macrogl/examples/backend/common/testTexture.jpg", texture, mgl, { textureReady = true; print("Texture ready"); true })
+      org.macrogl.Utils.loadTexture2DFromResources("/org/macrogl/examples/backend/common/macrogl.png", texture, mgl, { textureReady = true; print("Texture ready"); true })
 
-      mgl.clearColor(1, 0, 0, 1)
+      mgl.clearColor(0, 0, 1, 1)
 
       mgl.enableVertexAttribArray(attribPosLocation)
       mgl.enableVertexAttribArray(attribCoordLocation)

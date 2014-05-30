@@ -1,8 +1,8 @@
 package org.macrogl.math
 
 class Matrix2 extends Matrix {
-  var m00, m11: Float = 1
-  var m01, m10: Float = 0
+  private var m00, m11: Float = 1
+  private var m01, m10: Float = 0
 
   def this(a00: Float, a01: Float, a10: Float, a11: Float) = {
     this()
