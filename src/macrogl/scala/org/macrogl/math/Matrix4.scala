@@ -528,7 +528,7 @@ object Matrix4 {
   }
 
   /**
-   * Generates the homogeneous rotation matrix for a given angle (in degrees) and a given unitary axis
+   * Generates the homogeneous rotation matrix for a given angle (in degrees) and a given unitary axis around the origin
    * See: https://www.opengl.org/sdk/docs/man2/xhtml/glRotate.xml
    */
   def rotation3D(angle: Float, axis: Vector3): Matrix4 = {
@@ -601,7 +601,7 @@ object Matrix4 {
   }
 
   /**
-   * Generates the homogeneous scaling matrix for a given scale vector
+   * Generates the homogeneous scaling matrix for a given scale vector around the origin
    * See: https://www.opengl.org/sdk/docs/man2/xhtml/glScale.xml
    */
   def scale3D(scale: Vector3): Matrix4 = {
@@ -633,7 +633,7 @@ object Matrix4 {
   }
 
   /**
-   * Generates the homogeneous projection matrix given the properties of the frustum
+   * Generates the homogeneous projection matrix given the details of the perspective frustum
    * See: http://www.opengl.org/sdk/docs/man2/xhtml/glFrustum.xml
    */
   def frustum3D(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float): Matrix4 = {
@@ -673,7 +673,7 @@ object Matrix4 {
   }
   
   /**
-   * Generates the homogeneous projection matrix given the basic properties of the frustum
+   * Generates the homogeneous projection matrix given the basic properties of the perspective frustum (fovy in degrees)
    * See: http://www.opengl.org/sdk/docs/man2/xhtml/gluPerspective.xml
    */
   def perspective3D(fovy: Float, aspect: Float, near: Float, far: Float): Matrix4 = {
@@ -683,6 +683,59 @@ object Matrix4 {
   }
   
   def setPerspective3D(fovy: Float, aspect: Float, near: Float, far: Float, dst: Matrix4): Unit = {
-    // TODO
+    val fovyRad = Utils.degToRad(fovy)
+    val f = Utils.cotan(fovyRad/2).toFloat
+    
+    dst.m00 = f / aspect
+    dst.m10 = 0f
+    dst.m20 = 0f
+    dst.m30 = 0f
+
+    dst.m01 = 0f
+    dst.m11 = f
+    dst.m21 = 0f
+    dst.m31 = 0f
+
+    dst.m02 = 0f
+    dst.m12 = 0f
+    dst.m22 = (far + near) / (near - far)
+    dst.m32 = (2 * far * near) / (near - far)
+
+    dst.m03 = 0f
+    dst.m13 = 0f
+    dst.m23 = -1f
+    dst.m33 = 0f
+  }
+  
+  /**
+   * Generates the homogeneous projection matrix given the details of the orthographic projection
+   * See: http://www.opengl.org/sdk/docs/man2/xhtml/glOrtho.xml
+   */
+  def ortho3D(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float): Matrix4 = {
+    val ret = new Matrix4
+    setOrtho3D(left, right, bottom, top, near, far, ret)
+    ret
+  }
+  
+  def setOrtho3D(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float, dst: Matrix4): Unit = {
+    dst.m00 = 2 / (right - left)
+    dst.m10 = 0f
+    dst.m20 = 0f
+    dst.m30 = -(right + left) / (right - left)
+
+    dst.m01 = 0f
+    dst.m11 = 2 / (top - bottom)
+    dst.m21 = 0f
+    dst.m31 = -(top + bottom) / (top - bottom)
+
+    dst.m02 = 0f
+    dst.m12 = 0f
+    dst.m22 = -2 / (far - near)
+    dst.m32 = -(far + near) / (far - near)
+
+    dst.m03 = 0f
+    dst.m13 = 0f
+    dst.m23 = 0f
+    dst.m33 = 1f
   }
 }

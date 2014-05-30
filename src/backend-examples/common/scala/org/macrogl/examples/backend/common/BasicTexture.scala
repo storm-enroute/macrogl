@@ -90,6 +90,7 @@ class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: 
       vertexBufferData.put(-0.4f).put(0.25f).put(0)
       vertexBufferData.rewind()
 
+      // WebGL does not support INTEGER for index buffers, use SHORT instead if you want a portable behavior
       val indicesBufferData = Macrogl.createShortData(2 * 3) // 2 triangles (3 vertices each)
       indicesBufferData.put(0.toShort).put(1.toShort).put(2.toShort)
       indicesBufferData.put(0.toShort).put(2.toShort).put(3.toShort)
