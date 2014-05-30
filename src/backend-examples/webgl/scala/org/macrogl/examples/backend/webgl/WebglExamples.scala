@@ -31,7 +31,7 @@ object WebglExamples {
       // Nothing to do
     }
 
-    val example: DemoRenderable = new BasicTexture(myPrint, myUpdate, myInit, myClose)
+    val example: DemoRenderable = new BasicProjection3D(myPrint, myUpdate, myInit, myClose)
 
     example.start
   }

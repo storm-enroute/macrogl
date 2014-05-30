@@ -1,11 +1,10 @@
 package org.macrogl.examples.backend.lwjgl
 
 import org.lwjgl.opengl._
-
 import org.macrogl.Macrogl
 import org.macrogl.Utils
-
 import org.macrogl.examples.backend.common._
+import org.macrogl.examples.backend.common.BasicProjection3D
 
 object LwjglExamples {
   def main(args: Array[String]): Unit = {
@@ -29,7 +28,7 @@ object LwjglExamples {
       Display.destroy()
     }
 
-    val example: DemoRenderable = new BasicTexture(myPrint, myUpdate, myInit, myClose)
+    val example: DemoRenderable = new BasicProjection3D(myPrint, myUpdate, myInit, myClose)
 
     example.start
   }

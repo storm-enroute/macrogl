@@ -4,9 +4,9 @@ import org.macrogl.Utils
 import org.macrogl.Macrogl
 import org.macrogl.{ Macrogl => GL }
 
-class BasicTriangle(print: String => Unit, systemUpdate: => Boolean, systemInit: => Macrogl, systemClose: => Unit) extends DemoRenderable {
+class BasicProjection3D(print: String => Unit, systemUpdate: => Boolean, systemInit: => Macrogl, systemClose: => Unit) extends DemoRenderable {
   
-  class BasicTriangleListener extends org.macrogl.FrameListener {
+  class BasicProjection3DListener extends org.macrogl.FrameListener {
     // (continue, render, close)
     var funcs: Option[(() => Boolean, org.macrogl.FrameEvent => Unit, () => Unit)] = None
 
@@ -159,6 +159,6 @@ class BasicTriangle(print: String => Unit, systemUpdate: => Boolean, systemInit:
   }
 
   def start(): Unit = {
-    org.macrogl.Utils.startFrameListener(new BasicTriangleListener)
+    org.macrogl.Utils.startFrameListener(new BasicProjection3DListener)
   }
 }
