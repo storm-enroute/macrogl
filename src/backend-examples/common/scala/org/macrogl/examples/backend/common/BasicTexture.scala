@@ -14,7 +14,7 @@ class BasicTexture(print: String => Unit, systemUpdate: () => Boolean, systemIni
     var funcs: Option[(() => Boolean, org.macrogl.FrameEvent => Unit, () => Unit)] = None
 
     def init(): Unit = {
-      print("Init example")
+      print("Basic Texture: init")
 
       val mgl = systemInit()
 
@@ -133,14 +133,14 @@ class BasicTexture(print: String => Unit, systemUpdate: () => Boolean, systemIni
 
       // Load the texture
       var textureReady = false
-      org.macrogl.Utils.loadTexture2DFromResources("/org/macrogl/examples/backend/common/macrogl.png", texture, mgl, { textureReady = true; print("Texture ready"); true })
+      org.macrogl.Utils.loadTexture2DFromResources("/org/macrogl/examples/backend/common/macrogl.png", texture, mgl, { textureReady = true; print("Basic Texture: texture ready"); true })
 
       mgl.clearColor(0, 0, 1, 1)
 
       mgl.enableVertexAttribArray(attribPosLocation)
       mgl.enableVertexAttribArray(attribCoordLocation)
 
-      print("Example ready")
+      print("Basic Texture: ready")
 
       var continueCondition: Boolean = true
 
@@ -162,7 +162,7 @@ class BasicTexture(print: String => Unit, systemUpdate: () => Boolean, systemIni
       }
 
       def close(): Unit = {
-        print("Closing example")
+        print("Basic Texture: closing")
 
         mgl.disableVertexAttribArray(attribCoordLocation)
         mgl.disableVertexAttribArray(attribPosLocation)
@@ -178,28 +178,30 @@ class BasicTexture(print: String => Unit, systemUpdate: () => Boolean, systemIni
 
         systemClose()
 
-        print("Example closed")
+        print("Basic Texture: closed")
       }
 
       funcs = Some(continue, render, close)
     }
+    
+    val errMsg = "Basic Texture: not ready"
 
     def continue(): Boolean = {
       funcs match {
         case Some((continueFunc, _, _)) => continueFunc()
-        case None => throw new RuntimeException("Not ready")
+        case None => throw new RuntimeException(errMsg)
       }
     }
     def render(fe: org.macrogl.FrameEvent): Unit = {
       funcs match {
         case Some((_, renderFunc, _)) => renderFunc(fe)
-        case None => throw new RuntimeException("Not ready")
+        case None => throw new RuntimeException(errMsg)
       }
     }
     def close(): Unit = {
       funcs match {
         case Some((_, _, closeFunc)) => closeFunc()
-        case None => throw new RuntimeException("Not ready")
+        case None => throw new RuntimeException(errMsg)
       }
 
       funcs = None

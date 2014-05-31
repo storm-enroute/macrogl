@@ -14,7 +14,7 @@ class BasicProjection3D(print: String => Unit, systemUpdate: () => Boolean, syst
     var funcs: Option[(() => Boolean, org.macrogl.FrameEvent => Unit, () => Unit)] = None
 
     def init(): Unit = {
-      print("Init example")
+      print("Basic Projection3D: init")
 
       val mgl = systemInit()
 
@@ -128,7 +128,7 @@ class BasicProjection3D(print: String => Unit, systemUpdate: () => Boolean, syst
       val projection = Matrix4f.perspective3D(70f, 1280f / 720f, 0.01f, 10f)
       val transformStack = new MatrixStack(new Matrix4f)
 
-      print("Example ready")
+      print("Basic Projection3D: ready")
 
       var continueCondition: Boolean = true
 
@@ -163,7 +163,7 @@ class BasicProjection3D(print: String => Unit, systemUpdate: () => Boolean, syst
       }
 
       def close(): Unit = {
-        print("Closing example")
+        print("Basic Projection3D: closing")
 
         mgl.disableVertexAttribArray(attribColorLocation)
         mgl.disableVertexAttribArray(attribPosLocation)
@@ -179,28 +179,30 @@ class BasicProjection3D(print: String => Unit, systemUpdate: () => Boolean, syst
 
         systemClose()
 
-        print("Example closed")
+        print("Basic Projection3D: closed")
       }
 
       funcs = Some(continue, render, close)
     }
+    
+    val errMsg = "Basic Projection3D: not ready"
 
     def continue(): Boolean = {
       funcs match {
         case Some((continueFunc, _, _)) => continueFunc()
-        case None => throw new RuntimeException("Not ready")
+        case None => throw new RuntimeException(errMsg)
       }
     }
     def render(fe: org.macrogl.FrameEvent): Unit = {
       funcs match {
         case Some((_, renderFunc, _)) => renderFunc(fe)
-        case None => throw new RuntimeException("Not ready")
+        case None => throw new RuntimeException(errMsg)
       }
     }
     def close(): Unit = {
       funcs match {
         case Some((_, _, closeFunc)) => closeFunc()
-        case None => throw new RuntimeException("Not ready")
+        case None => throw new RuntimeException(errMsg)
       }
 
       funcs = None

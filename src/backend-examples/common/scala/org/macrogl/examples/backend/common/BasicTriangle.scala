@@ -12,7 +12,7 @@ class BasicTriangle(print: String => Unit, systemUpdate: () => Boolean, systemIn
     var funcs: Option[(() => Boolean, org.macrogl.FrameEvent => Unit, () => Unit)] = None
 
     def init(): Unit = {
-      print("Init example")
+      print("Basic Triangle: init")
 
       val mgl = systemInit()
 
@@ -95,7 +95,7 @@ class BasicTriangle(print: String => Unit, systemUpdate: () => Boolean, systemIn
 
       mgl.enableVertexAttribArray(attribPosLocation)
 
-      print("Example ready")
+      print("Basic Triangle: ready")
 
       var continueCondition: Boolean = true
 
@@ -115,7 +115,7 @@ class BasicTriangle(print: String => Unit, systemUpdate: () => Boolean, systemIn
       }
 
       def close(): Unit = {
-        print("Closing example")
+        print("Basic Triangle: closing")
 
         mgl.disableVertexAttribArray(attribPosLocation)
 
@@ -129,28 +129,30 @@ class BasicTriangle(print: String => Unit, systemUpdate: () => Boolean, systemIn
 
         systemClose()
 
-        print("Example closed")
+        print("Basic Triangle: closed")
       }
 
       funcs = Some(continue, render, close)
     }
+    
+    val errMsg = "Basic Triangle: not ready"
 
     def continue(): Boolean = {
       funcs match {
         case Some((continueFunc, _, _)) => continueFunc()
-        case None => throw new RuntimeException("Not ready")
+        case None => throw new RuntimeException(errMsg)
       }
     }
     def render(fe: org.macrogl.FrameEvent): Unit = {
       funcs match {
         case Some((_, renderFunc, _)) => renderFunc(fe)
-        case None => throw new RuntimeException("Not ready")
+        case None => throw new RuntimeException(errMsg)
       }
     }
     def close(): Unit = {
       funcs match {
         case Some((_, _, closeFunc)) => closeFunc()
-        case None => throw new RuntimeException("Not ready")
+        case None => throw new RuntimeException(errMsg)
       }
 
       funcs = None
