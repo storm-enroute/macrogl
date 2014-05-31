@@ -124,7 +124,7 @@ class Vector2f extends Vector {
   }
 
   override def toString = {
-    "Vector2ff[" + x + ", " + y + "]"
+    "Vector2f[" + x + ", " + y + "]"
   }
   
   override def equals(obj: Any): Boolean = {

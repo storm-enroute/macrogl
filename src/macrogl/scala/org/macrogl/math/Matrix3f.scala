@@ -246,6 +246,12 @@ class Matrix3f extends Matrix {
     Matrix3f.mult(this, v, ret)
     ret
   }
+  
+  def transform(v: Vector3f): Vector3f = {
+    val ret = new Vector3f
+    Matrix3f.mult(this, v, ret)
+    ret
+  }
 
   override def toString: String = {
     var sb = ""

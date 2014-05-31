@@ -146,7 +146,7 @@ class Vector3f extends Vector {
   }
   
   override def toString = {
-    "Vector3ff[" + x + ", " + y + ", " + z + "]"
+    "Vector3f[" + x + ", " + y + ", " + z + "]"
   }
   
   override def equals(obj: Any): Boolean = {
