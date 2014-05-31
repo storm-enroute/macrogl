@@ -862,22 +862,22 @@ class Macrogl () {
   final def uniformMatrix2f(location: Token.UniformLocation, mat: org.macrogl.math.Matrix2f): Unit = {
     this.tmpFloat.clear()
     mat.store(this.tmpFloat, org.macrogl.math.ColumnMajor)
-    this.tmpFloat.rewind()
-    this.uniformMatrix2fv(location, false, this.tmpFloat)
+    this.tmpFloat.flip()
+    this.uniformMatrix2fv(location, false, this.tmpFloat.slice)
   }
   
   final def uniformMatrix3f(location: Token.UniformLocation, mat: org.macrogl.math.Matrix3f): Unit = {
     this.tmpFloat.clear()
     mat.store(this.tmpFloat, org.macrogl.math.ColumnMajor)
-    this.tmpFloat.rewind()
-    this.uniformMatrix3fv(location, false, this.tmpFloat)
+    this.tmpFloat.flip()
+    this.uniformMatrix3fv(location, false, this.tmpFloat.slice)
   }
   
   final def uniformMatrix4f(location: Token.UniformLocation, mat: org.macrogl.math.Matrix4f): Unit = {
     this.tmpFloat.clear()
     mat.store(this.tmpFloat, org.macrogl.math.ColumnMajor)
-    this.tmpFloat.rewind()
-    this.uniformMatrix4fv(location, false, this.tmpFloat)
+    this.tmpFloat.flip()
+    this.uniformMatrix4fv(location, false, this.tmpFloat.slice)
   }
 }
 
