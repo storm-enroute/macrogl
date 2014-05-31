@@ -12,25 +12,29 @@ import org.macrogl.examples.backend.common._
 object WebglExamples {
   @JSExport
   def main(): Unit = {
+    org.macrogl.Utils.WebGLSettings.setResourcePath("./target/scala-2.11/classes")
+
     macroGLTest()
   }
 
   def macroGLTest(): Unit = {
-    org.macrogl.Utils.WebGLSettings.setResourcePath("./target/scala-2.11/classes")
-
     def myPrint(msg: String): Unit = g.console.log(msg)
     def myUpdate(): Boolean = true
-    def myInit(): Macrogl = {
-      val canvas = g.document.getElementById("playground-canvas")
-      val gl = canvas.getContext("webgl").asInstanceOf[dom.WebGLRenderingContext]
-      new Macrogl()(gl)
-    }
     def myClose(): Unit = {
       // Nothing to do
     }
+    def customInit(canvasName: String): () => Macrogl = {
+      def myInit(): Macrogl = {
+        val canvas = g.document.getElementById(canvasName)
+        val gl = canvas.getContext("webgl").asInstanceOf[dom.WebGLRenderingContext]
+        new Macrogl()(gl)
+      }
+      
+      myInit _
+    }
 
-    val example: DemoRenderable = new BasicProjection3D(myPrint, myUpdate, myInit, myClose)
-
-    example.start
+    new BasicTriangle(myPrint, myUpdate, customInit("canvas-triangle"), myClose).start()
+    new BasicTexture(myPrint, myUpdate, customInit("canvas-texture"), myClose).start()
+    new BasicProjection3D(myPrint, myUpdate, customInit("canvas-projection"), myClose).start()
   }
 }

@@ -6,7 +6,7 @@ import org.macrogl.{ Macrogl => GL }
 
 import org.macrogl.math._
 
-class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: => Macrogl, systemClose: => Unit)
+class BasicTexture(print: String => Unit, systemUpdate: () => Boolean, systemInit: () => Macrogl, systemClose: () => Unit)
   extends DemoRenderable {
 
   class BasicTextureListener extends org.macrogl.FrameListener {
@@ -16,7 +16,7 @@ class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: 
     def init(): Unit = {
       print("Init example")
 
-      val mgl = systemInit
+      val mgl = systemInit()
 
       val vertexSource = """
         attribute vec3 position;
@@ -118,7 +118,6 @@ class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: 
       val texture = mgl.createTexture()
       mgl.activeTexture(GL.TEXTURE0)
       mgl.bindTexture(GL.TEXTURE_2D, texture)
-      mgl.uniform1i(uniformTexSamplerLocation, 0)
 
       // Be careful about WebGL and textures: http://www.khronos.org/webgl/wiki/WebGL_and_OpenGL_Differences
       mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR)
@@ -153,11 +152,13 @@ class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: 
         //print("Elapsed seconds since last frame: " + fe.elapsedTime)
 
         mgl.clear(GL.COLOR_BUFFER_BIT)
+        mgl.uniform1i(uniformTexSamplerLocation, 0)
+        
         //if (textureReady) {
         mgl.drawElements(GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
         //}
 
-        continueCondition = systemUpdate
+        continueCondition = systemUpdate()
       }
 
       def close(): Unit = {
@@ -175,7 +176,7 @@ class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: 
 
         mgl.deleteProgram(program)
 
-        systemClose
+        systemClose()
 
         print("Example closed")
       }

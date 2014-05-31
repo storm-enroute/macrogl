@@ -6,7 +6,7 @@ import org.macrogl.{ Macrogl => GL }
 
 import org.macrogl.math._
 
-class BasicProjection3D(print: String => Unit, systemUpdate: => Boolean, systemInit: => Macrogl, systemClose: => Unit)
+class BasicProjection3D(print: String => Unit, systemUpdate: () => Boolean, systemInit: () => Macrogl, systemClose: () => Unit)
   extends DemoRenderable {
 
   class BasicProjection3DListener extends org.macrogl.FrameListener {
@@ -16,7 +16,7 @@ class BasicProjection3D(print: String => Unit, systemUpdate: => Boolean, systemI
     def init(): Unit = {
       print("Init example")
 
-      val mgl = systemInit
+      val mgl = systemInit()
 
       val vertexSource = """
         uniform mat4 projection;
@@ -128,9 +128,6 @@ class BasicProjection3D(print: String => Unit, systemUpdate: => Boolean, systemI
       val projection = Matrix4f.perspective3D(70f, 1280f / 720f, 0.01f, 10f)
       val transformStack = new MatrixStack(new Matrix4f)
 
-      // Send the projection to the shader (it will not change anymore)
-      mgl.uniformMatrix4f(uniformProjectionLocation, projection)
-
       print("Example ready")
 
       var continueCondition: Boolean = true
@@ -155,11 +152,14 @@ class BasicProjection3D(print: String => Unit, systemUpdate: => Boolean, systemI
         // Send the current transformation to the shader
         mgl.uniformMatrix4f(uniformTransformLocation, transformStack.current)
 
+        // Send the projection to the shader
+        mgl.uniformMatrix4f(uniformProjectionLocation, projection)
+
         mgl.clear(GL.COLOR_BUFFER_BIT)
         mgl.drawElements(GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
 
         transformStack.pop // Restore the transformation matrix 
-        continueCondition = systemUpdate
+        continueCondition = systemUpdate()
       }
 
       def close(): Unit = {
@@ -177,7 +177,7 @@ class BasicProjection3D(print: String => Unit, systemUpdate: => Boolean, systemI
 
         mgl.deleteProgram(program)
 
-        systemClose
+        systemClose()
 
         print("Example closed")
       }

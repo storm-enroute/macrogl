@@ -4,7 +4,7 @@ import org.macrogl.Utils
 import org.macrogl.Macrogl
 import org.macrogl.{ Macrogl => GL }
 
-class BasicTriangle(print: String => Unit, systemUpdate: => Boolean, systemInit: => Macrogl, systemClose: => Unit)
+class BasicTriangle(print: String => Unit, systemUpdate: () => Boolean, systemInit: () => Macrogl, systemClose: () => Unit)
   extends DemoRenderable {
 
   class BasicTriangleListener extends org.macrogl.FrameListener {
@@ -14,7 +14,7 @@ class BasicTriangle(print: String => Unit, systemUpdate: => Boolean, systemInit:
     def init(): Unit = {
       print("Init example")
 
-      val mgl = systemInit
+      val mgl = systemInit()
 
       val vertexSource = """
         attribute vec3 position;
@@ -82,9 +82,7 @@ class BasicTriangle(print: String => Unit, systemUpdate: => Boolean, systemInit:
       indicesBufferData.put(0.toShort).put(1.toShort).put(2.toShort)
       indicesBufferData.rewind
 
-      val colorData = Macrogl.createFloatData(3)
-      colorData.put(0).put(0).put(1)
-      colorData.rewind
+      val color = new org.macrogl.math.Vector3f(0, 0, 1)
 
       mgl.bindBuffer(GL.ARRAY_BUFFER, vertexBuffer)
       mgl.bufferData(GL.ARRAY_BUFFER, vertexBufferData, GL.STATIC_DRAW)
@@ -92,8 +90,6 @@ class BasicTriangle(print: String => Unit, systemUpdate: => Boolean, systemInit:
 
       mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indicesBuffer)
       mgl.bufferData(GL.ELEMENT_ARRAY_BUFFER, indicesBufferData, GL.STATIC_DRAW)
-
-      mgl.uniform3fv(uniformColorLocation, colorData)
 
       mgl.clearColor(1, 0, 0, 1)
 
@@ -111,9 +107,11 @@ class BasicTriangle(print: String => Unit, systemUpdate: => Boolean, systemInit:
         //print("Elapsed seconds since last frame: " + fe.elapsedTime)
 
         mgl.clear(GL.COLOR_BUFFER_BIT)
+        mgl.uniform3f(uniformColorLocation, color)
+        
         mgl.drawElements(GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
 
-        continueCondition = systemUpdate
+        continueCondition = systemUpdate()
       }
 
       def close(): Unit = {
@@ -129,7 +127,7 @@ class BasicTriangle(print: String => Unit, systemUpdate: => Boolean, systemInit:
 
         mgl.deleteProgram(program)
 
-        systemClose
+        systemClose()
 
         print("Example closed")
       }
