@@ -6,7 +6,8 @@ import org.macrogl.{ Macrogl => GL }
 
 import org.macrogl.math._
 
-class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: => Macrogl, systemClose: => Unit) extends DemoRenderable {
+class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: => Macrogl, systemClose: => Unit)
+  extends DemoRenderable {
 
   class BasicTextureListener extends org.macrogl.FrameListener {
     // (continue, render, close)
@@ -113,7 +114,7 @@ class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: 
 
       mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indicesBuffer)
       mgl.bufferData(GL.ELEMENT_ARRAY_BUFFER, indicesBufferData, GL.STATIC_DRAW)
-      
+
       val texture = mgl.createTexture()
       mgl.activeTexture(GL.TEXTURE0)
       mgl.bindTexture(GL.TEXTURE_2D, texture)
@@ -126,7 +127,7 @@ class BasicTexture(print: String => Unit, systemUpdate: => Boolean, systemInit: 
       // Not mandatory, but good to have
       mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE)
       mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE)
-      
+
       // Enable transparency (looks better for textures that support it)
       mgl.enable(GL.BLEND)
       mgl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)

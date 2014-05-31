@@ -6,15 +6,16 @@ import org.macrogl.{ Macrogl => GL }
 
 import org.macrogl.math._
 
-class BasicProjection3D(print: String => Unit, systemUpdate: => Boolean, systemInit: => Macrogl, systemClose: => Unit) extends DemoRenderable {
-  
+class BasicProjection3D(print: String => Unit, systemUpdate: => Boolean, systemInit: => Macrogl, systemClose: => Unit)
+  extends DemoRenderable {
+
   class BasicProjection3DListener extends org.macrogl.FrameListener {
     // (continue, render, close)
     var funcs: Option[(() => Boolean, org.macrogl.FrameEvent => Unit, () => Unit)] = None
 
     def init(): Unit = {
       print("Init example")
-      
+
       val mgl = systemInit
 
       val vertexSource = """
@@ -90,7 +91,7 @@ class BasicProjection3D(print: String => Unit, systemUpdate: => Boolean, systemI
       vertexBufferData.put(1f).put(0.5f).put(0f)
       vertexBufferData.put(-1f).put(0.5f).put(0f)
       vertexBufferData.rewind
-      
+
       // color: 1 face (4 vertices)
       val colorBufferData = Macrogl.createFloatData(4 * 3)
       colorBufferData.put(1f).put(0f).put(0f)
@@ -109,7 +110,7 @@ class BasicProjection3D(print: String => Unit, systemUpdate: => Boolean, systemI
       mgl.bindBuffer(GL.ARRAY_BUFFER, vertexBuffer)
       mgl.bufferData(GL.ARRAY_BUFFER, vertexBufferData, GL.STATIC_DRAW)
       mgl.vertexAttribPointer(attribPosLocation, 3, GL.FLOAT, false, 0, 0)
-      
+
       mgl.bindBuffer(GL.ARRAY_BUFFER, colorBuffer)
       mgl.bufferData(GL.ARRAY_BUFFER, colorBufferData, GL.STATIC_DRAW)
       mgl.vertexAttribPointer(attribColorLocation, 3, GL.FLOAT, false, 0, 0)
@@ -122,33 +123,35 @@ class BasicProjection3D(print: String => Unit, systemUpdate: => Boolean, systemI
 
       mgl.enableVertexAttribArray(attribPosLocation)
       mgl.enableVertexAttribArray(attribColorLocation)
-      
+
       // Setup matrices
-      val projection = Matrix4f.perspective3D(70f, 1280f/720f, 0.01f, 10f)
+      val projection = Matrix4f.perspective3D(70f, 1280f / 720f, 0.01f, 10f)
       val transformStack = new MatrixStack(new Matrix4f)
-      
+
       // Send the projection to the shader (it will not change anymore)
       mgl.uniformMatrix4f(uniformProjectionLocation, projection)
 
       print("Example ready")
-      
+
       var continueCondition: Boolean = true
-      
+
       def continue(): Boolean = {
         continueCondition
       }
-      
+
       var currentRotation: Float = 0f
       val rotationVelocity: Float = 90f
-      
+
       def render(fe: org.macrogl.FrameEvent): Unit = {
         //print("Elapsed seconds since last frame: " + fe.elapsedTime)
         transformStack.push // Save the current transformation matrix
-        
+
         // Anime the rotation using the data from the FrameEvent
         currentRotation += rotationVelocity * fe.elapsedTime
-        
-        transformStack.current = Matrix4f.translate3D(new Vector3f(0, 0, -3)) * Matrix4f.rotation3D(currentRotation, new Vector3f(0, 1, 0))
+
+        transformStack.current = Matrix4f.translate3D(new Vector3f(0, 0, -3)) *
+          Matrix4f.rotation3D(currentRotation, new Vector3f(0, 1, 0))
+
         // Send the current transformation to the shader
         mgl.uniformMatrix4f(uniformTransformLocation, transformStack.current)
 
@@ -158,10 +161,10 @@ class BasicProjection3D(print: String => Unit, systemUpdate: => Boolean, systemI
         transformStack.pop // Restore the transformation matrix 
         continueCondition = systemUpdate
       }
-      
+
       def close(): Unit = {
         print("Closing example")
-        
+
         mgl.disableVertexAttribArray(attribColorLocation)
         mgl.disableVertexAttribArray(attribPosLocation)
 
@@ -175,13 +178,13 @@ class BasicProjection3D(print: String => Unit, systemUpdate: => Boolean, systemI
         mgl.deleteProgram(program)
 
         systemClose
-        
+
         print("Example closed")
       }
-      
+
       funcs = Some(continue, render, close)
     }
-    
+
     def continue(): Boolean = {
       funcs match {
         case Some((continueFunc, _, _)) => continueFunc()

@@ -4,15 +4,16 @@ import org.macrogl.Utils
 import org.macrogl.Macrogl
 import org.macrogl.{ Macrogl => GL }
 
-class BasicTriangle(print: String => Unit, systemUpdate: => Boolean, systemInit: => Macrogl, systemClose: => Unit) extends DemoRenderable {
-  
+class BasicTriangle(print: String => Unit, systemUpdate: => Boolean, systemInit: => Macrogl, systemClose: => Unit)
+  extends DemoRenderable {
+
   class BasicTriangleListener extends org.macrogl.FrameListener {
     // (continue, render, close)
     var funcs: Option[(() => Boolean, org.macrogl.FrameEvent => Unit, () => Unit)] = None
 
     def init(): Unit = {
       print("Init example")
-      
+
       val mgl = systemInit
 
       val vertexSource = """
@@ -99,13 +100,13 @@ class BasicTriangle(print: String => Unit, systemUpdate: => Boolean, systemInit:
       mgl.enableVertexAttribArray(attribPosLocation)
 
       print("Example ready")
-      
+
       var continueCondition: Boolean = true
-      
+
       def continue(): Boolean = {
         continueCondition
       }
-      
+
       def render(fe: org.macrogl.FrameEvent): Unit = {
         //print("Elapsed seconds since last frame: " + fe.elapsedTime)
 
@@ -114,10 +115,10 @@ class BasicTriangle(print: String => Unit, systemUpdate: => Boolean, systemInit:
 
         continueCondition = systemUpdate
       }
-      
+
       def close(): Unit = {
         print("Closing example")
-        
+
         mgl.disableVertexAttribArray(attribPosLocation)
 
         mgl.deleteBuffer(indicesBuffer)
@@ -129,13 +130,13 @@ class BasicTriangle(print: String => Unit, systemUpdate: => Boolean, systemInit:
         mgl.deleteProgram(program)
 
         systemClose
-        
+
         print("Example closed")
       }
-      
+
       funcs = Some(continue, render, close)
     }
-    
+
     def continue(): Boolean = {
       funcs match {
         case Some((continueFunc, _, _)) => continueFunc()

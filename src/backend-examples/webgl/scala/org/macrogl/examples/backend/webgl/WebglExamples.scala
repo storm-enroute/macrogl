@@ -6,7 +6,6 @@ import js.annotation.JSExport
 import org.scalajs.dom
 
 import org.macrogl.Macrogl
-
 import org.macrogl.examples.backend.common._
 
 @JSExport
@@ -18,7 +17,7 @@ object WebglExamples {
 
   def macroGLTest(): Unit = {
     org.macrogl.Utils.WebGLSettings.setResourcePath("./target/scala-2.11/classes")
-    
+
     def myPrint(msg: String): Unit = g.console.log(msg)
     def myUpdate(): Boolean = true
     def myInit(): Macrogl = {

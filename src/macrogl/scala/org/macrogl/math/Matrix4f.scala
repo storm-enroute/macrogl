@@ -7,7 +7,10 @@ class Matrix4f extends Matrix {
   private var m00, m11, m22, m33: Float = 1
   private var m01, m02, m03, m10, m12, m13, m20, m21, m23, m30, m31, m32: Float = 0
 
-  def this(a00: Float, a01: Float, a02: Float, a03: Float, a10: Float, a11: Float, a12: Float, a13: Float, a20: Float, a21: Float, a22: Float, a23: Float, a30: Float, a31: Float, a32: Float, a33: Float) = {
+  def this(a00: Float, a01: Float, a02: Float, a03: Float,
+    a10: Float, a11: Float, a12: Float, a13: Float,
+    a20: Float, a21: Float, a22: Float, a23: Float,
+    a30: Float, a31: Float, a32: Float, a33: Float) = {
     this()
     // Internally stored as Column-major
     m00 = a00
@@ -295,7 +298,7 @@ class Matrix4f extends Matrix {
     Matrix4f.mult(this, m, this)
     this
   }
-  
+
   def *(v: Float): Matrix4f = {
     val ret = new Matrix4f
     Matrix4f.mult(this, v, ret)
@@ -332,36 +335,36 @@ class Matrix4f extends Matrix {
     sb += m03 + " " + m13 + " " + m23 + " " + m33 + "\n"
     sb
   }
-  
+
   override def equals(obj: Any): Boolean = {
-    if(obj == null) false
-    if(!obj.isInstanceOf[Matrix4f]) false
-    
+    if (obj == null) false
+    if (!obj.isInstanceOf[Matrix4f]) false
+
     val o = obj.asInstanceOf[Matrix4f]
-    
+
     m00 == o.m00 &&
-    m01 == o.m01 &&
-    m02 == o.m02 &&
-    m03 == o.m03 &&
-    m10 == o.m10 &&
-    m11 == o.m11 &&
-    m12 == o.m12 &&
-    m13 == o.m13 &&
-    m20 == o.m20 &&
-    m21 == o.m21 &&
-    m22 == o.m22 &&
-    m23 == o.m23 &&
-    m30 == o.m30 &&
-    m31 == o.m31 &&
-    m32 == o.m32 &&
-    m33 == o.m33
+      m01 == o.m01 &&
+      m02 == o.m02 &&
+      m03 == o.m03 &&
+      m10 == o.m10 &&
+      m11 == o.m11 &&
+      m12 == o.m12 &&
+      m13 == o.m13 &&
+      m20 == o.m20 &&
+      m21 == o.m21 &&
+      m22 == o.m22 &&
+      m23 == o.m23 &&
+      m30 == o.m30 &&
+      m31 == o.m31 &&
+      m32 == o.m32 &&
+      m33 == o.m33
   }
-  
+
   override def hashCode(): Int = {
     m00.toInt ^ m01.toInt ^ m02.toInt ^ m03.toInt ^
-    m10.toInt ^ m11.toInt ^ m12.toInt ^ m13.toInt ^
-    m20.toInt ^ m21.toInt ^ m22.toInt ^ m23.toInt ^
-    m30.toInt ^ m31.toInt ^ m32.toInt ^ m33.toInt
+      m10.toInt ^ m11.toInt ^ m12.toInt ^ m13.toInt ^
+      m20.toInt ^ m21.toInt ^ m22.toInt ^ m23.toInt ^
+      m30.toInt ^ m31.toInt ^ m32.toInt ^ m33.toInt
   }
 }
 
@@ -410,7 +413,9 @@ object Matrix4f {
     dst.m33 = -src.m33
   }
 
-  private def determinant3x3(t00: Float, t01: Float, t02: Float, t10: Float, t11: Float, t12: Float, t20: Float, t21: Float, t22: Float): Float = {
+  private def determinant3x3(t00: Float, t01: Float, t02: Float,
+    t10: Float, t11: Float, t12: Float,
+    t20: Float, t21: Float, t22: Float): Float = {
     t00 * (t11 * t22 - t12 * t21) + t01 * (t12 * t20 - t10 * t22) + t02 * (t10 * t21 - t11 * t20)
   }
 
@@ -582,7 +587,7 @@ object Matrix4f {
     dst.z = z
     dst.w = w
   }
-  
+
   def mult(left: Matrix4f, right: Float, dst: Matrix4f): Unit = {
     dst.m00 = left.m00 * right
     dst.m01 = left.m01 * right
@@ -598,7 +603,7 @@ object Matrix4f {
     dst.m21 = left.m21 * right
     dst.m22 = left.m22 * right
     dst.m23 = left.m23 * right
-    
+
     dst.m30 = left.m30 * right
     dst.m31 = left.m31 * right
     dst.m32 = left.m32 * right
@@ -620,7 +625,7 @@ object Matrix4f {
     dst.m21 = left.m21 / right
     dst.m22 = left.m22 / right
     dst.m23 = left.m23 / right
-    
+
     dst.m30 = left.m30 / right
     dst.m31 = left.m31 / right
     dst.m32 = left.m32 / right
@@ -771,7 +776,7 @@ object Matrix4f {
     dst.m23 = -1f
     dst.m33 = 0f
   }
-  
+
   /**
    * Generates the homogeneous projection matrix given the basic properties of the perspective frustum (fovy in degrees)
    * See: http://www.opengl.org/sdk/docs/man2/xhtml/gluPerspective.xml
@@ -781,11 +786,11 @@ object Matrix4f {
     setPerspective3D(fovy, aspect, near, far, ret)
     ret
   }
-  
+
   def setPerspective3D(fovy: Float, aspect: Float, near: Float, far: Float, dst: Matrix4f): Unit = {
     val fovyRad = Utils.degToRad(fovy)
-    val f = Utils.cotan(fovyRad/2).toFloat
-    
+    val f = Utils.cotan(fovyRad / 2).toFloat
+
     dst.m00 = f / aspect
     dst.m10 = 0f
     dst.m20 = 0f
@@ -806,7 +811,7 @@ object Matrix4f {
     dst.m23 = -1f
     dst.m33 = 0f
   }
-  
+
   /**
    * Generates the homogeneous projection matrix given the details of the orthographic projection
    * See: http://www.opengl.org/sdk/docs/man2/xhtml/glOrtho.xml
@@ -816,7 +821,7 @@ object Matrix4f {
     setOrtho3D(left, right, bottom, top, near, far, ret)
     ret
   }
-  
+
   def setOrtho3D(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float, dst: Matrix4f): Unit = {
     dst.m00 = 2 / (right - left)
     dst.m10 = 0f
