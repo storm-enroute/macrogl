@@ -296,4 +296,43 @@ object Matrix2f {
     dst.m10 = left.m10 / right
     dst.m11 = left.m11 / right
   }
+  
+  /**
+   * Generates the non-homogeneous rotation matrix for a given angle (in degrees) around the origin
+   */
+  def rotation2D(angle: Float): Matrix2f = {
+    val ret = new Matrix2f
+    setRotation2D(angle, ret)
+    ret
+  }
+
+  def setRotation2D(angle: Float, dst: Matrix2f): Unit = {
+    val radAngle = Utils.degToRad(angle)
+
+    val c = Math.cos(radAngle).toFloat
+    val s = Math.sin(radAngle).toFloat
+
+    dst.m00 = c
+    dst.m10 = -s
+
+    dst.m01 = s
+    dst.m11 = c
+  }
+
+  /**
+   * Generates the non-homogeneous scaling matrix for a given scale vector around the origin
+   */
+  def scale2D(scale: Vector2f): Matrix2f = {
+    val ret = new Matrix2f
+    setScale2D(scale, ret)
+    ret
+  }
+
+  def setScale2D(scale: Vector2f, dst: Matrix2f): Unit = {
+    dst.m00 = scale.x
+    dst.m10 = 0f
+
+    dst.m01 = 0f
+    dst.m11 = scale.y
+  }
 }

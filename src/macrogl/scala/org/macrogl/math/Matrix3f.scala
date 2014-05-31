@@ -441,4 +441,133 @@ object Matrix3f {
     dst.m21 = left.m21 / right
     dst.m22 = left.m22 / right
   }
+  
+  /**
+   * Generates the homogeneous rotation matrix for a given angle (in degrees) around the origin
+   */
+  def rotation2D(angle: Float): Matrix3f = {
+    val ret = new Matrix3f
+    setRotation2D(angle, ret)
+    ret
+  }
+
+  def setRotation2D(angle: Float, dst: Matrix3f): Unit = {
+    val radAngle = Utils.degToRad(angle)
+
+    val c = Math.cos(radAngle).toFloat
+    val s = Math.sin(radAngle).toFloat
+
+    dst.m00 = c
+    dst.m10 = -s
+    dst.m20 = 0f
+
+    dst.m01 = s
+    dst.m11 = c
+    dst.m21 = 0f
+
+    dst.m02 = 0f
+    dst.m12 = 0f
+    dst.m22 = 1f
+  }
+
+  /**
+   * Generates the homogeneous translation matrix for a given translation vector
+   */
+  def translate2D(mov: Vector2f): Matrix3f = {
+    val ret = new Matrix3f
+    setTranslate2D(mov, ret)
+    ret
+  }
+
+  def setTranslate2D(mov: Vector2f, dst: Matrix3f): Unit = {
+    dst.m00 = 1f
+    dst.m10 = 0f
+    dst.m20 = mov.x
+
+    dst.m01 = 0f
+    dst.m11 = 1f
+    dst.m21 = mov.y
+
+    dst.m02 = 0f
+    dst.m12 = 0f
+    dst.m22 = 1f
+  }
+
+  /**
+   * Generates the homogeneous scaling matrix for a given scale vector around the origin
+   */
+  def scale2D(scale: Vector2f): Matrix3f = {
+    val ret = new Matrix3f
+    setScale2D(scale, ret)
+    ret
+  }
+
+  def setScale2D(scale: Vector2f, dst: Matrix3f): Unit = {
+    dst.m00 = scale.x
+    dst.m10 = 0f
+    dst.m20 = 0f
+
+    dst.m01 = 0f
+    dst.m11 = scale.y
+    dst.m21 = 0f
+
+    dst.m02 = 0f
+    dst.m12 = 0f
+    dst.m22 = 1f
+  }
+  
+  /**
+   * Generates the non-homogeneous rotation matrix for a given angle (in degrees) and a given unitary axis around the origin
+   */
+  def rotation3D(angle: Float, axis: Vector3f): Matrix3f = {
+    val ret = new Matrix3f
+    setRotation3D(angle, axis, ret)
+    ret
+  }
+
+  def setRotation3D(angle: Float, axis: Vector3f, dst: Matrix3f): Unit = {
+    val radAngle = Utils.degToRad(angle)
+
+    val c = Math.cos(radAngle).toFloat
+    val s = Math.sin(radAngle).toFloat
+
+    val x = axis.x
+    val y = axis.y
+    val z = axis.z
+
+    dst.m00 = x * x * (1 - c) + c
+    dst.m10 = x * y * (1 - c) - z * s
+    dst.m20 = x * z * (1 - c) + y * s
+
+    dst.m01 = y * x * (1 - c) + z * s
+    dst.m11 = y * y * (1 - c) + c
+    dst.m21 = y * z * (1 - c) - x * s
+
+    dst.m02 = x * z * (1 - c) - y * s
+    dst.m12 = y * z * (1 - c) + x * s
+    dst.m22 = z * z * (1 - c) + c
+  }
+
+  /**
+   * Generates the non-homogeneous scaling matrix for a given scale vector around the origin
+   */
+  def scale3D(scale: Vector3f): Matrix3f = {
+    val ret = new Matrix3f
+    setScale3D(scale, ret)
+    ret
+  }
+
+  def setScale3D(scale: Vector3f, dst: Matrix3f): Unit = {
+    dst.m00 = scale.x
+    dst.m10 = 0f
+    dst.m20 = 0f
+
+    dst.m01 = 0f
+    dst.m11 = scale.y
+    dst.m21 = 0f
+
+    dst.m02 = 0f
+    dst.m12 = 0f
+    dst.m22 = scale.z
+  }
 }
