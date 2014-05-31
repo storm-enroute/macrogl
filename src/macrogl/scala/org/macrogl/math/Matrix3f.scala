@@ -1,5 +1,8 @@
 package org.macrogl.math
 
+/**
+ * Ported from LWJGL source code
+ */
 class Matrix3f extends Matrix {
   private var m00, m11, m22: Float = 1
   private var m01, m02, m10, m12, m20, m21: Float = 0

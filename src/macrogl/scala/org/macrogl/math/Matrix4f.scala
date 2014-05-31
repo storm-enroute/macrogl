@@ -1,5 +1,8 @@
 package org.macrogl.math
 
+/**
+ * Ported from LWJGL source code
+ */
 class Matrix4f extends Matrix {
   private var m00, m11, m22, m33: Float = 1
   private var m01, m02, m03, m10, m12, m13, m20, m21, m23, m30, m31, m32: Float = 0
@@ -516,15 +519,15 @@ object Matrix4f {
   }
 
   def mult(left: Matrix4f, right: Vector4f, dst: Vector4f): Unit = {
-    val x = left.m00 * right.x + left.m10 * right.y + left.m20 * right.z + left.m30 * right.w;
-    val y = left.m01 * right.x + left.m11 * right.y + left.m21 * right.z + left.m31 * right.w;
-    val z = left.m02 * right.x + left.m12 * right.y + left.m22 * right.z + left.m32 * right.w;
-    val w = left.m03 * right.x + left.m13 * right.y + left.m23 * right.z + left.m33 * right.w;
+    val x = left.m00 * right.x + left.m10 * right.y + left.m20 * right.z + left.m30 * right.w
+    val y = left.m01 * right.x + left.m11 * right.y + left.m21 * right.z + left.m31 * right.w
+    val z = left.m02 * right.x + left.m12 * right.y + left.m22 * right.z + left.m32 * right.w
+    val w = left.m03 * right.x + left.m13 * right.y + left.m23 * right.z + left.m33 * right.w
 
-    dst.x = x;
-    dst.y = y;
-    dst.z = z;
-    dst.w = w;
+    dst.x = x
+    dst.y = y
+    dst.z = z
+    dst.w = w
   }
 
   /**

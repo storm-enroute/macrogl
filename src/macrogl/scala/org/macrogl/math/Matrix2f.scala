@@ -1,5 +1,8 @@
 package org.macrogl.math
 
+/**
+ * Ported from LWJGL source code
+ */
 class Matrix2f extends Matrix {
   private var m00, m11: Float = 1
   private var m01, m10: Float = 0
@@ -235,8 +238,8 @@ object Matrix2f {
   }
 
   def mult(left: Matrix2f, right: Vector2f, dst: Vector2f): Unit = {
-    val x = left.m00 * right.x + left.m10 * right.y;
-    val y = left.m01 * right.x + left.m11 * right.y;
+    val x = left.m00 * right.x + left.m10 * right.y
+    val y = left.m01 * right.x + left.m11 * right.y
 
     dst.x = x
     dst.y = y
