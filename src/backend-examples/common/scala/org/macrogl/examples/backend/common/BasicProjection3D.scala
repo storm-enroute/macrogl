@@ -124,8 +124,8 @@ class BasicProjection3D(print: String => Unit, systemUpdate: => Boolean, systemI
       mgl.enableVertexAttribArray(attribColorLocation)
       
       // Setup matrices
-      val projection = Matrix4.perspective3D(70f, 1280f/720f, 0.01f, 10f)
-      val transformStack = new MatrixStack(new Matrix4)
+      val projection = Matrix4f.perspective3D(70f, 1280f/720f, 0.01f, 10f)
+      val transformStack = new MatrixStack(new Matrix4f)
       
       // Send the projection to the shader (it will not change anymore)
       mgl.uniformMatrix4f(uniformProjectionLocation, projection)
@@ -148,7 +148,7 @@ class BasicProjection3D(print: String => Unit, systemUpdate: => Boolean, systemI
         // Anime the rotation using the data from the FrameEvent
         currentRotation += rotationVelocity * fe.elapsedTime
         
-        transformStack.current = Matrix4.translate3D(new Vector3(0, 0, -3)) * Matrix4.rotation3D(currentRotation, new Vector3(0, 1, 0))
+        transformStack.current = Matrix4f.translate3D(new Vector3f(0, 0, -3)) * Matrix4f.rotation3D(currentRotation, new Vector3f(0, 1, 0))
         // Send the current transformation to the shader
         mgl.uniformMatrix4f(uniformTransformLocation, transformStack.current)
 

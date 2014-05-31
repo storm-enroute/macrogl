@@ -1,6 +1,6 @@
 package org.macrogl.math
 
-class Matrix2 extends Matrix {
+class Matrix2f extends Matrix {
   private var m00, m11: Float = 1
   private var m01, m10: Float = 0
 
@@ -13,9 +13,9 @@ class Matrix2 extends Matrix {
     m11 = a11
   }
 
-  def this(m: Matrix2) = {
+  def this(m: Matrix2f) = {
     this()
-    Matrix2.set(m, this)
+    Matrix2f.set(m, this)
   }
 
   def apply(row: Int, col: Int): Float = (row, col) match {
@@ -34,7 +34,7 @@ class Matrix2 extends Matrix {
     case _ => throw new IndexOutOfBoundsException
   }
 
-  def load(src: org.macrogl.Data.Float, order: MajorOrder): Matrix2 = order match {
+  def load(src: org.macrogl.Data.Float, order: MajorOrder): Matrix2f = order match {
     case RowMajor =>
       m00 = src.get()
       m10 = src.get()
@@ -48,7 +48,7 @@ class Matrix2 extends Matrix {
       m11 = src.get()
       this
   }
-  def store(dst: org.macrogl.Data.Float, order: MajorOrder): Matrix2 = order match {
+  def store(dst: org.macrogl.Data.Float, order: MajorOrder): Matrix2f = order match {
     case RowMajor =>
       dst.put(m00)
       dst.put(m10)
@@ -63,14 +63,14 @@ class Matrix2 extends Matrix {
       this
   }
 
-  def setIdentity(): Matrix2 = {
+  def setIdentity(): Matrix2f = {
     m00 = 1
     m01 = 0
     m10 = 0
     m11 = 1
     this
   }
-  def setZero(): Matrix2 = {
+  def setZero(): Matrix2f = {
     m00 = 0
     m01 = 0
     m10 = 0
@@ -78,33 +78,33 @@ class Matrix2 extends Matrix {
     this
   }
 
-  def invert(): Matrix2 = {
-    Matrix2.invert(this, this)
+  def invert(): Matrix2f = {
+    Matrix2f.invert(this, this)
     this
   }
-  def invertedCopy(): Matrix2 = {
-    val ret = new Matrix2
-    Matrix2.invert(this, ret)
+  def invertedCopy(): Matrix2f = {
+    val ret = new Matrix2f
+    Matrix2f.invert(this, ret)
     ret
   }
 
-  def negate(): Matrix2 = {
-    Matrix2.negate(this, this)
+  def negate(): Matrix2f = {
+    Matrix2f.negate(this, this)
     this
   }
-  def negatedCopy(): Matrix2 = {
-    val ret = new Matrix2
-    Matrix2.negate(this, ret)
+  def negatedCopy(): Matrix2f = {
+    val ret = new Matrix2f
+    Matrix2f.negate(this, ret)
     ret
   }
 
-  def transpose(): Matrix2 = {
-    Matrix2.transpose(this, this)
+  def transpose(): Matrix2f = {
+    Matrix2f.transpose(this, this)
     this
   }
-  def transposedCopy(): Matrix2 = {
-    val ret = new Matrix2
-    Matrix2.transpose(this, ret)
+  def transposedCopy(): Matrix2f = {
+    val ret = new Matrix2f
+    Matrix2f.transpose(this, ret)
     ret
   }
 
@@ -112,48 +112,48 @@ class Matrix2 extends Matrix {
     m00 * m11 - m01 * m10
   }
 
-  def copy(): Matrix2 = {
-    val ret = new Matrix2
-    Matrix2.set(this, ret)
+  def copy(): Matrix2f = {
+    val ret = new Matrix2f
+    Matrix2f.set(this, ret)
     ret
   }
 
-  def +(m: Matrix2): Matrix2 = {
-    val ret = new Matrix2
-    Matrix2.add(this, m, ret)
+  def +(m: Matrix2f): Matrix2f = {
+    val ret = new Matrix2f
+    Matrix2f.add(this, m, ret)
     ret
   }
 
-  def +=(m: Matrix2): Matrix2 = {
-    Matrix2.add(this, m, this)
+  def +=(m: Matrix2f): Matrix2f = {
+    Matrix2f.add(this, m, this)
     this
   }
 
-  def -(m: Matrix2): Matrix2 = {
-    val ret = new Matrix2
-    Matrix2.sub(this, m, ret)
+  def -(m: Matrix2f): Matrix2f = {
+    val ret = new Matrix2f
+    Matrix2f.sub(this, m, ret)
     ret
   }
 
-  def -=(m: Matrix2): Matrix2 = {
-    Matrix2.sub(this, m, this)
+  def -=(m: Matrix2f): Matrix2f = {
+    Matrix2f.sub(this, m, this)
     this
   }
 
-  def *(m: Matrix2): Matrix2 = {
-    val ret = new Matrix2
-    Matrix2.mult(this, m, ret)
+  def *(m: Matrix2f): Matrix2f = {
+    val ret = new Matrix2f
+    Matrix2f.mult(this, m, ret)
     ret
   }
 
-  def *=(m: Matrix2): Matrix2 = {
-    Matrix2.mult(this, m, this)
+  def *=(m: Matrix2f): Matrix2f = {
+    Matrix2f.mult(this, m, this)
     this
   }
 
-  def *(v: Vector2): Vector2 = {
-    val ret = new Vector2
-    Matrix2.mult(this, v, ret)
+  def *(v: Vector2f): Vector2f = {
+    val ret = new Vector2f
+    Matrix2f.mult(this, v, ret)
     ret
   }
 
@@ -165,22 +165,22 @@ class Matrix2 extends Matrix {
   }
 }
 
-object Matrix2 {
-  def set(src: Matrix2, dst: Matrix2): Unit = {
+object Matrix2f {
+  def set(src: Matrix2f, dst: Matrix2f): Unit = {
     dst.m00 = src.m00
     dst.m01 = src.m01
     dst.m10 = src.m10
     dst.m11 = src.m11
   }
 
-  def negate(src: Matrix2, dst: Matrix2): Unit = {
+  def negate(src: Matrix2f, dst: Matrix2f): Unit = {
     dst.m00 = -src.m00
     dst.m01 = -src.m01
     dst.m10 = -src.m10
     dst.m11 = -src.m11
   }
 
-  def invert(src: Matrix2, dst: Matrix2): Unit = {
+  def invert(src: Matrix2f, dst: Matrix2f): Unit = {
     val det = src.determinant
 
     if (det != 0) {
@@ -198,7 +198,7 @@ object Matrix2 {
     }
   }
 
-  def transpose(src: Matrix2, dst: Matrix2): Unit = {
+  def transpose(src: Matrix2f, dst: Matrix2f): Unit = {
     val t10 = src.m10
     val t01 = src.m01
 
@@ -208,21 +208,21 @@ object Matrix2 {
     dst.m11 = src.m11
   }
 
-  def add(m1: Matrix2, m2: Matrix2, dst: Matrix2): Unit = {
+  def add(m1: Matrix2f, m2: Matrix2f, dst: Matrix2f): Unit = {
     dst.m00 = m1.m00 + m2.m00
     dst.m01 = m1.m10 + m2.m10
     dst.m10 = m1.m01 + m2.m01
     dst.m11 = m1.m11 + m2.m11
   }
 
-  def sub(m1: Matrix2, m2: Matrix2, dst: Matrix2): Unit = {
+  def sub(m1: Matrix2f, m2: Matrix2f, dst: Matrix2f): Unit = {
     dst.m00 = m1.m00 - m2.m00
     dst.m01 = m1.m10 - m2.m10
     dst.m10 = m1.m01 - m2.m01
     dst.m11 = m1.m11 - m2.m11
   }
 
-  def mult(left: Matrix2, right: Matrix2, dst: Matrix2): Unit = {
+  def mult(left: Matrix2f, right: Matrix2f, dst: Matrix2f): Unit = {
     val m00 = left.m00 * right.m00 + left.m10 * right.m01
     val m01 = left.m01 * right.m00 + left.m11 * right.m01
     val m10 = left.m00 * right.m10 + left.m10 * right.m11
@@ -234,7 +234,7 @@ object Matrix2 {
     dst.m11 = m11
   }
 
-  def mult(left: Matrix2, right: Vector2, dst: Vector2): Unit = {
+  def mult(left: Matrix2f, right: Vector2f, dst: Vector2f): Unit = {
     val x = left.m00 * right.x + left.m10 * right.y;
     val y = left.m01 * right.x + left.m11 * right.y;
 

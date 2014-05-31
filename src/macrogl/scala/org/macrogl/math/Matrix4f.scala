@@ -1,6 +1,6 @@
 package org.macrogl.math
 
-class Matrix4 extends Matrix {
+class Matrix4f extends Matrix {
   private var m00, m11, m22, m33: Float = 1
   private var m01, m02, m03, m10, m12, m13, m20, m21, m23, m30, m31, m32: Float = 0
 
@@ -28,9 +28,9 @@ class Matrix4 extends Matrix {
     m33 = a33
   }
 
-  def this(m: Matrix4) = {
+  def this(m: Matrix4f) = {
     this()
-    Matrix4.set(m, this)
+    Matrix4f.set(m, this)
   }
 
   def apply(row: Int, col: Int): Float = (row, col) match {
@@ -79,7 +79,7 @@ class Matrix4 extends Matrix {
     case _ => throw new IndexOutOfBoundsException
   }
 
-  def load(src: org.macrogl.Data.Float, order: MajorOrder): Matrix4 = order match {
+  def load(src: org.macrogl.Data.Float, order: MajorOrder): Matrix4f = order match {
     case RowMajor =>
       m00 = src.get()
       m10 = src.get()
@@ -123,7 +123,7 @@ class Matrix4 extends Matrix {
       m33 = src.get()
       this
   }
-  def store(dst: org.macrogl.Data.Float, order: MajorOrder): Matrix4 = order match {
+  def store(dst: org.macrogl.Data.Float, order: MajorOrder): Matrix4f = order match {
     case RowMajor =>
       dst.put(m00)
       dst.put(m10)
@@ -168,7 +168,7 @@ class Matrix4 extends Matrix {
       this
   }
 
-  def setIdentity(): Matrix4 = {
+  def setIdentity(): Matrix4f = {
     m00 = 1
     m11 = 1
     m22 = 1
@@ -192,7 +192,7 @@ class Matrix4 extends Matrix {
 
     this
   }
-  def setZero(): Matrix4 = {
+  def setZero(): Matrix4f = {
     m00 = 0
     m01 = 0
     m02 = 0
@@ -215,33 +215,33 @@ class Matrix4 extends Matrix {
     this
   }
 
-  def invert(): Matrix4 = {
-    Matrix4.invert(this, this)
+  def invert(): Matrix4f = {
+    Matrix4f.invert(this, this)
     this
   }
-  def invertedCopy(): Matrix4 = {
-    val ret = new Matrix4
-    Matrix4.invert(this, ret)
+  def invertedCopy(): Matrix4f = {
+    val ret = new Matrix4f
+    Matrix4f.invert(this, ret)
     ret
   }
 
-  def negate(): Matrix4 = {
-    Matrix4.negate(this, this)
+  def negate(): Matrix4f = {
+    Matrix4f.negate(this, this)
     this
   }
-  def negatedCopy(): Matrix4 = {
-    val ret = new Matrix4
-    Matrix4.negate(this, ret)
+  def negatedCopy(): Matrix4f = {
+    val ret = new Matrix4f
+    Matrix4f.negate(this, ret)
     ret
   }
 
-  def transpose(): Matrix4 = {
-    Matrix4.transpose(this, this)
+  def transpose(): Matrix4f = {
+    Matrix4f.transpose(this, this)
     this
   }
-  def transposedCopy(): Matrix4 = {
-    val ret = new Matrix4
-    Matrix4.transpose(this, ret)
+  def transposedCopy(): Matrix4f = {
+    val ret = new Matrix4f
+    Matrix4f.transpose(this, ret)
     ret
   }
 
@@ -254,48 +254,48 @@ class Matrix4 extends Matrix {
     (f0 - f1 + f2 - f3)
   }
 
-  def copy(): Matrix4 = {
-    val ret = new Matrix4
-    Matrix4.set(this, ret)
+  def copy(): Matrix4f = {
+    val ret = new Matrix4f
+    Matrix4f.set(this, ret)
     ret
   }
 
-  def +(m: Matrix4): Matrix4 = {
-    val ret = new Matrix4
-    Matrix4.add(this, m, ret)
+  def +(m: Matrix4f): Matrix4f = {
+    val ret = new Matrix4f
+    Matrix4f.add(this, m, ret)
     ret
   }
 
-  def +=(m: Matrix4): Matrix4 = {
-    Matrix4.add(this, m, this)
+  def +=(m: Matrix4f): Matrix4f = {
+    Matrix4f.add(this, m, this)
     this
   }
 
-  def -(m: Matrix4): Matrix4 = {
-    val ret = new Matrix4
-    Matrix4.sub(this, m, ret)
+  def -(m: Matrix4f): Matrix4f = {
+    val ret = new Matrix4f
+    Matrix4f.sub(this, m, ret)
     ret
   }
 
-  def -=(m: Matrix4): Matrix4 = {
-    Matrix4.sub(this, m, this)
+  def -=(m: Matrix4f): Matrix4f = {
+    Matrix4f.sub(this, m, this)
     this
   }
 
-  def *(m: Matrix4): Matrix4 = {
-    val ret = new Matrix4
-    Matrix4.mult(this, m, ret)
+  def *(m: Matrix4f): Matrix4f = {
+    val ret = new Matrix4f
+    Matrix4f.mult(this, m, ret)
     ret
   }
 
-  def *=(m: Matrix4): Matrix4 = {
-    Matrix4.mult(this, m, this)
+  def *=(m: Matrix4f): Matrix4f = {
+    Matrix4f.mult(this, m, this)
     this
   }
 
-  def *(v: Vector4): Vector4 = {
-    val ret = new Vector4
-    Matrix4.mult(this, v, ret)
+  def *(v: Vector4f): Vector4f = {
+    val ret = new Vector4f
+    Matrix4f.mult(this, v, ret)
     ret
   }
 
@@ -309,8 +309,8 @@ class Matrix4 extends Matrix {
   }
 }
 
-object Matrix4 {
-  def set(src: Matrix4, dst: Matrix4): Unit = {
+object Matrix4f {
+  def set(src: Matrix4f, dst: Matrix4f): Unit = {
     dst.m00 = src.m00
     dst.m01 = src.m01
     dst.m02 = src.m02
@@ -332,7 +332,7 @@ object Matrix4 {
     dst.m33 = src.m33
   }
 
-  def negate(src: Matrix4, dst: Matrix4): Unit = {
+  def negate(src: Matrix4f, dst: Matrix4f): Unit = {
     dst.m00 = -src.m00
     dst.m01 = -src.m01
     dst.m02 = -src.m02
@@ -358,7 +358,7 @@ object Matrix4 {
     t00 * (t11 * t22 - t12 * t21) + t01 * (t12 * t20 - t10 * t22) + t02 * (t10 * t21 - t11 * t20)
   }
 
-  def invert(src: Matrix4, dst: Matrix4): Unit = {
+  def invert(src: Matrix4f, dst: Matrix4f): Unit = {
     val determinant = src.determinant
 
     if (determinant != 0) {
@@ -405,7 +405,7 @@ object Matrix4 {
     }
   }
 
-  def transpose(src: Matrix4, dst: Matrix4): Unit = {
+  def transpose(src: Matrix4f, dst: Matrix4f): Unit = {
     val m00 = src.m00
     val m01 = src.m10
     val m02 = src.m20
@@ -441,7 +441,7 @@ object Matrix4 {
     dst.m33 = m33
   }
 
-  def add(left: Matrix4, right: Matrix4, dst: Matrix4): Unit = {
+  def add(left: Matrix4f, right: Matrix4f, dst: Matrix4f): Unit = {
     dst.m00 = left.m00 + right.m00
     dst.m01 = left.m01 + right.m01
     dst.m02 = left.m02 + right.m02
@@ -460,7 +460,7 @@ object Matrix4 {
     dst.m33 = left.m33 + right.m33
   }
 
-  def sub(left: Matrix4, right: Matrix4, dst: Matrix4): Unit = {
+  def sub(left: Matrix4f, right: Matrix4f, dst: Matrix4f): Unit = {
     dst.m00 = left.m00 - right.m00
     dst.m01 = left.m01 - right.m01
     dst.m02 = left.m02 - right.m02
@@ -479,7 +479,7 @@ object Matrix4 {
     dst.m33 = left.m33 - right.m33
   }
 
-  def mult(left: Matrix4, right: Matrix4, dst: Matrix4): Unit = {
+  def mult(left: Matrix4f, right: Matrix4f, dst: Matrix4f): Unit = {
     val m00 = left.m00 * right.m00 + left.m10 * right.m01 + left.m20 * right.m02 + left.m30 * right.m03
     val m01 = left.m01 * right.m00 + left.m11 * right.m01 + left.m21 * right.m02 + left.m31 * right.m03
     val m02 = left.m02 * right.m00 + left.m12 * right.m01 + left.m22 * right.m02 + left.m32 * right.m03
@@ -515,7 +515,7 @@ object Matrix4 {
     dst.m33 = m33
   }
 
-  def mult(left: Matrix4, right: Vector4, dst: Vector4): Unit = {
+  def mult(left: Matrix4f, right: Vector4f, dst: Vector4f): Unit = {
     val x = left.m00 * right.x + left.m10 * right.y + left.m20 * right.z + left.m30 * right.w;
     val y = left.m01 * right.x + left.m11 * right.y + left.m21 * right.z + left.m31 * right.w;
     val z = left.m02 * right.x + left.m12 * right.y + left.m22 * right.z + left.m32 * right.w;
@@ -531,13 +531,13 @@ object Matrix4 {
    * Generates the homogeneous rotation matrix for a given angle (in degrees) and a given unitary axis around the origin
    * See: https://www.opengl.org/sdk/docs/man2/xhtml/glRotate.xml
    */
-  def rotation3D(angle: Float, axis: Vector3): Matrix4 = {
-    val ret = new Matrix4
+  def rotation3D(angle: Float, axis: Vector3f): Matrix4f = {
+    val ret = new Matrix4f
     setRotation3D(angle, axis, ret)
     ret
   }
 
-  def setRotation3D(angle: Float, axis: Vector3, dst: Matrix4): Unit = {
+  def setRotation3D(angle: Float, axis: Vector3f, dst: Matrix4f): Unit = {
     val radAngle = Utils.degToRad(angle)
 
     val c = Math.cos(radAngle).toFloat
@@ -572,13 +572,13 @@ object Matrix4 {
    * Generates the homogeneous translation matrix for a given translation vector
    * See: http://www.opengl.org/sdk/docs/man2/xhtml/glTranslate.xml
    */
-  def translate3D(mov: Vector3): Matrix4 = {
-    val ret = new Matrix4
+  def translate3D(mov: Vector3f): Matrix4f = {
+    val ret = new Matrix4f
     setTranslate3D(mov, ret)
     ret
   }
 
-  def setTranslate3D(mov: Vector3, dst: Matrix4): Unit = {
+  def setTranslate3D(mov: Vector3f, dst: Matrix4f): Unit = {
     dst.m00 = 1f
     dst.m10 = 0f
     dst.m20 = 0f
@@ -604,13 +604,13 @@ object Matrix4 {
    * Generates the homogeneous scaling matrix for a given scale vector around the origin
    * See: https://www.opengl.org/sdk/docs/man2/xhtml/glScale.xml
    */
-  def scale3D(scale: Vector3): Matrix4 = {
-    val ret = new Matrix4
+  def scale3D(scale: Vector3f): Matrix4f = {
+    val ret = new Matrix4f
     setScale3D(scale, ret)
     ret
   }
 
-  def setScale3D(scale: Vector3, dst: Matrix4): Unit = {
+  def setScale3D(scale: Vector3f, dst: Matrix4f): Unit = {
     dst.m00 = scale.x
     dst.m10 = 0f
     dst.m20 = 0f
@@ -636,13 +636,13 @@ object Matrix4 {
    * Generates the homogeneous projection matrix given the details of the perspective frustum
    * See: http://www.opengl.org/sdk/docs/man2/xhtml/glFrustum.xml
    */
-  def frustum3D(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float): Matrix4 = {
-    val ret = new Matrix4
+  def frustum3D(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float): Matrix4f = {
+    val ret = new Matrix4f
     setFrustum3D(left, right, bottom, top, near, far, ret)
     ret
   }
 
-  def setFrustum3D(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float, dst: Matrix4): Unit = {
+  def setFrustum3D(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float, dst: Matrix4f): Unit = {
     val a = (right + left) / (right - left)
     val b = (top + bottom) / (top - bottom)
     val c = -(far + near) / (far - near)
@@ -676,13 +676,13 @@ object Matrix4 {
    * Generates the homogeneous projection matrix given the basic properties of the perspective frustum (fovy in degrees)
    * See: http://www.opengl.org/sdk/docs/man2/xhtml/gluPerspective.xml
    */
-  def perspective3D(fovy: Float, aspect: Float, near: Float, far: Float): Matrix4 = {
-    val ret = new Matrix4
+  def perspective3D(fovy: Float, aspect: Float, near: Float, far: Float): Matrix4f = {
+    val ret = new Matrix4f
     setPerspective3D(fovy, aspect, near, far, ret)
     ret
   }
   
-  def setPerspective3D(fovy: Float, aspect: Float, near: Float, far: Float, dst: Matrix4): Unit = {
+  def setPerspective3D(fovy: Float, aspect: Float, near: Float, far: Float, dst: Matrix4f): Unit = {
     val fovyRad = Utils.degToRad(fovy)
     val f = Utils.cotan(fovyRad/2).toFloat
     
@@ -711,13 +711,13 @@ object Matrix4 {
    * Generates the homogeneous projection matrix given the details of the orthographic projection
    * See: http://www.opengl.org/sdk/docs/man2/xhtml/glOrtho.xml
    */
-  def ortho3D(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float): Matrix4 = {
-    val ret = new Matrix4
+  def ortho3D(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float): Matrix4f = {
+    val ret = new Matrix4f
     setOrtho3D(left, right, bottom, top, near, far, ret)
     ret
   }
   
-  def setOrtho3D(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float, dst: Matrix4): Unit = {
+  def setOrtho3D(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float, dst: Matrix4f): Unit = {
     dst.m00 = 2 / (right - left)
     dst.m10 = 0f
     dst.m20 = 0f

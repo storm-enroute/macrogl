@@ -891,33 +891,33 @@ class Macrogl(implicit gl: dom.WebGLRenderingContext) {
     p1 != p2
   }
   
-  final def uniform2f(location: Token.UniformLocation, vec: org.macrogl.math.Vector2): Unit = {
+  final def uniform2f(location: Token.UniformLocation, vec: org.macrogl.math.Vector2f): Unit = {
     this.uniform2f(location, vec.x, vec.y)
   }
   
-  final def uniform3f(location: Token.UniformLocation, vec: org.macrogl.math.Vector3): Unit = {
+  final def uniform3f(location: Token.UniformLocation, vec: org.macrogl.math.Vector3f): Unit = {
     this.uniform3f(location, vec.x, vec.y, vec.z)
   }
   
-  final def uniform4f(location: Token.UniformLocation, vec: org.macrogl.math.Vector4): Unit = {
+  final def uniform4f(location: Token.UniformLocation, vec: org.macrogl.math.Vector4f): Unit = {
     this.uniform4f(location, vec.x, vec.y, vec.z, vec.w)
   }
   
-  final def uniformMatrix2f(location: Token.UniformLocation, mat: org.macrogl.math.Matrix2): Unit = {
+  final def uniformMatrix2f(location: Token.UniformLocation, mat: org.macrogl.math.Matrix2f): Unit = {
     this.tmpFloat.clear()
     mat.store(this.tmpFloat, org.macrogl.math.ColumnMajor)
     this.tmpFloat.rewind()
     this.uniformMatrix2fv(location, false, this.tmpFloat)
   }
   
-  final def uniformMatrix3f(location: Token.UniformLocation, mat: org.macrogl.math.Matrix3): Unit = {
+  final def uniformMatrix3f(location: Token.UniformLocation, mat: org.macrogl.math.Matrix3f): Unit = {
     this.tmpFloat.clear()
     mat.store(this.tmpFloat, org.macrogl.math.ColumnMajor)
     this.tmpFloat.rewind()
     this.uniformMatrix3fv(location, false, this.tmpFloat)
   }
   
-  final def uniformMatrix4f(location: Token.UniformLocation, mat: org.macrogl.math.Matrix4): Unit = {
+  final def uniformMatrix4f(location: Token.UniformLocation, mat: org.macrogl.math.Matrix4f): Unit = {
     this.tmpFloat.clear()
     mat.store(this.tmpFloat, org.macrogl.math.ColumnMajor)
     this.tmpFloat.rewind()

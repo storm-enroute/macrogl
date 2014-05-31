@@ -1,6 +1,6 @@
 package org.macrogl.math
 
-class Vector4 extends Vector {
+class Vector4f extends Vector {
   var x, y, z, w: Float = _
   
   def this(v1: Float, v2: Float, v3: Float, v4: Float) = {
@@ -11,9 +11,9 @@ class Vector4 extends Vector {
     z = v4
   }
   
-  def this(v: Vector4) = {
+  def this(v: Vector4f) = {
     this()
-    Vector4.set(v, this)
+    Vector4f.set(v, this)
   }
   
   def apply(pos: Int): Float = pos match {
@@ -32,14 +32,14 @@ class Vector4 extends Vector {
     case _ => throw new IndexOutOfBoundsException
   }
   
-  def load(src: org.macrogl.Data.Float): Vector4 = {
+  def load(src: org.macrogl.Data.Float): Vector4f = {
     x = src.get
     y = src.get
     z = src.get
     w = src.get
     this
   }
-  def store(dst: org.macrogl.Data.Float): Vector4 = {
+  def store(dst: org.macrogl.Data.Float): Vector4f = {
     dst.put(x)
     dst.put(y)
     dst.put(z)
@@ -47,24 +47,24 @@ class Vector4 extends Vector {
     this
   }
 
-  def normalise(): Vector4 = {
+  def normalise(): Vector4f = {
     val l = length
     this /= l
   }
   
-  def normalizedCopy(): Vector4 = {
+  def normalizedCopy(): Vector4f = {
     val l = length
     this / l
   }
 
-  def negate(): Vector4 = {
-    Vector4.negate(this, this)
+  def negate(): Vector4f = {
+    Vector4f.negate(this, this)
     this
   }
   
-  def negatedCopy(): Vector4 = {
-    val ret = new Vector4
-    Vector4.negate(this, ret)
+  def negatedCopy(): Vector4f = {
+    val ret = new Vector4f
+    Vector4f.negate(this, ret)
     ret
   }
 
@@ -75,106 +75,106 @@ class Vector4 extends Vector {
     Math.sqrt(this.lengthSquared).toFloat
   }
   
-  def copy(): Vector4 = {
-    val ret = new Vector4
-    Vector4.set(this, ret)
+  def copy(): Vector4f = {
+    val ret = new Vector4f
+    Vector4f.set(this, ret)
     ret
   }
   
-  def +(v: Vector4): Vector4 = {
-    val ret = new Vector4
-    Vector4.add(this, v, ret)
+  def +(v: Vector4f): Vector4f = {
+    val ret = new Vector4f
+    Vector4f.add(this, v, ret)
     ret
   }
   
-  def -(v: Vector4): Vector4 = {
-    val ret = new Vector4
-    Vector4.sub(this, v, ret)
+  def -(v: Vector4f): Vector4f = {
+    val ret = new Vector4f
+    Vector4f.sub(this, v, ret)
     ret
   }
   
-  def *(v: Vector4): Float = {
-    Vector4.dot(this, v)
+  def *(v: Vector4f): Float = {
+    Vector4f.dot(this, v)
   }
   
-  def *(v: Float): Vector4 = {
-    val ret = new Vector4
-    Vector4.mult(this, v, ret)
+  def *(v: Float): Vector4f = {
+    val ret = new Vector4f
+    Vector4f.mult(this, v, ret)
     ret
   }
   
-  def /(v: Float): Vector4 = {
-    val ret = new Vector4
-    Vector4.div(this, v, ret)
+  def /(v: Float): Vector4f = {
+    val ret = new Vector4f
+    Vector4f.div(this, v, ret)
     ret
   }
   
-  def +=(v: Vector4): Vector4 = {
-    Vector4.add(this, v, this)
+  def +=(v: Vector4f): Vector4f = {
+    Vector4f.add(this, v, this)
     this
   }
   
-  def -=(v: Vector4): Vector4 = {
-    Vector4.sub(this, v, this)
+  def -=(v: Vector4f): Vector4f = {
+    Vector4f.sub(this, v, this)
     this
   }
   
-  def *=(v: Float): Vector4 = {
-    Vector4.mult(this, v, this)
+  def *=(v: Float): Vector4f = {
+    Vector4f.mult(this, v, this)
     this
   }
   
-  def /=(v: Float): Vector4 = {
-    Vector4.div(this, v, this)
+  def /=(v: Float): Vector4f = {
+    Vector4f.div(this, v, this)
     this
   }
   
   override def toString = {
-    "Vector4f[" + x + ", " + y + ", " + z + ", " + w + "]"
+    "Vector4ff[" + x + ", " + y + ", " + z + ", " + w + "]"
   }
 }
 
-object Vector4 {
-  def set(src: Vector4, dst: Vector4): Unit = {
+object Vector4f {
+  def set(src: Vector4f, dst: Vector4f): Unit = {
     dst.x = src.x
     dst.y = src.y
     dst.z = src.z
     dst.w = src.w
   }
   
-  def negate(v1: Vector4, dst: Vector4): Unit = {
+  def negate(v1: Vector4f, dst: Vector4f): Unit = {
     dst.x = -v1.x
     dst.y = -v1.y
     dst.z = -v1.z
     dst.w = -v1.w
   }
   
-  def add(v1: Vector4, v2: Vector4, dst: Vector4): Unit = {
+  def add(v1: Vector4f, v2: Vector4f, dst: Vector4f): Unit = {
     dst.x = v1.x + v2.x
     dst.y = v1.y + v2.y
     dst.z = v1.z + v2.z
     dst.w = v1.w + v2.w
   }
   
-  def sub(v1: Vector4, v2: Vector4, dst: Vector4): Unit = {
+  def sub(v1: Vector4f, v2: Vector4f, dst: Vector4f): Unit = {
     dst.x = v1.x - v2.x
     dst.y = v1.y - v2.y
     dst.z = v1.z - v2.z
     dst.w = v1.w - v2.w
   }
   
-  def dot(v1: Vector4, v2: Vector4): Float = {
+  def dot(v1: Vector4f, v2: Vector4f): Float = {
     v1.x*v2.x + v1.y*v2.y + v1.z*v2.z + v1.w*v2.w
   }
   
-  def mult(v1: Vector4, v: Float, dst: Vector4): Unit = {
+  def mult(v1: Vector4f, v: Float, dst: Vector4f): Unit = {
     dst.x = v1.x * v
     dst.y = v1.y * v
     dst.z = v1.z * v
     dst.w = v1.w * v
   }
   
-  def div(v1: Vector4, v: Float, dst: Vector4): Unit = {
+  def div(v1: Vector4f, v: Float, dst: Vector4f): Unit = {
     dst.x = v1.x / v
     dst.y = v1.y / v
     dst.z = v1.z / v
