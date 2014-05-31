@@ -219,6 +219,28 @@ class Matrix3f extends Matrix {
     this
   }
 
+  def *(v: Float): Matrix3f = {
+    val ret = new Matrix3f
+    Matrix3f.mult(this, v, ret)
+    ret
+  }
+
+  def *=(v: Float): Matrix3f = {
+    Matrix3f.mult(this, v, this)
+    this
+  }
+
+  def /(v: Float): Matrix3f = {
+    val ret = new Matrix3f
+    Matrix3f.div(this, v, ret)
+    ret
+  }
+
+  def /=(v: Float): Matrix3f = {
+    Matrix3f.div(this, v, this)
+    this
+  }
+
   def *(v: Vector3f): Vector3f = {
     val ret = new Vector3f
     Matrix3f.mult(this, v, ret)
@@ -231,6 +253,29 @@ class Matrix3f extends Matrix {
     sb += m01 + " " + m11 + " " + m21 + "\n"
     sb += m02 + " " + m12 + " " + m22 + "\n"
     sb
+  }
+  
+  override def equals(obj: Any): Boolean = {
+    if(obj == null) false
+    if(!obj.isInstanceOf[Matrix3f]) false
+    
+    val o = obj.asInstanceOf[Matrix3f]
+    
+    m00 == o.m00 &&
+    m01 == o.m01 &&
+    m02 == o.m02 &&
+    m10 == o.m10 &&
+    m11 == o.m11 &&
+    m12 == o.m12 &&
+    m20 == o.m20 &&
+    m21 == o.m21 &&
+    m22 == o.m22
+  }
+  
+  override def hashCode(): Int = {
+    m00.toInt ^ m01.toInt ^ m02.toInt ^
+    m10.toInt ^ m11.toInt ^ m12.toInt ^
+    m20.toInt ^ m21.toInt ^ m22.toInt
   }
 }
 
@@ -367,5 +412,33 @@ object Matrix3f {
     dst.x = x
     dst.y = y
     dst.z = z
+  }
+
+  def mult(left: Matrix3f, right: Float, dst: Matrix3f): Unit = {
+    dst.m00 = left.m00 * right
+    dst.m01 = left.m01 * right
+    dst.m02 = left.m02 * right
+
+    dst.m10 = left.m10 * right
+    dst.m11 = left.m11 * right
+    dst.m12 = left.m12 * right
+
+    dst.m20 = left.m20 * right
+    dst.m21 = left.m21 * right
+    dst.m22 = left.m22 * right
+  }
+
+  def div(left: Matrix3f, right: Float, dst: Matrix3f): Unit = {
+    dst.m00 = left.m00 / right
+    dst.m01 = left.m01 / right
+    dst.m02 = left.m02 / right
+
+    dst.m10 = left.m10 / right
+    dst.m11 = left.m11 / right
+    dst.m12 = left.m12 / right
+
+    dst.m20 = left.m20 / right
+    dst.m21 = left.m21 / right
+    dst.m22 = left.m22 / right
   }
 }

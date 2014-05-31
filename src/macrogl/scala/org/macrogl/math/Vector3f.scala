@@ -92,6 +92,27 @@ class Vector3f extends Vector {
     Vector3f.dot(this, v)
   }
   
+  def dot(v: Vector3f): Float = {
+    Vector3f.dot(this, v)
+  }
+  
+  def cross(v: Vector3f): Vector3f = {
+    val ret = new Vector3f
+    Vector3f.cross(this, v, ret)
+    ret
+  }
+  
+  def x(v: Vector3f): Vector3f = {
+    val ret = new Vector3f
+    Vector3f.cross(this, v, ret)
+    ret
+  }
+  
+  def `x=`(v: Vector3f): Vector3f = {
+    Vector3f.cross(this, v, this)
+    this
+  }
+  
   def *(v: Float): Vector3f = {
     val ret = new Vector3f
     Vector3f.mult(this, v, ret)
@@ -127,6 +148,23 @@ class Vector3f extends Vector {
   override def toString = {
     "Vector3ff[" + x + ", " + y + ", " + z + "]"
   }
+  
+  override def equals(obj: Any): Boolean = {
+    if(obj == null) false
+    if(!obj.isInstanceOf[Vector3f]) false
+    
+    val o = obj.asInstanceOf[Vector3f]
+    
+    x == o.x &&
+    y == o.y &&
+    z == o.z
+  }
+  
+  override def hashCode(): Int = {
+    x.toInt ^
+    y.toInt ^
+    z.toInt
+  }
 }
 
 object Vector3f {
@@ -156,6 +194,16 @@ object Vector3f {
   
   def dot(v1: Vector3f, v2: Vector3f): Float = {
     v1.x*v2.x + v1.y*v2.y + v1.z*v2.z
+  }
+  
+  def cross(left: Vector3f, right: Vector3f, dst: Vector3f): Unit = {
+    val x = left.y * right.z - left.z * right.y
+    val y = right.x * left.z - right.z * left.x
+    val z = left.x * right.y - left.y * right.x
+    
+    dst.x = x
+    dst.y = y
+    dst.z = z
   }
   
   def mult(v1: Vector3f, v: Float, dst: Vector3f): Unit = {

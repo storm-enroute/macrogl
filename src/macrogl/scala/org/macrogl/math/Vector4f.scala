@@ -97,6 +97,10 @@ class Vector4f extends Vector {
     Vector4f.dot(this, v)
   }
   
+  def dot(v: Vector4f): Float = {
+    Vector4f.dot(this, v)
+  }
+  
   def *(v: Float): Vector4f = {
     val ret = new Vector4f
     Vector4f.mult(this, v, ret)
@@ -131,6 +135,25 @@ class Vector4f extends Vector {
   
   override def toString = {
     "Vector4ff[" + x + ", " + y + ", " + z + ", " + w + "]"
+  }
+  
+  override def equals(obj: Any): Boolean = {
+    if(obj == null) false
+    if(!obj.isInstanceOf[Vector4f]) false
+    
+    val o = obj.asInstanceOf[Vector4f]
+    
+    x == o.x &&
+    y == o.y &&
+    z == o.z &&
+    w == o.w
+  }
+  
+  override def hashCode(): Int = {
+    x.toInt ^
+    y.toInt ^
+    z.toInt ^
+    w.toInt
   }
 }
 

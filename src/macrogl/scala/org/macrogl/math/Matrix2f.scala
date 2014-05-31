@@ -154,6 +154,28 @@ class Matrix2f extends Matrix {
     this
   }
 
+  def *(v: Float): Matrix2f = {
+    val ret = new Matrix2f
+    Matrix2f.mult(this, v, ret)
+    ret
+  }
+
+  def *=(v: Float): Matrix2f = {
+    Matrix2f.mult(this, v, this)
+    this
+  }
+
+  def /(v: Float): Matrix2f = {
+    val ret = new Matrix2f
+    Matrix2f.div(this, v, ret)
+    ret
+  }
+
+  def /=(v: Float): Matrix2f = {
+    Matrix2f.div(this, v, this)
+    this
+  }
+
   def *(v: Vector2f): Vector2f = {
     val ret = new Vector2f
     Matrix2f.mult(this, v, ret)
@@ -165,6 +187,22 @@ class Matrix2f extends Matrix {
     sb += m00 + " " + m10 + "\n"
     sb += m01 + " " + m11 + "\n"
     sb
+  }
+  
+  override def equals(obj: Any): Boolean = {
+    if(obj == null) false
+    if(!obj.isInstanceOf[Matrix2f]) false
+    
+    val o = obj.asInstanceOf[Matrix2f]
+    
+    m00 == o.m00 &&
+    m01 == o.m01 &&
+    m10 == o.m10 &&
+    m11 == o.m11
+  }
+  
+  override def hashCode(): Int = {
+    m00.toInt ^ m01.toInt ^ m10.toInt ^ m11.toInt
   }
 }
 
@@ -243,5 +281,19 @@ object Matrix2f {
 
     dst.x = x
     dst.y = y
+  }
+
+  def mult(left: Matrix2f, right: Float, dst: Matrix2f): Unit = {
+    dst.m00 = left.m00 * right
+    dst.m01 = left.m01 * right
+    dst.m10 = left.m10 * right
+    dst.m11 = left.m11 * right
+  }
+
+  def div(left: Matrix2f, right: Float, dst: Matrix2f): Unit = {
+    dst.m00 = left.m00 / right
+    dst.m01 = left.m01 / right
+    dst.m10 = left.m10 / right
+    dst.m11 = left.m11 / right
   }
 }

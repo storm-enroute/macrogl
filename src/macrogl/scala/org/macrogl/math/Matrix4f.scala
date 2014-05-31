@@ -295,6 +295,28 @@ class Matrix4f extends Matrix {
     Matrix4f.mult(this, m, this)
     this
   }
+  
+  def *(v: Float): Matrix4f = {
+    val ret = new Matrix4f
+    Matrix4f.mult(this, v, ret)
+    ret
+  }
+
+  def *=(v: Float): Matrix4f = {
+    Matrix4f.mult(this, v, this)
+    this
+  }
+
+  def /(v: Float): Matrix4f = {
+    val ret = new Matrix4f
+    Matrix4f.div(this, v, ret)
+    ret
+  }
+
+  def /=(v: Float): Matrix4f = {
+    Matrix4f.div(this, v, this)
+    this
+  }
 
   def *(v: Vector4f): Vector4f = {
     val ret = new Vector4f
@@ -309,6 +331,37 @@ class Matrix4f extends Matrix {
     sb += m02 + " " + m12 + " " + m22 + " " + m32 + "\n"
     sb += m03 + " " + m13 + " " + m23 + " " + m33 + "\n"
     sb
+  }
+  
+  override def equals(obj: Any): Boolean = {
+    if(obj == null) false
+    if(!obj.isInstanceOf[Matrix4f]) false
+    
+    val o = obj.asInstanceOf[Matrix4f]
+    
+    m00 == o.m00 &&
+    m01 == o.m01 &&
+    m02 == o.m02 &&
+    m03 == o.m03 &&
+    m10 == o.m10 &&
+    m11 == o.m11 &&
+    m12 == o.m12 &&
+    m13 == o.m13 &&
+    m20 == o.m20 &&
+    m21 == o.m21 &&
+    m22 == o.m22 &&
+    m23 == o.m23 &&
+    m30 == o.m30 &&
+    m31 == o.m31 &&
+    m32 == o.m32 &&
+    m33 == o.m33
+  }
+  
+  override def hashCode(): Int = {
+    m00.toInt ^ m01.toInt ^ m02.toInt ^ m03.toInt ^
+    m10.toInt ^ m11.toInt ^ m12.toInt ^ m13.toInt ^
+    m20.toInt ^ m21.toInt ^ m22.toInt ^ m23.toInt ^
+    m30.toInt ^ m31.toInt ^ m32.toInt ^ m33.toInt
   }
 }
 
@@ -528,6 +581,50 @@ object Matrix4f {
     dst.y = y
     dst.z = z
     dst.w = w
+  }
+  
+  def mult(left: Matrix4f, right: Float, dst: Matrix4f): Unit = {
+    dst.m00 = left.m00 * right
+    dst.m01 = left.m01 * right
+    dst.m02 = left.m02 * right
+    dst.m03 = left.m03 * right
+
+    dst.m10 = left.m10 * right
+    dst.m11 = left.m11 * right
+    dst.m12 = left.m12 * right
+    dst.m13 = left.m13 * right
+
+    dst.m20 = left.m20 * right
+    dst.m21 = left.m21 * right
+    dst.m22 = left.m22 * right
+    dst.m23 = left.m23 * right
+    
+    dst.m30 = left.m30 * right
+    dst.m31 = left.m31 * right
+    dst.m32 = left.m32 * right
+    dst.m33 = left.m33 * right
+  }
+
+  def div(left: Matrix4f, right: Float, dst: Matrix4f): Unit = {
+    dst.m00 = left.m00 / right
+    dst.m01 = left.m01 / right
+    dst.m02 = left.m02 / right
+    dst.m03 = left.m03 / right
+
+    dst.m10 = left.m10 / right
+    dst.m11 = left.m11 / right
+    dst.m12 = left.m12 / right
+    dst.m13 = left.m13 / right
+
+    dst.m20 = left.m20 / right
+    dst.m21 = left.m21 / right
+    dst.m22 = left.m22 / right
+    dst.m23 = left.m23 / right
+    
+    dst.m30 = left.m30 / right
+    dst.m31 = left.m31 / right
+    dst.m32 = left.m32 / right
+    dst.m33 = left.m33 / right
   }
 
   /**
