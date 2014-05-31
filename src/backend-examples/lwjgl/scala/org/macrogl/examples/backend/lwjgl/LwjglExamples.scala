@@ -2,10 +2,7 @@ package org.macrogl.examples.backend.lwjgl
 
 import org.lwjgl.opengl._
 import org.macrogl.Macrogl
-import org.macrogl.Utils
 import org.macrogl.examples.backend.common._
-import org.macrogl.examples.backend.common.BasicProjection3D
-import org.macrogl.examples.backend.common.BasicProjection3D
 
 object LwjglExamples {
   def main(args: Array[String]): Unit = {

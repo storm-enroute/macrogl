@@ -6,7 +6,6 @@ import js.annotation.JSExport
 import org.scalajs.dom
 
 import org.macrogl.Macrogl
-import org.macrogl.Utils
 
 import org.macrogl.examples.backend.common._
 

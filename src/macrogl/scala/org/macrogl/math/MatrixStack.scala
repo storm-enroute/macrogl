@@ -1,7 +1,7 @@
 package org.macrogl.math
 
 class MatrixStack[T <: Matrix](var current: T) {
-  var stack: List[T] = Nil
+  private var stack: List[T] = Nil
   
   def push: Unit = {
     stack = current.copy.asInstanceOf[T] :: stack

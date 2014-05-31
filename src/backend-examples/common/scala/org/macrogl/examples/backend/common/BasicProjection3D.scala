@@ -101,8 +101,8 @@ class BasicProjection3D(print: String => Unit, systemUpdate: => Boolean, systemI
 
       // 1 faces = 2 triangles
       val indicesBufferData = Macrogl.createShortData(2 * 3)
-      indicesBufferData.put(0.toShort).put(1.toShort).put(2.toShort)
-      indicesBufferData.put(0.toShort).put(2.toShort).put(3.toShort)
+      indicesBufferData.put(0.toShort).put(1.toShort).put(3.toShort)
+      indicesBufferData.put(1.toShort).put(2.toShort).put(3.toShort)
       indicesBufferData.rewind
 
       // Fill the OpenGL buffers with the data
