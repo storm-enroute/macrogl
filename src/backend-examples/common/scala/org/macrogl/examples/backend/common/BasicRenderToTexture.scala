@@ -22,7 +22,7 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
 
       val mgl = systemInit()
 
-      //#### PROJECTION ####
+      //#### PROJECTION (3D) ####
       
       // Shaders
       val projectionVertexSource = """
@@ -126,7 +126,7 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
       val projection = Matrix4f.perspective3D(70f, textureWidth.toFloat / textureHeight.toFloat, 0.01f, 10f)
       val projectionTransformStack = new MatrixStack(new Matrix4f)
 
-      //#### FULLSCREEN ####
+      //#### SCREEN RENDERING (2D) ####
       
       // Shaders
       val fullscreenVertexSource = """
@@ -264,7 +264,7 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
       }
 
       var currentRotation: Float = 0f
-      val rotationVelocity: Float = 90f
+      val rotationVelocity: Float = -60f
       
       var currentScreenRotation: Float = 0f
       val screenRotationVelocity: Float = -20f
@@ -310,7 +310,8 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
         mgl.disableVertexAttribArray(attribPosLocation)
 
         projectionTransformStack.pop // Restore the transformation matrix
-        //#### FULlSCREEN ####
+        
+        //#### FULLSCREEN ####
         
         // Render into the screen
         mgl.bindFramebuffer(GL.FRAMEBUFFER, org.macrogl.Token.FrameBuffer.none)
@@ -318,7 +319,9 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
         
         fullscreenTransformStack.push
         
-        fullscreenTransformStack.current = Matrix3f.scale2D(new Vector2f(0.75f, 0.75f)) * Matrix3f.rotation2D(currentScreenRotation)
+        val scaleFactor = width.toFloat / textureWidth.toFloat * 0.75f
+        
+        fullscreenTransformStack.current = Matrix3f.scale2D(new Vector2f(scaleFactor, scaleFactor)) * Matrix3f.rotation2D(currentScreenRotation)
         
         mgl.useProgram(fullscreenProgram)
         
