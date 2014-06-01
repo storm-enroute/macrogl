@@ -14,6 +14,7 @@ object LwjglExamples {
       println("\t[1] For basic triangle rendering")
       println("\t[2] For basic texturing")
       println("\t[3] For basic 3D projection and animation")
+      println("\t[3] For basic 3D fractale")
     }
   }
 
@@ -38,6 +39,7 @@ object LwjglExamples {
       case "1" => new BasicTriangle(myPrint, myUpdate, myInit, myClose)
       case "2" => new BasicTexture(myPrint, myUpdate, myInit, myClose)
       case "3" => new BasicProjection3D(myPrint, myUpdate, myInit, myClose)
+      case "4" => new BasicFractale3D(myPrint, myUpdate, myInit, myClose)
       case _ => {
         println("\"" + exampleName + "\" is not a valid example")
         return

@@ -36,5 +36,6 @@ object WebglExamples {
     new BasicTriangle(myPrint, myUpdate, customInit("canvas-triangle"), myClose).start()
     new BasicTexture(myPrint, myUpdate, customInit("canvas-texture"), myClose).start()
     new BasicProjection3D(myPrint, myUpdate, customInit("canvas-projection"), myClose).start()
+    new BasicFractale3D(myPrint, myUpdate, customInit("canvas-fractale"), myClose).start()
   }
 }
