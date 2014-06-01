@@ -143,6 +143,10 @@ class BasicFractale3D(width: Int, height: Int, print: String => Unit, systemUpda
       val projection = Matrix4f.perspective3D(70f, 1280f / 720f, 0.01f, 10f)
       val transformStack = new MatrixStack(new Matrix4f)
 
+      // Enable depth test
+      mgl.enable(GL.DEPTH_TEST)
+      mgl.depthFunc(GL.LESS)
+
       print("Basic Fractale3D: ready")
 
       var continueCondition: Boolean = true
@@ -158,10 +162,6 @@ class BasicFractale3D(width: Int, height: Int, print: String => Unit, systemUpda
         //print("Elapsed seconds since last frame: " + fe.elapsedTime)
         transformStack.push // Save the current transformation matrix
 
-        // Enable depth test
-        mgl.enable(GL.DEPTH_TEST)
-        mgl.depthFunc(GL.LESS)
-
         // Anime the rotation using the data from the FrameEvent
         currentRotation += rotationVelocity * fe.elapsedTime
 
@@ -174,8 +174,7 @@ class BasicFractale3D(width: Int, height: Int, print: String => Unit, systemUpda
         // Send the projection to the shader
         mgl.uniformMatrix4f(uniformProjectionLocation, projection)
 
-        mgl.clear(GL.COLOR_BUFFER_BIT)
-        mgl.clear(GL.DEPTH_BUFFER_BIT)
+        mgl.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT)
         mgl.drawElements(GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
 
         transformStack.pop // Restore the transformation matrix 
