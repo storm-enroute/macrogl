@@ -96,21 +96,21 @@ class BasicFractale3D(width: Int, height: Int, print: String => Unit, systemUpda
       val sin120 = 0.866025403784438646763723170752936183471402626905190314027903f
       val cos240 = -0.5f
       val sin240 = -0.866025403784438646763723170752936183471402626905190314027903f
-      def drawTriangle(cX: Float, cY: Float, cZ: Float, r: Float):Unit = {
-      	val top = cY+r
-      	vertexBufferData.put(cX).put(top).put(cZ)
-      	vertexBufferData.put(cX*cos120-top*sin120).put(cX*sin120+top*cos120).put(cZ)
-      	vertexBufferData.put(cX*cos240-top*sin240).put(cX*sin240+top*cos240).put(cZ)
-      	colorBufferData.put(0f).put(0f).put(0f)
-      	colorBufferData.put(0f).put(0f).put(0f)
-      	colorBufferData.put(0f).put(0f).put(1f/cZ)
+      def drawTriangle(cX: Float, cY: Float, cZ: Float, r: Float): Unit = {
+        val top = cY + r
+        vertexBufferData.put(cX).put(top).put(cZ)
+        vertexBufferData.put(cX * cos120 - top * sin120).put(cX * sin120 + top * cos120).put(cZ)
+        vertexBufferData.put(cX * cos240 - top * sin240).put(cX * sin240 + top * cos240).put(cZ)
+        colorBufferData.put(0f).put(0f).put(0f)
+        colorBufferData.put(0f).put(0f).put(0f)
+        colorBufferData.put(0f).put(0f).put(1f / cZ)
       }
 
       def recursiveTriangles(n: Integer): Unit = {
-      	drawTriangle(0f, 0f, 2f/n.toFloat, 3f/n.toFloat)
-      	indicesBufferData.put((3*n-3).toShort).put((3*n-2).toShort).put((3*n-1).toShort)
-      	if (n > 2)
-      	  recursiveTriangles(n-1)
+        drawTriangle(0f, 0f, 2f / n.toFloat, 3f / n.toFloat)
+        indicesBufferData.put((3 * n - 3).toShort).put((3 * n - 2).toShort).put((3 * n - 1).toShort)
+        if (n > 2)
+          recursiveTriangles(n - 1)
       }
 
       recursiveTriangles(nbTriangles)
@@ -132,7 +132,7 @@ class BasicFractale3D(width: Int, height: Int, print: String => Unit, systemUpda
       mgl.bufferData(GL.ELEMENT_ARRAY_BUFFER, indicesBufferData, GL.STATIC_DRAW)
 
       mgl.viewport(0, 0, width, height)
-      
+
       // Grey background
       mgl.clearColor(0.5f, 0.5f, 0.5f, 1)
 
@@ -158,6 +158,10 @@ class BasicFractale3D(width: Int, height: Int, print: String => Unit, systemUpda
         //print("Elapsed seconds since last frame: " + fe.elapsedTime)
         transformStack.push // Save the current transformation matrix
 
+        // Enable depth test
+        mgl.enable(GL.DEPTH_TEST)
+        mgl.depthFunc(GL.LESS)
+
         // Anime the rotation using the data from the FrameEvent
         currentRotation += rotationVelocity * fe.elapsedTime
 
@@ -171,6 +175,7 @@ class BasicFractale3D(width: Int, height: Int, print: String => Unit, systemUpda
         mgl.uniformMatrix4f(uniformProjectionLocation, projection)
 
         mgl.clear(GL.COLOR_BUFFER_BIT)
+        mgl.clear(GL.DEPTH_BUFFER_BIT)
         mgl.drawElements(GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
 
         transformStack.pop // Restore the transformation matrix 
@@ -199,7 +204,7 @@ class BasicFractale3D(width: Int, height: Int, print: String => Unit, systemUpda
 
       funcs = Some(continue, render, close)
     }
-    
+
     val errMsg = "Basic Fractale3D: not ready"
 
     def continue(): Boolean = {
