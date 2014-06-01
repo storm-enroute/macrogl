@@ -11,8 +11,8 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
 
   class BasicRenderToTextureListener extends org.macrogl.FrameListener {
     
-    val textureWidth = 800
-    val textureHeight = 600
+    val textureWidth = 600
+    val textureHeight = 400
     
     // (continue, render, close)
     var funcs: Option[(() => Boolean, org.macrogl.FrameEvent => Unit, () => Unit)] = None

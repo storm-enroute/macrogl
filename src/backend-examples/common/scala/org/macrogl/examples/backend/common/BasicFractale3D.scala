@@ -178,7 +178,7 @@ class BasicFractale3D(width: Int, height: Int, print: String => Unit, systemUpda
       }
 
       def close(): Unit = {
-        print("Basic Projection3D: closing")
+        print("Basic Fractale3D: closing")
 
         mgl.disableVertexAttribArray(attribColorLocation)
         mgl.disableVertexAttribArray(attribPosLocation)
@@ -194,13 +194,13 @@ class BasicFractale3D(width: Int, height: Int, print: String => Unit, systemUpda
 
         systemClose()
 
-        print("Basic Projection3D: closed")
+        print("Basic Fractale3D: closed")
       }
 
       funcs = Some(continue, render, close)
     }
     
-    val errMsg = "Basic Projection3D: not ready"
+    val errMsg = "Basic Fractale3D: not ready"
 
     def continue(): Boolean = {
       funcs match {

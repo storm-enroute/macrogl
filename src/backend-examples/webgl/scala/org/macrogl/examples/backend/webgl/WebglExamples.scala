@@ -18,6 +18,9 @@ object WebglExamples {
   }
 
   def macroGLTest(): Unit = {
+    val width = 640
+    val height = 360
+    
     def myPrint(msg: String): Unit = g.console.log(msg)
     def myUpdate(): Boolean = true
     def myClose(): Unit = {
@@ -26,15 +29,14 @@ object WebglExamples {
     def customInit(canvasName: String): () => Macrogl = {
       def myInit(): Macrogl = {
         val canvas = g.document.getElementById(canvasName)
+        canvas.width = width
+        canvas.height = height
         val gl = canvas.getContext("webgl").asInstanceOf[dom.WebGLRenderingContext]
         new Macrogl()(gl)
       }
       
       myInit _
     }
-    
-    val width = 1280
-    val height = 720
 
     new BasicTriangle(width, height, myPrint, myUpdate, customInit("canvas-triangle"), myClose).start()
     new BasicTexture(width, height, myPrint, myUpdate, customInit("canvas-texture"), myClose).start()

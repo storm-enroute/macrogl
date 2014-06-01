@@ -20,8 +20,8 @@ object LwjglExamples {
   }
 
   def macroGLTest(exampleName: String): Unit = {
-    val width = 1280
-    val height = 720
+    val width = 640
+    val height = 360
     
     def myPrint(msg: String) = println(msg)
     def myUpdate(): Boolean = {
