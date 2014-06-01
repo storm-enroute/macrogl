@@ -6,7 +6,7 @@ import org.macrogl.{ Macrogl => GL }
 
 import org.macrogl.math._
 
-class BasicTexture(print: String => Unit, systemUpdate: () => Boolean, systemInit: () => Macrogl, systemClose: () => Unit)
+class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate: () => Boolean, systemInit: () => Macrogl, systemClose: () => Unit)
   extends DemoRenderable {
 
   class BasicTextureListener extends org.macrogl.FrameListener {
@@ -137,6 +137,8 @@ class BasicTexture(print: String => Unit, systemUpdate: () => Boolean, systemIni
       var textureReady = false
       org.macrogl.Utils.loadTexture2DFromResources("/org/macrogl/examples/backend/common/macrogl.png", texture, mgl, { textureReady = true; print("Basic Texture: texture ready"); true })
 
+      mgl.viewport(0, 0, width, height)
+      
       mgl.clearColor(0, 0, 1, 1)
 
       mgl.enableVertexAttribArray(attribPosLocation)

@@ -20,6 +20,9 @@ object LwjglExamples {
   }
 
   def macroGLTest(exampleName: String): Unit = {
+    val width = 1280
+    val height = 720
+    
     def myPrint(msg: String) = println(msg)
     def myUpdate(): Boolean = {
       Display.update()
@@ -27,7 +30,7 @@ object LwjglExamples {
     }
     def myInit(): Macrogl = {
       val contextAttributes = new ContextAttribs(2, 1)
-      Display.setDisplayMode(new DisplayMode(1280, 720))
+      Display.setDisplayMode(new DisplayMode(width, height))
       Display.create(new PixelFormat, contextAttributes)
 
       Macrogl.default
@@ -35,13 +38,13 @@ object LwjglExamples {
     def myClose(): Unit = {
       Display.destroy()
     }
-
+    
     val example: DemoRenderable = exampleName match {
-      case "1" => new BasicTriangle(myPrint, myUpdate, myInit, myClose)
-      case "2" => new BasicTexture(myPrint, myUpdate, myInit, myClose)
-      case "3" => new BasicProjection3D(myPrint, myUpdate, myInit, myClose)
-      case "4" => new BasicFractale3D(myPrint, myUpdate, myInit, myClose)
-      case "5" => new BasicRenderToTexture(1280, 720, myPrint, myUpdate, myInit, myClose)
+      case "1" => new BasicTriangle(width, height, myPrint, myUpdate, myInit, myClose)
+      case "2" => new BasicTexture(width, height, myPrint, myUpdate, myInit, myClose)
+      case "3" => new BasicProjection3D(width, height, myPrint, myUpdate, myInit, myClose)
+      case "4" => new BasicFractale3D(width, height, myPrint, myUpdate, myInit, myClose)
+      case "5" => new BasicRenderToTexture(width, height, myPrint, myUpdate, myInit, myClose)
       case _ => {
         println("\"" + exampleName + "\" is not a valid example")
         return

@@ -6,7 +6,7 @@ import org.macrogl.{ Macrogl => GL }
 
 import org.macrogl.math._
 
-class BasicProjection3D(print: String => Unit, systemUpdate: () => Boolean, systemInit: () => Macrogl, systemClose: () => Unit)
+class BasicProjection3D(width: Int, height: Int, print: String => Unit, systemUpdate: () => Boolean, systemInit: () => Macrogl, systemClose: () => Unit)
   extends DemoRenderable {
 
   class BasicProjection3DListener extends org.macrogl.FrameListener {
@@ -118,6 +118,8 @@ class BasicProjection3D(print: String => Unit, systemUpdate: () => Boolean, syst
       mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indicesBuffer)
       mgl.bufferData(GL.ELEMENT_ARRAY_BUFFER, indicesBufferData, GL.STATIC_DRAW)
 
+      mgl.viewport(0, 0, width, height)
+      
       // Grey background
       mgl.clearColor(0.5f, 0.5f, 0.5f, 1)
 
@@ -125,7 +127,7 @@ class BasicProjection3D(print: String => Unit, systemUpdate: () => Boolean, syst
       mgl.enableVertexAttribArray(attribColorLocation)
 
       // Setup matrices
-      val projection = Matrix4f.perspective3D(70f, 1280f / 720f, 0.01f, 10f)
+      val projection = Matrix4f.perspective3D(70f, width.toFloat / height.toFloat, 0.01f, 10f)
       val transformStack = new MatrixStack(new Matrix4f)
 
       print("Basic Projection3D: ready")

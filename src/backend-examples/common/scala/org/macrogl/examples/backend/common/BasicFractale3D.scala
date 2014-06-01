@@ -6,7 +6,7 @@ import org.macrogl.{ Macrogl => GL }
 
 import org.macrogl.math._
 
-class BasicFractale3D(print: String => Unit, systemUpdate: () => Boolean, systemInit: () => Macrogl, systemClose: () => Unit)
+class BasicFractale3D(width: Int, height: Int, print: String => Unit, systemUpdate: () => Boolean, systemInit: () => Macrogl, systemClose: () => Unit)
   extends DemoRenderable {
 
   class BasicFractale3DListener extends org.macrogl.FrameListener {
@@ -131,6 +131,8 @@ class BasicFractale3D(print: String => Unit, systemUpdate: () => Boolean, system
       mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indicesBuffer)
       mgl.bufferData(GL.ELEMENT_ARRAY_BUFFER, indicesBufferData, GL.STATIC_DRAW)
 
+      mgl.viewport(0, 0, width, height)
+      
       // Grey background
       mgl.clearColor(0.5f, 0.5f, 0.5f, 1)
 
