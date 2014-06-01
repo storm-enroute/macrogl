@@ -616,19 +616,23 @@ class Macrogl(implicit gl: dom.WebGLRenderingContext) {
 
   final def texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
     format: Int, `type`: Int, pixels: Data.Byte) = this._texImage2D(target, level, internalformat, width, height, border,
-    format, `type`, pixels.slice)
+    format, `type`, if(pixels != null) pixels.slice else null)
   final def texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
     format: Int, `type`: Int, pixels: Data.Short) = this._texImage2D(target, level, internalformat, width, height, border,
-    format, `type`, pixels.slice)
+    format, `type`, if(pixels != null) pixels.slice else null)
   final def texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
     format: Int, `type`: Int, pixels: Data.Int) = this._texImage2D(target, level, internalformat, width, height, border,
-    format, `type`, pixels.slice)
+    format, `type`, if(pixels != null) pixels.slice else null)
   final def texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
     format: Int, `type`: Int, pixels: Data.Float) = this._texImage2D(target, level, internalformat, width, height, border,
-    format, `type`, pixels.slice)
+    format, `type`, if(pixels != null) pixels.slice else null)
   final def texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
     format: Int, `type`: Int, pixels: Data.Double) = this._texImage2D(target, level, internalformat, width, height, border,
-    format, `type`, pixels.slice)
+    format, `type`, if(pixels != null) pixels.slice else null)
+  final def texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
+    format: Int, `type`: Int): Unit = {
+    gl.texImage2D(target, level, internalformat, width, height, border, format, `type`, null)
+  }
 
   final def texParameterf(target: Int, pname: Int, param: Float) = {
     gl.texParameterf(target, pname, param)

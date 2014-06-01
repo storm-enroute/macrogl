@@ -576,4 +576,27 @@ object Matrix3f {
     dst.m12 = 0f
     dst.m22 = scale.z
   }
+  
+  /**
+   * Generates the homogeneous projection matrix given the details of the orthographic projection
+   */
+  def ortho2D(left: Float, right: Float, bottom: Float, top: Float): Matrix3f = {
+    val ret = new Matrix3f
+    setOrtho2D(left, right, bottom, top, ret)
+    ret
+  }
+
+  def setOrtho2D(left: Float, right: Float, bottom: Float, top: Float, dst: Matrix3f): Unit = {
+    dst.m00 = 2 / (right - left)
+    dst.m10 = 0f
+    dst.m20 = -(right + left) / (right - left)
+
+    dst.m01 = 0f
+    dst.m11 = 2 / (top - bottom)
+    dst.m21 = -(top + bottom) / (top - bottom)
+
+    dst.m02 = 0f
+    dst.m12 = 0f
+    dst.m22 = 1f
+  }
 }

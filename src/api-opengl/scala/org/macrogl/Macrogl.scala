@@ -614,6 +614,10 @@ class Macrogl () {
     format: Int, `type`: Int, pixels: Data.Double) = {
     GL11.glTexImage2D(target, level, internalformat, width, height, border, format, `type`, pixels)
   }
+  final def texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
+    format: Int, `type`: Int) = {
+    GL11.glTexImage2D(target, level, internalformat, width, height, border, format, `type`, null.asInstanceOf[org.macrogl.Data.Byte])
+  }
 
   final def texParameterf(target: Int, pname: Int, param: Float) = {
     GL11.glTexParameterf(target, pname, param)

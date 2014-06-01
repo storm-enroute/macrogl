@@ -41,7 +41,7 @@ object LwjglExamples {
       case "2" => new BasicTexture(myPrint, myUpdate, myInit, myClose)
       case "3" => new BasicProjection3D(myPrint, myUpdate, myInit, myClose)
       case "4" => new BasicFractale3D(myPrint, myUpdate, myInit, myClose)
-      case "5" => new BasicRenderToTexture(myPrint, myUpdate, myInit, myClose)
+      case "5" => new BasicRenderToTexture(1280, 720, myPrint, myUpdate, myInit, myClose)
       case _ => {
         println("\"" + exampleName + "\" is not a valid example")
         return

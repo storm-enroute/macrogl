@@ -37,6 +37,6 @@ object WebglExamples {
     new BasicTexture(myPrint, myUpdate, customInit("canvas-texture"), myClose).start()
     new BasicProjection3D(myPrint, myUpdate, customInit("canvas-projection"), myClose).start()
     new BasicFractale3D(myPrint, myUpdate, customInit("canvas-fractale"), myClose).start()
-    new BasicRenderToTexture(myPrint, myUpdate, customInit("canvas-renderToTexture"), myClose).start()
+    new BasicRenderToTexture(1280, 720, myPrint, myUpdate, customInit("canvas-renderToTexture"), myClose).start()
   }
 }

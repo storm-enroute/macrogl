@@ -96,7 +96,7 @@ class BasicProjection3D(print: String => Unit, systemUpdate: () => Boolean, syst
       val colorBufferData = Macrogl.createFloatData(4 * 3)
       colorBufferData.put(1f).put(0f).put(0f)
       colorBufferData.put(0f).put(1f).put(0f)
-      colorBufferData.put(1f).put(0f).put(0f)
+      colorBufferData.put(1f).put(1f).put(0f)
       colorBufferData.put(0f).put(0f).put(1f)
       colorBufferData.rewind
 
