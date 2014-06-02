@@ -85,6 +85,8 @@ object Utils {
 
         var lastLoopTime: Long = System.nanoTime()
         while (fl.continue) {
+          LWJGLSpecifics.flushPendingTaskList()
+          
           val currentTime: Long = System.nanoTime()
           val diff = ((currentTime - lastLoopTime) / 1e9).toFloat
           lastLoopTime = currentTime
@@ -92,8 +94,6 @@ object Utils {
           val frameEvent = FrameEvent(diff)
 
           fl.render(frameEvent)
-
-          LWJGLSpecifics.flushPendingTaskList()
         }
 
         fl.close
