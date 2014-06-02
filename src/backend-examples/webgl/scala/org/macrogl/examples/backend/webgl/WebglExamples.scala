@@ -31,7 +31,9 @@ object WebglExamples {
         val canvas = g.document.getElementById(canvasName)
         canvas.width = width
         canvas.height = height
-        val gl = canvas.getContext("webgl").asInstanceOf[dom.WebGLRenderingContext]
+        var gl = canvas.getContext("webgl").asInstanceOf[dom.WebGLRenderingContext]
+        if(gl == null) gl = canvas.getContext("experimental-webgl").asInstanceOf[dom.WebGLRenderingContext]
+        if(gl == null) throw new RuntimeException("WebGL not supported")
         new Macrogl()(gl)
       }
       

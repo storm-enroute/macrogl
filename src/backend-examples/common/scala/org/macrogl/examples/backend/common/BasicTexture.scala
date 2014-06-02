@@ -130,8 +130,6 @@ class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate:
       // Enable transparency (looks better for textures that support it)
       mgl.enable(GL.BLEND)
       mgl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
-      
-      mgl.enable(GL.TEXTURE_2D)
 
       // Load the texture
       var textureReady = false
