@@ -6,7 +6,9 @@ import js.annotation.JSExport
 import org.scalajs.dom
 
 object Utils {
-  object WebGLSettings {
+  def LWJGLSpecifics: Nothing = throw new UnsupportedOperationException("Available only when using the JVM platform")
+  
+  object WebGLSpecifics {
     private var resourceRelativePath: String = "."
 
     def setResourcePath(path: String): Unit = {
@@ -28,7 +30,7 @@ object Utils {
         gl.bindTexture(Macrogl.TEXTURE_2D, previousTexture)
       }
     })
-    image.src = WebGLSettings.getResourcePath + resourceName
+    image.src = WebGLSpecifics.getResourcePath + resourceName
   }
   
   private def now():Double = g.Date.now().asInstanceOf[js.Number].toDouble

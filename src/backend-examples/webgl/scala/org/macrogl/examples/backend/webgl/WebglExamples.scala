@@ -12,7 +12,7 @@ import org.macrogl.examples.backend.common._
 object WebglExamples {
   @JSExport
   def main(): Unit = {
-    org.macrogl.Utils.WebGLSettings.setResourcePath("./target/scala-2.11/classes")
+    org.macrogl.Utils.WebGLSpecifics.setResourcePath("./target/scala-2.11/classes")
 
     macroGLTest()
   }
