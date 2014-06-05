@@ -45,7 +45,7 @@ object AdaptiveShortBuffer {
     if (byteOrder == ByteOrder.nativeOrder){
       NativeShortBuffer.allocate(capacity)
     } else {
-      val jsBuffer = g.ArrayBuffer(capacity * NativeShortBuffer.BYTES_PER_ELEMENT).asInstanceOf[dom.ArrayBuffer]
+      val jsBuffer = js.Dynamic.newInstance(g.ArrayBuffer)(capacity * NativeShortBuffer.BYTES_PER_ELEMENT).asInstanceOf[dom.ArrayBuffer]
       val shortBuffer = new AdaptiveShortBuffer(capacity, capacity, 0, -1, jsBuffer, 0, byteOrder)
       shortBuffer
     }

@@ -20,7 +20,7 @@ object ByteOrder {
   val LITTLE_ENDIAN: ByteOrder = LittleEndian
 
   private lazy val byteOrder: ByteOrder = {
-    val buffer = g.ArrayBuffer(2).asInstanceOf[dom.ArrayBuffer]
+    val buffer = js.Dynamic.newInstance(g.ArrayBuffer)(2).asInstanceOf[dom.ArrayBuffer]
 
     val byteView = new dom.Int8Array(buffer)
     val shortView = new dom.Int16Array(buffer)

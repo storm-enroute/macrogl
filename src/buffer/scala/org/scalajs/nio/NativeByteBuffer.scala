@@ -211,7 +211,7 @@ class NativeByteBuffer(protected var mCapacity: Int, protected var mLimit: Int, 
 
 object NativeByteBuffer {
   def allocate(capacity: Int): NativeByteBuffer = {
-    val jsBuffer = g.ArrayBuffer(capacity).asInstanceOf[dom.ArrayBuffer]
+    val jsBuffer = js.Dynamic.newInstance(g.ArrayBuffer)(capacity).asInstanceOf[dom.ArrayBuffer]
     // Why not native endianness? No idea, ask Oracle!
     val nativeByteBuffer = new NativeByteBuffer(capacity, capacity, 0, -1, jsBuffer, 0, ByteOrder.BIG_ENDIAN)
     nativeByteBuffer

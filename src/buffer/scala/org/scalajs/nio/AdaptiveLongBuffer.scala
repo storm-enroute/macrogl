@@ -57,7 +57,7 @@ object AdaptiveLongBuffer {
     if (byteOrder == ByteOrder.nativeOrder){
       NativeLongBuffer.allocate(capacity)
     } else {
-      val jsBuffer = g.ArrayBuffer(capacity * NativeLongBuffer.BYTES_PER_ELEMENT).asInstanceOf[dom.ArrayBuffer]
+      val jsBuffer = js.Dynamic.newInstance(g.ArrayBuffer)(capacity * NativeLongBuffer.BYTES_PER_ELEMENT).asInstanceOf[dom.ArrayBuffer]
       val longBuffer = new AdaptiveLongBuffer(capacity, capacity, 0, -1, jsBuffer, 0, byteOrder)
       longBuffer
     }

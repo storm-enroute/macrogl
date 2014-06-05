@@ -45,7 +45,7 @@ object AdaptiveDoubleBuffer {
     if (byteOrder == ByteOrder.nativeOrder){
       NativeDoubleBuffer.allocate(capacity)
     } else {
-      val jsBuffer = g.ArrayBuffer(capacity * NativeDoubleBuffer.BYTES_PER_ELEMENT).asInstanceOf[dom.ArrayBuffer]
+      val jsBuffer = js.Dynamic.newInstance(g.ArrayBuffer)(capacity * NativeDoubleBuffer.BYTES_PER_ELEMENT).asInstanceOf[dom.ArrayBuffer]
       val doubleBuffer = new AdaptiveDoubleBuffer(capacity, capacity, 0, -1, jsBuffer, 0, byteOrder)
       doubleBuffer
     }

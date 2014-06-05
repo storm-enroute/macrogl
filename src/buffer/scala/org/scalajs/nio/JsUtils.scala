@@ -4,7 +4,7 @@ import scala.scalajs.js
 import js.Dynamic.{ global => g }
 
 object JsUtils {
-  private val typeRegex = g.RegExp("^\\[object\\s(.*)\\]$")
+  private val typeRegex = js.Dynamic.newInstance(g.RegExp)("^\\[object\\s(.*)\\]$")
   
   /*
    * Return the type of the JavaScript object as a String. Examples:

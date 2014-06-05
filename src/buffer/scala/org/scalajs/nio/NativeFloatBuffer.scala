@@ -74,7 +74,7 @@ class NativeFloatBuffer(protected var mCapacity: Int, protected var mLimit: Int,
 
 object NativeFloatBuffer {
   def allocate(capacity: Int): NativeFloatBuffer = {
-    val jsBuffer = g.ArrayBuffer(capacity * BYTES_PER_ELEMENT).asInstanceOf[dom.ArrayBuffer]
+    val jsBuffer = js.Dynamic.newInstance(g.ArrayBuffer)(capacity * BYTES_PER_ELEMENT).asInstanceOf[dom.ArrayBuffer]
     val floatBuffer = new NativeFloatBuffer(capacity, capacity, 0, -1, jsBuffer, 0)
     floatBuffer
   }

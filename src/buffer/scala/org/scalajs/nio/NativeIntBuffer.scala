@@ -72,7 +72,7 @@ class NativeIntBuffer(protected var mCapacity: Int, protected var mLimit: Int, p
 
 object NativeIntBuffer {
   def allocate(capacity: Int): NativeIntBuffer = {
-    val jsBuffer = g.ArrayBuffer(capacity * BYTES_PER_ELEMENT).asInstanceOf[dom.ArrayBuffer]
+    val jsBuffer = js.Dynamic.newInstance(g.ArrayBuffer)(capacity * BYTES_PER_ELEMENT).asInstanceOf[dom.ArrayBuffer]
     val intBuffer = new NativeIntBuffer(capacity, capacity, 0, -1, jsBuffer, 0)
     intBuffer
   }
