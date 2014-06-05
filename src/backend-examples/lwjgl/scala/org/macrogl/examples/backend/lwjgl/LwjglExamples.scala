@@ -29,7 +29,7 @@ object LwjglExamples {
       !Display.isCloseRequested()
     }
     def myInit(): Macrogl = {
-      val contextAttributes = new ContextAttribs(3, 0)
+      val contextAttributes = new ContextAttribs(2, 1)
       Display.setDisplayMode(new DisplayMode(width, height))
       Display.create(new PixelFormat, contextAttributes)
 
