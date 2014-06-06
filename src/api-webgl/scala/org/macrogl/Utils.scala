@@ -35,7 +35,8 @@ object Utils {
 
   /**
    * Load a image from the resources into an OpenGL 2D texture.
-   *
+   * The textures are stored using the 32 bits per pixel RGBA format.
+   * Supported images format: PNG, JPEG, BMP and GIF.
    *
    * @param resourceName The Fully qualified path of the resource image
    * @param texture The token of the texture where the decoded texture have to be loaded
