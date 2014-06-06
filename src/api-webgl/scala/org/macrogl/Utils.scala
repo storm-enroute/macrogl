@@ -62,6 +62,7 @@ object Utils {
 
   private class FrameListenerLoopContext {
     var lastLoopTime: Double = now()
+    var closed: Boolean = false
   }
 
   /**
@@ -79,18 +80,21 @@ object Utils {
     val ctx = new FrameListenerLoopContext
 
     def loop(timeStamp: js.Any): Unit = {
-      if (fl.continue) {
-        val currentTime = now()
-        val diff = ((currentTime - ctx.lastLoopTime) / 1e3).toFloat
-        ctx.lastLoopTime = currentTime
+      if (!ctx.closed) {
+        if (fl.continue) {
+          val currentTime = now()
+          val diff = ((currentTime - ctx.lastLoopTime) / 1e3).toFloat
+          ctx.lastLoopTime = currentTime
 
-        val frameEvent = FrameEvent(diff)
+          val frameEvent = FrameEvent(diff)
 
-        fl.render(frameEvent)
+          fl.render(frameEvent)
 
-        g.window.requestAnimationFrame(loop _)
-      } else {
-        fl.close
+          g.window.requestAnimationFrame(loop _)
+        } else {
+          ctx.closed = true
+          fl.close
+        }
       }
     }
 

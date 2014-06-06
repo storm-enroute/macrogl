@@ -118,10 +118,10 @@ object Utils {
 
     val frameListenerThread = new Thread(new Runnable {
       def run() {
+        var lastLoopTime: Long = System.nanoTime()
 
         fl.init
 
-        var lastLoopTime: Long = System.nanoTime()
         while (fl.continue) {
           LWJGLSpecifics.flushPendingTaskList()
 
