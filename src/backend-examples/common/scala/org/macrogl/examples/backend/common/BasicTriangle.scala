@@ -4,7 +4,11 @@ import org.macrogl.Utils
 import org.macrogl.Macrogl
 import org.macrogl.{ Macrogl => GL }
 
-class BasicTriangle(width: Int, height: Int, print: String => Unit, systemUpdate: () => Boolean, systemInit: () => Macrogl, systemClose: () => Unit)
+/**
+ * Basic example with a static triangle
+ */
+class BasicTriangle(width: Int, height: Int, print: String => Unit, systemUpdate: () => Boolean,
+    systemInit: () => Macrogl, systemClose: () => Unit)
   extends DemoRenderable {
 
   class BasicTriangleListener extends org.macrogl.FrameListener {

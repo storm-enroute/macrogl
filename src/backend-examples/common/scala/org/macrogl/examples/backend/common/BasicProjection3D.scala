@@ -6,7 +6,11 @@ import org.macrogl.{ Macrogl => GL }
 
 import org.macrogl.math._
 
-class BasicProjection3D(width: Int, height: Int, print: String => Unit, systemUpdate: () => Boolean, systemInit: () => Macrogl, systemClose: () => Unit)
+/**
+ * Basic example to try the package org.macrogl.math
+ */
+class BasicProjection3D(width: Int, height: Int, print: String => Unit, systemUpdate: () => Boolean,
+    systemInit: () => Macrogl, systemClose: () => Unit)
   extends DemoRenderable {
 
   class BasicProjection3DListener extends org.macrogl.FrameListener {
@@ -142,7 +146,6 @@ class BasicProjection3D(width: Int, height: Int, print: String => Unit, systemUp
       val rotationVelocity: Float = 90f
 
       def render(fe: org.macrogl.FrameEvent): Unit = {
-        //print("Elapsed seconds since last frame: " + fe.elapsedTime)
         transformStack.push // Save the current transformation matrix
 
         // Anime the rotation using the data from the FrameEvent

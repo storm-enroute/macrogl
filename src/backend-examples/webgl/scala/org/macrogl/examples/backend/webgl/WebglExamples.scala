@@ -8,6 +8,10 @@ import org.scalajs.dom
 import org.macrogl.Macrogl
 import org.macrogl.examples.backend.common._
 
+/**
+ * Framework for the examples using the WebGL back end
+ * All 5 demos should be visible at the page backend-examples-webgl/index.html
+ */
 @JSExport
 object WebglExamples {
   @JSExport

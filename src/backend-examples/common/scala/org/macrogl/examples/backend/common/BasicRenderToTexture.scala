@@ -6,7 +6,13 @@ import org.macrogl.{ Macrogl => GL }
 
 import org.macrogl.math._
 
-class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, systemUpdate: () => Boolean, systemInit: () => Macrogl, systemClose: () => Unit)
+/**
+ * Basic example of render-to-texture
+ * This example use features of OpenGL 3, so it will not work on some old Intel IGP,
+ * you should use at least a Sandy Bridge processor, though we had it working with an Arrandale and an OpenGL 2.1 context.
+ */
+class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, systemUpdate: () => Boolean,
+    systemInit: () => Macrogl, systemClose: () => Unit)
   extends DemoRenderable {
 
   class BasicRenderToTextureListener extends org.macrogl.FrameListener {

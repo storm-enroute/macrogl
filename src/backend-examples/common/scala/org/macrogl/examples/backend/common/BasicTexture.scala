@@ -6,7 +6,11 @@ import org.macrogl.{ Macrogl => GL }
 
 import org.macrogl.math._
 
-class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate: () => Boolean, systemInit: () => Macrogl, systemClose: () => Unit)
+/**
+ * Basic example of texturing
+ */
+class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate: () => Boolean,
+    systemInit: () => Macrogl, systemClose: () => Unit)
   extends DemoRenderable {
 
   class BasicTextureListener extends org.macrogl.FrameListener {

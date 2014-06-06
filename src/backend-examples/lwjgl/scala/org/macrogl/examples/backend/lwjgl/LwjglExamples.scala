@@ -3,8 +3,11 @@ package org.macrogl.examples.backend.lwjgl
 import org.lwjgl.opengl._
 import org.macrogl.Macrogl
 import org.macrogl.examples.backend.common._
-import org.macrogl.examples.backend.common.BasicTriangle
 
+/**
+ * Framework for the examples using the LWJGL back end
+ * Start the program with the number of the demo you want to launch as the first argument
+ */
 object LwjglExamples {
   def main(args: Array[String]): Unit = {
     if (args.length > 0) {
