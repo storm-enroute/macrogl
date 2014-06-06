@@ -8,23 +8,50 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import org.lwjgl.opengl._
 
 object Utils {
+  /**
+   * Specifics when using the LWJGL back end with the JVM.
+   * Not accessible when not using the JVM.
+   */
   object LWJGLSpecifics {
     private val pendingTaskList = new ConcurrentLinkedQueue[() => Unit]
-    
+
+    /**
+     * Flush all the pending tasks.
+     * You don't need to explicitly use this method if you use the FrameListener loop system.
+     * Warning: this should be called only from the OpenGL thread!
+     */
     def flushPendingTaskList(): Unit = {
       var current: () => Unit = null
       while ({ current = pendingTaskList.poll(); current } != null) {
         current()
       }
     }
-    
+
+    /**
+     * Add a task to be executed by the OpenGL thread.
+     * Tasks are usually executed at the beginning of the next iteration of the FrameListener loop system.
+     */
     def addPendingTask(task: () => Unit): Unit = {
       pendingTaskList.add(task)
     }
   }
 
+  /**
+   * Specifics when using the WebGL back end with Scala.js.
+   * Not accessible when not using Scala.js.
+   */
   def WebGLSpecifics: Nothing = throw new UnsupportedOperationException("Available only when using the Scala.js platform")
 
+  /**
+   * Load a image from the resources into an OpenGL 2D texture.
+   * 
+   * 
+   * @param resourceName The Fully qualified path of the resource image
+   * @param texture The token of the texture where the decoded texture have to be loaded
+   * @param gl The Macrogl instance to use to load the texture into OpenGL
+   * @param preload Optional function called by the OpenGL thread after the image has been decoded but before it is loaded into OpenGL.
+   * A returned value false means aborting the texture loading
+   */
   def loadTexture2DFromResources(resourceName: String, texture: Token.Texture, gl: Macrogl, preload: => Boolean = { true }): Unit = {
     val stream = this.getClass().getResourceAsStream(resourceName)
 
@@ -76,6 +103,17 @@ object Utils {
     }
   }
 
+  /**
+   * Start the FrameListener into a separate thread while the following logical flow:
+   * {{{
+   * val fl:FrameListener = ...
+   * fl.init
+   * while(fl.continue) {
+   *   fl.render
+   * }
+   * fl.close
+   * }}}
+   */
   def startFrameListener(fl: FrameListener): Unit = {
 
     val frameListenerThread = new Thread(new Runnable {
@@ -86,7 +124,7 @@ object Utils {
         var lastLoopTime: Long = System.nanoTime()
         while (fl.continue) {
           LWJGLSpecifics.flushPendingTaskList()
-          
+
           val currentTime: Long = System.nanoTime()
           val diff = ((currentTime - lastLoopTime) / 1e9).toFloat
           lastLoopTime = currentTime
