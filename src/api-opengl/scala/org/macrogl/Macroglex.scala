@@ -31,15 +31,15 @@ class Macroglex private[macrogl] () extends Macrogl() {
   final def getBufferSubData(target: Int, offset: Long, data: Data.Double) {
     GL15.glGetBufferSubData(target, offset, data)
   }
-  
+
   final def getParameterd(pname: Int): Double = {
     GL11.glGetDouble(pname)
   }
-  
+
   final def getParameterdv(pname: Int, outputs: Data.Double) = {
     GL11.glGetDouble(pname, outputs)
   }
-  
+
   final def texImage1D(target: Int, level: Int, internalformat: Int, width: Int, border: Int,
     format: Int, `type`: Int, pixels: Data.Byte) = {
     GL11.glTexImage1D(target, level, internalformat, width, border, format, `type`, pixels)
@@ -60,19 +60,19 @@ class Macroglex private[macrogl] () extends Macrogl() {
     format: Int, `type`: Int, pixels: Data.Double) = {
     GL11.glTexImage1D(target, level, internalformat, width, border, format, `type`, pixels)
   }
-  
+
   final def color4f(r: Float, g: Float, b: Float, a: Float) {
     GL11.glColor4f(r, g, b, a)
   }
-  
+
   final def drawBuffers(ib: Data.Int) {
     GL20.glDrawBuffers(ib)
   }
-  
+
   final def readBuffer(b: Int) {
     GL11.glReadBuffer(b)
   }
-  
+
   final def begin(mode: Int) {
     GL11.glBegin(mode)
   }
@@ -80,7 +80,7 @@ class Macroglex private[macrogl] () extends Macrogl() {
   final def end() {
     GL11.glEnd()
   }
-  
+
   final def matrixMode(mode: Int) {
     GL11.glMatrixMode(mode)
   }
@@ -121,12 +121,12 @@ object Macroglex {
   val GEOMETRY_SHADER = GL32.GL_GEOMETRY_SHADER
   val COMPUTE_SHADER = GL43.GL_COMPUTE_SHADER
   val SHADER_STORAGE_BUFFER = GL43.GL_SHADER_STORAGE_BUFFER
-  
+
   val FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER = GL30.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER
   val FRAMEBUFFER_INCOMPLETE_READ_BUFFER = GL30.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER
-  
+
   // Moved from Macrogl
-  
+
   val MATRIX_MODE = GL11.GL_MATRIX_MODE
   val PROJECTION = GL11.GL_PROJECTION
   val PROJECTION_MATRIX = GL11.GL_PROJECTION_MATRIX

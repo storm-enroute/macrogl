@@ -181,7 +181,7 @@ class Matrix2f extends Matrix {
     Matrix2f.mult(this, v, ret)
     ret
   }
-  
+
   def transform(v: Vector2f): Vector2f = {
     val ret = new Vector2f
     Matrix2f.mult(this, v, ret)
@@ -194,19 +194,19 @@ class Matrix2f extends Matrix {
     sb += m01 + " " + m11 + "\n"
     sb
   }
-  
+
   override def equals(obj: Any): Boolean = {
-    if(obj == null) false
-    if(!obj.isInstanceOf[Matrix2f]) false
-    
+    if (obj == null) false
+    if (!obj.isInstanceOf[Matrix2f]) false
+
     val o = obj.asInstanceOf[Matrix2f]
-    
+
     m00 == o.m00 &&
-    m01 == o.m01 &&
-    m10 == o.m10 &&
-    m11 == o.m11
+      m01 == o.m01 &&
+      m10 == o.m10 &&
+      m11 == o.m11
   }
-  
+
   override def hashCode(): Int = {
     m00.toInt ^ m01.toInt ^ m10.toInt ^ m11.toInt
   }
@@ -302,7 +302,7 @@ object Matrix2f {
     dst.m10 = left.m10 / right
     dst.m11 = left.m11 / right
   }
-  
+
   /**
    * Generates the non-homogeneous rotation matrix for a given angle (in degrees) around the origin
    */

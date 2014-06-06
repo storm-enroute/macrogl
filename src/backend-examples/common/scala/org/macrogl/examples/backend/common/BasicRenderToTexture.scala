@@ -12,14 +12,14 @@ import org.macrogl.math._
  * you should use at least a Sandy Bridge processor, though we had it working with an Arrandale and an OpenGL 2.1 context.
  */
 class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, systemUpdate: () => Boolean,
-    systemInit: () => Macrogl, systemClose: () => Unit)
+  systemInit: () => Macrogl, systemClose: () => Unit)
   extends DemoRenderable {
 
   class BasicRenderToTextureListener extends org.macrogl.FrameListener {
-    
+
     val textureWidth = 600
     val textureHeight = 400
-    
+
     // (continue, render, close)
     var funcs: Option[(() => Boolean, org.macrogl.FrameEvent => Unit, () => Unit)] = None
 
@@ -29,7 +29,7 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
       val mgl = systemInit()
 
       //#### PROJECTION (3D) ####
-      
+
       // Shaders
       val projectionVertexSource = """
         uniform mat4 projection;
@@ -133,7 +133,7 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
       val projectionTransformStack = new MatrixStack(new Matrix4f)
 
       //#### SCREEN RENDERING (2D) ####
-      
+
       // Shaders
       val fullscreenVertexSource = """
         uniform mat3 projection;
@@ -204,9 +204,9 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
       val fullscreenTexCoordBuffer = mgl.createBuffer
       val fullscreenIndicesBuffer = mgl.createBuffer
 
-      val w = textureWidth.toFloat/2
-      val h = textureHeight.toFloat/2
-      
+      val w = textureWidth.toFloat / 2
+      val h = textureHeight.toFloat / 2
+
       val fullscreenVertexBufferData = Macrogl.createFloatData(4 * 2)
       fullscreenVertexBufferData.put(-w).put(-h)
       fullscreenVertexBufferData.put(w).put(-h)
@@ -234,13 +234,13 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
 
       mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, fullscreenIndicesBuffer)
       mgl.bufferData(GL.ELEMENT_ARRAY_BUFFER, fullscreenIndicesBufferData, GL.STATIC_DRAW)
-      
+
       // Setup matrices
-      val fullscreenProjection = Matrix3f.ortho2D(-width.toFloat/2, width.toFloat/2, -height.toFloat/2, height.toFloat/2)
+      val fullscreenProjection = Matrix3f.ortho2D(-width.toFloat / 2, width.toFloat / 2, -height.toFloat / 2, height.toFloat / 2)
       val fullscreenTransformStack = new MatrixStack(new Matrix3f)
-      
+
       //#### RENDER TO TEXTURE ####
-      
+
       val targetTexture = mgl.createTexture
       mgl.bindTexture(GL.TEXTURE_2D, targetTexture)
       mgl.texImage2D(GL.TEXTURE_2D, 0, GL.RGB, textureWidth, textureHeight, 0, GL.RGB, GL.UNSIGNED_BYTE) // Allocate memory
@@ -248,17 +248,17 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
       mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR)
       mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE)
       mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE)
-      
+
       val renderbufferDepth = mgl.createRenderbuffer
       mgl.bindRenderbuffer(GL.RENDERBUFFER, renderbufferDepth)
       mgl.renderbufferStorage(GL.RENDERBUFFER, GL.DEPTH_COMPONENT16, textureWidth, textureHeight)
-      
+
       val framebuffer = mgl.createFramebuffer
       mgl.bindFramebuffer(GL.FRAMEBUFFER, framebuffer)
       mgl.framebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, targetTexture, 0) // attach the color buffer
       mgl.framebufferRenderbuffer(GL.FRAMEBUFFER, GL.DEPTH_ATTACHMENT, GL.RENDERBUFFER, renderbufferDepth) // attach the depth buffer
-      
-      if(mgl.checkFramebufferStatus(GL.FRAMEBUFFER) != GL.FRAMEBUFFER_COMPLETE)
+
+      if (mgl.checkFramebufferStatus(GL.FRAMEBUFFER) != GL.FRAMEBUFFER_COMPLETE)
         print("Framebuffer incomplete")
 
       print("Basic RenderToTexture: ready")
@@ -271,7 +271,7 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
 
       var currentRotation: Float = 0f
       val rotationVelocity: Float = -60f
-      
+
       var currentScreenRotation: Float = 0f
       val screenRotationVelocity: Float = -20f
 
@@ -279,19 +279,19 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
         // Anime the rotation using the data from the FrameEvent
         currentRotation += rotationVelocity * fe.elapsedTime
         currentScreenRotation += screenRotationVelocity * fe.elapsedTime
-        
+
         //#### PROJECTION ####
         // Render into the framebuffer
         mgl.bindFramebuffer(GL.FRAMEBUFFER, framebuffer)
         mgl.viewport(0, 0, textureWidth, textureHeight)
-        
+
         projectionTransformStack.push // Save the current transformation matrix
 
         projectionTransformStack.current = Matrix4f.translate3D(new Vector3f(0, 0, -2)) *
           Matrix4f.rotation3D(currentRotation, new Vector3f(0, 1, 0))
 
         mgl.useProgram(projectionProgram)
-        
+
         mgl.clearColor(0.5f, 0.5f, 0.5f, 1)
         mgl.clear(GL.COLOR_BUFFER_BIT)
 
@@ -316,59 +316,60 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
         mgl.disableVertexAttribArray(attribPosLocation)
 
         projectionTransformStack.pop // Restore the transformation matrix
-        
+
         //#### FULLSCREEN ####
-        
+
         // Render into the screen
         mgl.bindFramebuffer(GL.FRAMEBUFFER, org.macrogl.Token.FrameBuffer.none)
         mgl.viewport(0, 0, width, height)
-        
+
         fullscreenTransformStack.push
-        
+
         val scaleFactor = width.toFloat / textureWidth.toFloat * 0.75f
-        
-        fullscreenTransformStack.current = Matrix3f.scale2D(new Vector2f(scaleFactor, scaleFactor)) * Matrix3f.rotation2D(currentScreenRotation)
-        
+
+        fullscreenTransformStack.current = Matrix3f.scale2D(new Vector2f(scaleFactor, scaleFactor)) *
+          Matrix3f.rotation2D(currentScreenRotation)
+
         mgl.useProgram(fullscreenProgram)
-        
+
         mgl.clearColor(0f, 0f, 0f, 1)
         mgl.clear(GL.COLOR_BUFFER_BIT)
-        
+
         mgl.uniformMatrix3f(fullscreenUniformTransformLocation, fullscreenTransformStack.current)
-        
+
         mgl.uniformMatrix3f(fullscreenUniformProjectionLocation, fullscreenProjection)
-        
+
         mgl.activeTexture(GL.TEXTURE0)
         mgl.bindTexture(GL.TEXTURE_2D, targetTexture)
-        
+
         mgl.uniform1i(fullscreenUniformTexLocation, 0)
-        
+
         mgl.bindBuffer(GL.ARRAY_BUFFER, fullscreenVertexBuffer)
         mgl.vertexAttribPointer(fullscreenAttribPosLocation, 2, GL.FLOAT, false, 0, 0)
         mgl.enableVertexAttribArray(fullscreenAttribPosLocation)
-        
+
         mgl.bindBuffer(GL.ARRAY_BUFFER, fullscreenTexCoordBuffer)
         mgl.vertexAttribPointer(fullscreenAttribTexCoordLocation, 2, GL.FLOAT, false, 0, 0)
         mgl.enableVertexAttribArray(fullscreenAttribTexCoordLocation)
-        
+
         mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, fullscreenIndicesBuffer)
         mgl.drawElements(GL.TRIANGLES, fullscreenIndicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
-        
+
         mgl.disableVertexAttribArray(fullscreenAttribTexCoordLocation)
         mgl.disableVertexAttribArray(fullscreenAttribPosLocation)
-        
+
         fullscreenTransformStack.pop
-        
+
         continueCondition = systemUpdate()
       }
 
       def close(): Unit = {
         print("Basic RenderToTexture: closing")
-        
-      	mgl.deleteBuffer(fullscreenVertexBuffer)
-      	mgl.deleteBuffer(fullscreenTexCoordBuffer)
-      	mgl.deleteBuffer(fullscreenIndicesBuffer)
-        
+
+        mgl.deleteBuffer(fullscreenVertexBuffer)
+        mgl.deleteBuffer(fullscreenTexCoordBuffer)
+        mgl.deleteBuffer(fullscreenIndicesBuffer)
+
         mgl.deleteShader(fullscreenVertex)
         mgl.deleteShader(fullscreenFragment)
 

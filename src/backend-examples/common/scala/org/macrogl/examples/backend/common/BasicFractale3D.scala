@@ -10,7 +10,7 @@ import org.macrogl.math._
  * Basic example to try depth-testing
  */
 class BasicFractale3D(width: Int, height: Int, print: String => Unit, systemUpdate: () => Boolean,
-    systemInit: () => Macrogl, systemClose: () => Unit)
+  systemInit: () => Macrogl, systemClose: () => Unit)
   extends DemoRenderable {
 
   class BasicFractale3DListener extends org.macrogl.FrameListener {

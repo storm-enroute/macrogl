@@ -44,8 +44,8 @@ object Utils {
 
   /**
    * Load a image from the resources into an OpenGL 2D texture.
-   * 
-   * 
+   *
+   *
    * @param resourceName The Fully qualified path of the resource image
    * @param texture The token of the texture where the decoded texture have to be loaded
    * @param gl The Macrogl instance to use to load the texture into OpenGL

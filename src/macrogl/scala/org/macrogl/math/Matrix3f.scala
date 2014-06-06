@@ -246,7 +246,7 @@ class Matrix3f extends Matrix {
     Matrix3f.mult(this, v, ret)
     ret
   }
-  
+
   def transform(v: Vector3f): Vector3f = {
     val ret = new Vector3f
     Matrix3f.mult(this, v, ret)
@@ -260,28 +260,28 @@ class Matrix3f extends Matrix {
     sb += m02 + " " + m12 + " " + m22 + "\n"
     sb
   }
-  
+
   override def equals(obj: Any): Boolean = {
-    if(obj == null) false
-    if(!obj.isInstanceOf[Matrix3f]) false
-    
+    if (obj == null) false
+    if (!obj.isInstanceOf[Matrix3f]) false
+
     val o = obj.asInstanceOf[Matrix3f]
-    
+
     m00 == o.m00 &&
-    m01 == o.m01 &&
-    m02 == o.m02 &&
-    m10 == o.m10 &&
-    m11 == o.m11 &&
-    m12 == o.m12 &&
-    m20 == o.m20 &&
-    m21 == o.m21 &&
-    m22 == o.m22
+      m01 == o.m01 &&
+      m02 == o.m02 &&
+      m10 == o.m10 &&
+      m11 == o.m11 &&
+      m12 == o.m12 &&
+      m20 == o.m20 &&
+      m21 == o.m21 &&
+      m22 == o.m22
   }
-  
+
   override def hashCode(): Int = {
     m00.toInt ^ m01.toInt ^ m02.toInt ^
-    m10.toInt ^ m11.toInt ^ m12.toInt ^
-    m20.toInt ^ m21.toInt ^ m22.toInt
+      m10.toInt ^ m11.toInt ^ m12.toInt ^
+      m20.toInt ^ m21.toInt ^ m22.toInt
   }
 }
 
@@ -447,7 +447,7 @@ object Matrix3f {
     dst.m21 = left.m21 / right
     dst.m22 = left.m22 / right
   }
-  
+
   /**
    * Generates the homogeneous rotation matrix for a given angle (in degrees) around the origin
    */
@@ -521,7 +521,7 @@ object Matrix3f {
     dst.m12 = 0f
     dst.m22 = 1f
   }
-  
+
   /**
    * Generates the non-homogeneous rotation matrix for a given angle (in degrees) and a given unitary axis around the origin
    */
@@ -576,7 +576,7 @@ object Matrix3f {
     dst.m12 = 0f
     dst.m22 = scale.z
   }
-  
+
   /**
    * Generates the homogeneous projection matrix given the details of the orthographic projection
    */

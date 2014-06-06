@@ -1,7 +1,7 @@
 package org.scalajs.nio
 
 class ReadOnlyByteBuffer(protected val internalBuffer: ByteBuffer) extends ByteBuffer
-with ReadOnlyTypedBufferBehaviour[Byte, ByteBuffer] {
+  with ReadOnlyTypedBufferBehaviour[Byte, ByteBuffer] {
   def asReadOnlyBuffer(): ByteBuffer = this.duplicate
   def duplicate(): ByteBuffer = new ReadOnlyByteBuffer(internalBuffer.duplicate)
   def slice(): ByteBuffer = new ReadOnlyByteBuffer(internalBuffer.slice)

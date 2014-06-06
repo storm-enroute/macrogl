@@ -1,9 +1,6 @@
 package org.macrogl
 
-
 import scala.collection._
-
-
 
 abstract class Matrix(val array: Array[Double]) {
 
@@ -15,14 +12,12 @@ abstract class Matrix(val array: Array[Double]) {
     val invbases = array.map(v => f"$v%.5f").grouped(4).toArray.transpose
     "%s(\n%s)".format(
       this.getClass.getSimpleName,
-      invbases.map(_.mkString(", ")).mkString("\n")
-    )
+      invbases.map(_.mkString(", ")).mkString("\n"))
   }
 
   final def apply(y: Int, x: Int) = array(x * 4 + y)
 
 }
-
 
 object Matrix {
 
@@ -65,7 +60,7 @@ object Matrix {
 
     val inv0 = m(5) * m(10) * m(15) - m(5) * m(11) * m(14) - m(9) * m(6) * m(15) + m(9) * m(7) * m(14) + m(13) * m(6) * m(11) - m(13) * m(7) * m(10)
     val inv4 = -m(4) * m(10) * m(15) + m(4) * m(11) * m(14) + m(8) * m(6) * m(15) - m(8) * m(7) * m(14) - m(12) * m(6) * m(11) + m(12) * m(7) * m(10)
-    val inv8 = m(4)  * m(9) * m(15) - m(4) * m(11) * m(13) - m(8) * m(5) * m(15) + m(8) * m(7) * m(13) + m(12) * m(5) * m(11) - m(12) * m(7) * m(9)
+    val inv8 = m(4) * m(9) * m(15) - m(4) * m(11) * m(13) - m(8) * m(5) * m(15) + m(8) * m(7) * m(13) + m(12) * m(5) * m(11) - m(12) * m(7) * m(9)
     val inv12 = -m(4) * m(9) * m(14) + m(4) * m(10) * m(13) + m(8) * m(5) * m(14) - m(8) * m(6) * m(13) - m(12) * m(5) * m(10) + m(12) * m(6) * m(9)
     val inv1 = -m(1) * m(10) * m(15) + m(1) * m(11) * m(14) + m(9) * m(2) * m(15) - m(9) * m(3) * m(14) - m(13) * m(2) * m(11) + m(13) * m(3) * m(10)
     val inv5 = m(0) * m(10) * m(15) - m(0) * m(11) * m(14) - m(8) * m(2) * m(15) + m(8) * m(3) * m(14) + m(12) * m(2) * m(11) - m(12) * m(3) * m(10)
@@ -113,7 +108,6 @@ object Matrix {
     1.0, 0.0, 0.0, 0.0,
     0.0, 1.0, 0.0, 0.0,
     0.0, 0.0, 1.0, 0.0,
-    0.0, 0.0, 0.0, 1.0
-  ))
+    0.0, 0.0, 0.0, 1.0))
 
 }

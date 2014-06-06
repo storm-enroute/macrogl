@@ -5,17 +5,17 @@ import js.Dynamic.{ global => g }
 import org.scalajs.dom
 
 class AdaptiveLongBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: dom.ArrayBuffer,
-    mBufferOffset: Int, mByteOrder: ByteOrder) extends NativeLongBuffer(cap, lim, pos, mar, mBuffer, mBufferOffset) {
+  mBufferOffset: Int, mByteOrder: ByteOrder) extends NativeLongBuffer(cap, lim, pos, mar, mBuffer, mBufferOffset) {
   override protected val littleEndian: Boolean = mByteOrder == LittleEndian
 
   override protected def iGet(index: Int): Long = {
     val (lo, hi) =
       if (this.littleEndian) {
         (this.dataView.getInt32(index * 2 + 0, this.littleEndian).toInt,
-         this.dataView.getInt32(index * 2 + 4, this.littleEndian).toInt)
+          this.dataView.getInt32(index * 2 + 4, this.littleEndian).toInt)
       } else {
         (this.dataView.getInt32(index * 2 + 4, this.littleEndian).toInt,
-         this.dataView.getInt32(index * 2 + 0, this.littleEndian).toInt)
+          this.dataView.getInt32(index * 2 + 0, this.littleEndian).toInt)
       }
     Bits.pairIntToLong(hi, lo)
   }
@@ -32,11 +32,11 @@ class AdaptiveLongBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: dom.Ar
 
   override def duplicate(): LongBuffer = {
     new AdaptiveLongBuffer(this.mCapacity, this.mLimit, this.mPosition, this.mMark,
-        this.mBuffer, this.mBufferOffset, mByteOrder)
+      this.mBuffer, this.mBufferOffset, mByteOrder)
   }
   override def slice(): LongBuffer = {
     new AdaptiveLongBuffer(this.remaining, this.remaining, 0, -1, this.mBuffer,
-        this.mBufferOffset + (this.mPosition * this.bytes_per_element), mByteOrder)
+      this.mBufferOffset + (this.mPosition * this.bytes_per_element), mByteOrder)
   }
   override def asReadOnlyBuffer(): LongBuffer = {
     new ReadOnlyLongBuffer(this.duplicate)
@@ -54,7 +54,7 @@ class AdaptiveLongBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: dom.Ar
 object AdaptiveLongBuffer {
   def allocate(capacity: Int): NativeLongBuffer = this.allocate(capacity, ByteOrder.nativeOrder)
   def allocate(capacity: Int, byteOrder: ByteOrder): NativeLongBuffer = {
-    if (byteOrder == ByteOrder.nativeOrder){
+    if (byteOrder == ByteOrder.nativeOrder) {
       NativeLongBuffer.allocate(capacity)
     } else {
       val jsBuffer = js.Dynamic.newInstance(g.ArrayBuffer)(capacity * NativeLongBuffer.BYTES_PER_ELEMENT).asInstanceOf[dom.ArrayBuffer]

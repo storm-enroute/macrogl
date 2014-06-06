@@ -5,7 +5,7 @@ import js.Dynamic.{ global => g }
 import org.scalajs.dom
 
 class AdaptiveShortBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: dom.ArrayBuffer,
-    mBufferOffset: Int, mByteOrder: ByteOrder) extends NativeShortBuffer(cap, lim, pos, mar, mBuffer, mBufferOffset) {
+  mBufferOffset: Int, mByteOrder: ByteOrder) extends NativeShortBuffer(cap, lim, pos, mar, mBuffer, mBufferOffset) {
   protected val littleEndian: Boolean = mByteOrder == LittleEndian
 
   override protected def iGet(index: Int): Short = {
@@ -17,11 +17,11 @@ class AdaptiveShortBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: dom.A
 
   override def duplicate(): ShortBuffer = {
     new AdaptiveShortBuffer(this.mCapacity, this.mLimit, this.mPosition, this.mMark,
-        this.mBuffer, this.mBufferOffset, mByteOrder)
+      this.mBuffer, this.mBufferOffset, mByteOrder)
   }
   override def slice(): ShortBuffer = {
     new AdaptiveShortBuffer(this.remaining, this.remaining, 0, -1, this.mBuffer,
-        this.mBufferOffset + (this.mPosition * this.bytes_per_element), mByteOrder)
+      this.mBufferOffset + (this.mPosition * this.bytes_per_element), mByteOrder)
   }
   override def asReadOnlyBuffer(): ShortBuffer = {
     new ReadOnlyShortBuffer(this.duplicate)
@@ -32,9 +32,9 @@ class AdaptiveShortBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: dom.A
     else
       BigEndian
   }
-  
+
   override val hasJsArray = order() == ByteOrder.nativeOrder
-  override def jsArray(): dom.Int16Array = if(!hasJsArray) throw new UnsupportedOperationException else super.jsArray
+  override def jsArray(): dom.Int16Array = if (!hasJsArray) throw new UnsupportedOperationException else super.jsArray
 
   override def toString = "AdaptiveShortBuffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
 }
@@ -42,7 +42,7 @@ class AdaptiveShortBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: dom.A
 object AdaptiveShortBuffer {
   def allocate(capacity: Int): NativeShortBuffer = this.allocate(capacity, ByteOrder.nativeOrder)
   def allocate(capacity: Int, byteOrder: ByteOrder): NativeShortBuffer = {
-    if (byteOrder == ByteOrder.nativeOrder){
+    if (byteOrder == ByteOrder.nativeOrder) {
       NativeShortBuffer.allocate(capacity)
     } else {
       val jsBuffer = js.Dynamic.newInstance(g.ArrayBuffer)(capacity * NativeShortBuffer.BYTES_PER_ELEMENT).asInstanceOf[dom.ArrayBuffer]

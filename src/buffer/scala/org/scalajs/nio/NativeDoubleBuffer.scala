@@ -5,8 +5,8 @@ import js.Dynamic.{ global => g }
 import org.scalajs.dom
 
 class NativeDoubleBuffer(protected var mCapacity: Int, protected var mLimit: Int, protected var mPosition: Int,
-    protected var mMark: Int, mBuffer: dom.ArrayBuffer, mBufferOffset: Int) extends DoubleBuffer
-    with TypedBufferBehaviour[Double, DoubleBuffer] with JsNativeBuffer[Double] {
+  protected var mMark: Int, mBuffer: dom.ArrayBuffer, mBufferOffset: Int) extends DoubleBuffer
+  with TypedBufferBehaviour[Double, DoubleBuffer] with JsNativeBuffer[Double] {
 
   // Completing internal implementation of TypedBufferBehaviour
   protected def iGet(index: Int): Double = {
@@ -36,9 +36,9 @@ class NativeDoubleBuffer(protected var mCapacity: Int, protected var mLimit: Int
 
   // Completing public methods of TypedBufferBehaviour
   def duplicate(): DoubleBuffer = new NativeDoubleBuffer(this.mCapacity, this.mLimit, this.mPosition, this.mMark,
-      this.mBuffer, this.mBufferOffset)
+    this.mBuffer, this.mBufferOffset)
   def slice(): DoubleBuffer = new NativeDoubleBuffer(this.remaining, this.remaining, 0, -1,
-      this.mBuffer, this.mBufferOffset + (this.mPosition * this.bytes_per_element))
+    this.mBuffer, this.mBufferOffset + (this.mPosition * this.bytes_per_element))
   def asReadOnlyBuffer(): DoubleBuffer = new ReadOnlyDoubleBuffer(this.duplicate)
   def order(): ByteOrder = ByteOrder.nativeOrder
 
@@ -49,10 +49,10 @@ class NativeDoubleBuffer(protected var mCapacity: Int, protected var mLimit: Int
       val srcLength = src.remaining
       if (srcLength > this.remaining)
         throw new BufferOverflowException
-        
+
       val srcSlice = src.slice
       val thisSlice = this.slice
-      
+
       thisSlice.jsArray.set(srcSlice.jsArray)
       this.position(this.position + srcLength)
       this
@@ -60,7 +60,7 @@ class NativeDoubleBuffer(protected var mCapacity: Int, protected var mLimit: Int
       super.put(src)
     }
   }
-  
+
   // ScalaJS specifics
   def hasJsArray(): Boolean = true
   protected val typedArray = new dom.Float64Array(mBuffer, mBufferOffset, mCapacity)

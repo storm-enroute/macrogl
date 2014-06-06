@@ -86,7 +86,7 @@ class Vector2f extends Vector {
   def *(v: Vector2f): Float = {
     Vector2f.dot(this, v)
   }
-  
+
   def dot(v: Vector2f): Float = {
     Vector2f.dot(this, v)
   }
@@ -126,20 +126,20 @@ class Vector2f extends Vector {
   override def toString = {
     "Vector2f[" + x + ", " + y + "]"
   }
-  
+
   override def equals(obj: Any): Boolean = {
-    if(obj == null) false
-    if(!obj.isInstanceOf[Vector2f]) false
-    
+    if (obj == null) false
+    if (!obj.isInstanceOf[Vector2f]) false
+
     val o = obj.asInstanceOf[Vector2f]
-    
+
     x == o.x &&
-    y == o.y
+      y == o.y
   }
-  
+
   override def hashCode(): Int = {
     x.toInt ^
-    y.toInt
+      y.toInt
   }
 }
 

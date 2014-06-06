@@ -7,7 +7,7 @@ abstract class LongBuffer extends Buffer with TypedBuffer[Long, LongBuffer] with
   def put(src: Array[Long]): LongBuffer = this.put(src, 0, src.length)
 
   override def toString = "LongBuffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
-  
+
   def array(): Array[Long]
   def jsArray(): js.Object
 }

@@ -10,7 +10,7 @@ import org.macrogl.math._
  * Basic example to try the package org.macrogl.math
  */
 class BasicProjection3D(width: Int, height: Int, print: String => Unit, systemUpdate: () => Boolean,
-    systemInit: () => Macrogl, systemClose: () => Unit)
+  systemInit: () => Macrogl, systemClose: () => Unit)
   extends DemoRenderable {
 
   class BasicProjection3DListener extends org.macrogl.FrameListener {
@@ -123,7 +123,7 @@ class BasicProjection3D(width: Int, height: Int, print: String => Unit, systemUp
       mgl.bufferData(GL.ELEMENT_ARRAY_BUFFER, indicesBufferData, GL.STATIC_DRAW)
 
       mgl.viewport(0, 0, width, height)
-      
+
       // Grey background
       mgl.clearColor(0.5f, 0.5f, 0.5f, 1)
 
@@ -189,7 +189,7 @@ class BasicProjection3D(width: Int, height: Int, print: String => Unit, systemUp
 
       funcs = Some(continue, render, close)
     }
-    
+
     val errMsg = "Basic Projection3D: not ready"
 
     def continue(): Boolean = {

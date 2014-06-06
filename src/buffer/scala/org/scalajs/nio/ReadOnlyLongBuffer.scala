@@ -1,7 +1,7 @@
 package org.scalajs.nio
 
 class ReadOnlyLongBuffer(protected val internalBuffer: LongBuffer) extends LongBuffer
-with ReadOnlyTypedBufferBehaviour[Long, LongBuffer] {
+  with ReadOnlyTypedBufferBehaviour[Long, LongBuffer] {
   def asReadOnlyBuffer(): LongBuffer = this.duplicate
   def duplicate(): LongBuffer = new ReadOnlyLongBuffer(internalBuffer.duplicate)
   def slice(): LongBuffer = new ReadOnlyLongBuffer(internalBuffer.slice)

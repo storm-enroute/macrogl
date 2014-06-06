@@ -1,12 +1,8 @@
 package org.macrogl
 
-
-
 import language.experimental.macros
 import scala.reflect.macros.whitebox.Context
 import scala.collection._
-
-
 
 final class FrameBuffer(implicit gl: Macrogl) extends Handle {
   private var fbtoken = Token.FrameBuffer.invalid
@@ -29,7 +25,6 @@ final class FrameBuffer(implicit gl: Macrogl) extends Handle {
   }
 
 }
-
 
 object FrameBuffer {
 

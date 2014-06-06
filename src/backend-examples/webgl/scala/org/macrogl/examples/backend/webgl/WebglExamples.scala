@@ -24,7 +24,7 @@ object WebglExamples {
   def macroGLTest(): Unit = {
     val width = 640
     val height = 360
-    
+
     def myPrint(msg: String): Unit = g.console.log(msg)
     def myUpdate(): Boolean = true
     def myClose(): Unit = {
@@ -36,11 +36,11 @@ object WebglExamples {
         canvas.width = width
         canvas.height = height
         var gl = canvas.getContext("webgl").asInstanceOf[dom.WebGLRenderingContext]
-        if(gl == null) gl = canvas.getContext("experimental-webgl").asInstanceOf[dom.WebGLRenderingContext]
-        if(gl == null) throw new RuntimeException("WebGL not supported")
+        if (gl == null) gl = canvas.getContext("experimental-webgl").asInstanceOf[dom.WebGLRenderingContext]
+        if (gl == null) throw new RuntimeException("WebGL not supported")
         new Macrogl()(gl)
       }
-      
+
       myInit _
     }
 

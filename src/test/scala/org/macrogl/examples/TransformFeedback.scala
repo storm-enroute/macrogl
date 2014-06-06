@@ -3,9 +3,9 @@ package org.macrogl.examples
 import org.lwjgl.opengl._
 import org.lwjgl.input.Keyboard
 import org.lwjgl.BufferUtils
-import org.{macrogl => gl}
+import org.{ macrogl => gl }
 import org.macrogl._
-import org.macrogl.{ex => glex}
+import org.macrogl.{ ex => glex }
 import org.macrogl.ex._
 
 object TransformFeedback {
@@ -19,9 +19,8 @@ object TransformFeedback {
     GL30.glBindVertexArray(vao)
 
     val drawTriangle = new glex.Program("triangle")(
-      gl.Program.Shader.Vertex  (Utils.readResource("/org/macrogl/examples/TransformFeedbackTriangle.vert")),
-      gl.Program.Shader.Fragment(Utils.readResource("/org/macrogl/examples/SingleTriangle.frag"))
-    )
+      gl.Program.Shader.Vertex(Utils.readResource("/org/macrogl/examples/TransformFeedbackTriangle.vert")),
+      gl.Program.Shader.Fragment(Utils.readResource("/org/macrogl/examples/SingleTriangle.frag")))
     drawTriangle.acquire()
 
     GL30.glTransformFeedbackVaryings(drawTriangle.token, Array("worldPosition"), GL30.GL_INTERLEAVED_ATTRIBS)
@@ -31,14 +30,12 @@ object TransformFeedback {
     Macrogl.default.checkError()
 
     val drawParticles = new glex.Program("draw-particles")(
-      gl.Program.Shader.Vertex  (Utils.readResource("/org/macrogl/examples/TransformFeedbackTriangle.vert")),
-      gl.Program.Shader.Fragment(Utils.readResource("/org/macrogl/examples/SingleTriangle.frag"))
-    )
+      gl.Program.Shader.Vertex(Utils.readResource("/org/macrogl/examples/TransformFeedbackTriangle.vert")),
+      gl.Program.Shader.Fragment(Utils.readResource("/org/macrogl/examples/SingleTriangle.frag")))
     drawParticles.acquire()
 
     val updateParticles = new glex.Program("update-particles")(
-      gl.Program.Shader.Vertex(Utils.readResource("/org/macrogl/examples/TransformFeedback.vert"))
-    )
+      gl.Program.Shader.Vertex(Utils.readResource("/org/macrogl/examples/TransformFeedback.vert")))
     updateParticles.acquire()
 
     GL30.glTransformFeedbackVaryings(updateParticles.token, Array("newPosition", "newColor", "newVelocity"), GL30.GL_INTERLEAVED_ATTRIBS)
@@ -79,12 +76,12 @@ object TransformFeedback {
     triangleBuffer.send(0, tb)
 
     val updateAttr = Array((0, 3), (3, 3), (6, 3))
-    val drawAttr   = Array((0, 3), (3, 3))
+    val drawAttr = Array((0, 3), (3, 3))
 
     var prevTime = System.currentTimeMillis
     var frame = 0
 
-    val triangleTransform  = gl.Matrix.identity[glex.Matrix.Plain]
+    val triangleTransform = gl.Matrix.identity[glex.Matrix.Plain]
 
     val rotationSpeed = 2.0f
 
@@ -94,7 +91,7 @@ object TransformFeedback {
     val projectionTransform = Utils.orthoProjection(-aspectRatio, aspectRatio, -1, 1, -1, 1)
 
     for (_ <- using.program(drawParticles)) {
-      drawParticles.uniform.transform  = gl.Matrix.identity[glex.Matrix.Plain]
+      drawParticles.uniform.transform = gl.Matrix.identity[glex.Matrix.Plain]
       drawParticles.uniform.projection = projectionTransform
     }
 
@@ -107,20 +104,20 @@ object TransformFeedback {
       if (stateChanged) {}
 
       if (left || right) {
-        angle += (if (left) rotationSpeed * dtSeconds else - rotationSpeed * dtSeconds).toFloat
+        angle += (if (left) rotationSpeed * dtSeconds else -rotationSpeed * dtSeconds).toFloat
 
-        import scala.math.{sin, cos}
+        import scala.math.{ sin, cos }
         val c = cos(angle)
         val s = sin(angle)
 
-        triangleTransform.array(0) =  c
-        triangleTransform.array(1) =  s
+        triangleTransform.array(0) = c
+        triangleTransform.array(1) = s
         triangleTransform.array(4) = -s
-        triangleTransform.array(5) =  c
+        triangleTransform.array(5) = c
       }
 
       for {
-        _   <- using.program(drawTriangle)
+        _ <- using.program(drawTriangle)
         acc <- using.attributebuffer(triangleBuffer)
       } {
         drawTriangle.uniform.transform = triangleTransform
@@ -142,9 +139,9 @@ object TransformFeedback {
       frame += 1
 
       for {
-        _   <- using.program(updateParticles)
+        _ <- using.program(updateParticles)
         acc <- using.attributebuffer(input)
-        _   <- enabling(GL30.GL_RASTERIZER_DISCARD)
+        _ <- enabling(GL30.GL_RASTERIZER_DISCARD)
       } {
         GL13.glActiveTexture(GL13.GL_TEXTURE0)
         GL15.glBindBuffer(GL31.GL_TEXTURE_BUFFER, triangleFeedback.token)
@@ -170,7 +167,7 @@ object TransformFeedback {
       }
 
       for {
-        _   <- using.program(drawParticles)
+        _ <- using.program(drawParticles)
         acc <- using.attributebuffer(output)
       } acc.render(GL11.GL_POINTS, drawAttr)
 
@@ -198,13 +195,14 @@ object TransformFeedback {
     var stateChanged = false
 
     while (Keyboard.next()) {
-      left  = Keyboard.isKeyDown(Keyboard.KEY_A)
+      left = Keyboard.isKeyDown(Keyboard.KEY_A)
       right = !left && Keyboard.isKeyDown(Keyboard.KEY_D)
 
       if (Keyboard.getEventKeyState()) {
         stateChanged ||= {
           Keyboard.getEventKey() match {
-            case Keyboard.KEY_ESCAPE => closeRequested = true; false
+            case Keyboard.KEY_ESCAPE =>
+              closeRequested = true; false
 
             case _ => false
           }
@@ -220,12 +218,11 @@ object TransformFeedback {
     val components = vertices.length / count
 
     def genParticle() = {
-      import util.Random.{nextFloat => nf}
+      import util.Random.{ nextFloat => nf }
       Array[Float](
         0, 0.75f, 0,
         nf, nf, nf,
-        nf - 0.5f, nf - 0.5f, nf - 0.5f
-      )
+        nf - 0.5f, nf - 0.5f, nf - 0.5f)
     }
 
     def genParticles(count: Int) = {
@@ -239,9 +236,8 @@ object TransformFeedback {
     val count = 3
     val components = 6
     val vertices = Array[Float](
-      -0.433f,  0.25f, 0,  1, 0, 0,
-       0,      -0.5f,  0,  0, 1, 0,
-       0.433f,  0.25f, 0,  0, 0, 1
-    )
+      -0.433f, 0.25f, 0, 1, 0, 0,
+      0, -0.5f, 0, 0, 1, 0,
+      0.433f, 0.25f, 0, 0, 0, 1)
   }
 }

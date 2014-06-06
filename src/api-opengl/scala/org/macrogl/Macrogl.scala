@@ -1,14 +1,13 @@
 package org.macrogl
 
-
 import org.lwjgl.opengl._
 import org.lwjgl.util.glu._
 
-class Macrogl () {
+class Macrogl() {
 
   /* public API */
   final def getWebGLRenderingContext(): Nothing = throw new UnsupportedOperationException("Available only when using Scala.js")
-  
+
   final def bytesPerShort = 2
   final def bytesPerInt = 4
   final def bytesPerFloat = 4
@@ -61,7 +60,7 @@ class Macrogl () {
   final def blendFuncSeparate(srcfactorRGB: Int, dstfactorRGB: Int, srcfactorAlpha: Int, dstfactorAlpha: Int) = {
     GL14.glBlendFuncSeparate(srcfactorRGB, dstfactorRGB, srcfactorAlpha, dstfactorAlpha)
   }
-  
+
   final def bufferData(target: Int, totalBytes: Long, usage: Int) {
     GL15.glBufferData(target, totalBytes, usage)
   }
@@ -294,7 +293,7 @@ class Macrogl () {
     GL20.glGetAttachedShaders(program, this.tmpInt, buffer)
     val count = this.tmpInt.get(0)
     val array = new Array[Token.Shader](count)
-    for(i <- 0 until count) {
+    for (i <- 0 until count) {
       array(i) = buffer.get(i)
     }
     array
@@ -323,7 +322,7 @@ class Macrogl () {
   final def getParameterBuffer(pname: Int): Token.Buffer = {
     GL11.glGetInteger(pname)
   }
-  
+
   final def getParameterTexture(pname: Int): Token.Texture = {
     GL11.glGetInteger(pname)
   }
@@ -343,7 +342,7 @@ class Macrogl () {
   final def getParameterShader(pname: Int): Token.Shader = {
     GL11.glGetInteger(pname)
   }
-  
+
   final def getParameterString(pname: Int): String = {
     GL11.glGetString(pname)
   }
@@ -419,7 +418,7 @@ class Macrogl () {
     val tmpInt2 = tmpInt.slice() // No need to allocate a second buffer for this
     this.tmpInt.clear()
     this.tmpInt.limit(8)
-    
+
     ARBES2Compatibility.glGetShaderPrecisionFormat(shadertype, precisiontype, tmpInt, tmpInt2)
     org.macrogl.PrecisionFormat(tmpInt.get(0), tmpInt.get(1), tmpInt2.get(0))
   }
@@ -460,7 +459,7 @@ class Macrogl () {
 
   final def getUniformLocation(program: Token.Program, name: String): Token.UniformLocation = {
     GL20.glGetUniformLocation(program, name)
-    
+
   }
 
   final def getVertexAttribi(index: Int, pname: Int): Int = {
@@ -651,123 +650,123 @@ class Macrogl () {
   final def uniform1f(location: Token.UniformLocation, x: Float) = {
     GL20.glUniform1f(location, x)
   }
-  
+
   final def uniform1fv(location: Token.UniformLocation, values: Data.Float) = {
     GL20.glUniform1(location, values)
   }
-  
+
   final def uniform1i(location: Token.UniformLocation, x: Int) = {
     GL20.glUniform1i(location, x)
   }
-  
+
   final def uniform1iv(location: Token.UniformLocation, values: Data.Int) = {
     GL20.glUniform1(location, values)
   }
-  
+
   final def uniform2f(location: Token.UniformLocation, x: Float, y: Float) = {
     GL20.glUniform2f(location, x, y)
   }
-  
+
   final def uniform2fv(location: Token.UniformLocation, values: Data.Float) = {
     GL20.glUniform2(location, values)
   }
-  
+
   final def uniform2i(location: Token.UniformLocation, x: Int, y: Int) = {
     GL20.glUniform2i(location, x, y)
   }
-  
+
   final def uniform2iv(location: Token.UniformLocation, values: Data.Int) = {
     GL20.glUniform2(location, values)
   }
-  
+
   final def uniform3f(location: Token.UniformLocation, x: Float, y: Float, z: Float) = {
     GL20.glUniform3f(location, x, y, z)
   }
-  
+
   final def uniform3fv(location: Token.UniformLocation, values: Data.Float) = {
     GL20.glUniform3(location, values)
   }
-  
+
   final def uniform3i(location: Token.UniformLocation, x: Int, y: Int, z: Int) = {
     GL20.glUniform3i(location, x, y, z)
   }
-  
+
   final def uniform3iv(location: Token.UniformLocation, values: Data.Int) = {
     GL20.glUniform3(location, values)
   }
-  
+
   final def uniform4f(location: Token.UniformLocation, x: Float, y: Float, z: Float, w: Float) = {
     GL20.glUniform4f(location, x, y, z, w)
   }
-  
+
   final def uniform4fv(location: Token.UniformLocation, values: Data.Float) = {
     GL20.glUniform4(location, values)
   }
-  
+
   final def uniform4i(location: Token.UniformLocation, x: Int, y: Int, z: Int, w: Int) = {
     GL20.glUniform4i(location, x, y, z, w)
   }
-  
+
   final def uniform4iv(location: Token.UniformLocation, values: Data.Int) = {
     GL20.glUniform4(location, values)
   }
-  
+
   final def uniformMatrix2fv(location: Token.UniformLocation, transpose: Boolean, matrices: Data.Float) = {
     GL20.glUniformMatrix2(location, transpose, matrices)
   }
-  
+
   final def uniformMatrix3fv(location: Token.UniformLocation, transpose: Boolean, matrices: Data.Float) = {
     GL20.glUniformMatrix3(location, transpose, matrices)
   }
-  
+
   final def uniformMatrix4fv(location: Token.UniformLocation, transpose: Boolean, matrices: Data.Float) = {
     GL20.glUniformMatrix4(location, transpose, matrices)
   }
-  
+
   final def useProgram(program: Token.Program) = {
     GL20.glUseProgram(program)
   }
-  
+
   final def validateProgram(program: Token.Program) = {
     GL20.glValidateProgram(program)
   }
-  
+
   final def vertexAttrib1f(index: Int, x: Float) = {
     GL20.glVertexAttrib1f(index, x)
   }
-  
+
   final def vertexAttrib1fv(index: Int, values: Data.Float) = {
     val slice = values.slice
     GL20.glVertexAttrib1f(index, slice.get())
   }
-  
+
   final def vertexAttrib2f(index: Int, x: Float, y: Float) = {
     GL20.glVertexAttrib2f(index, x, y)
   }
-  
+
   final def vertexAttrib2fv(index: Int, values: Data.Float) = {
     val slice = values.slice
     GL20.glVertexAttrib2f(index, slice.get(), slice.get())
   }
-  
+
   final def vertexAttrib3f(index: Int, x: Float, y: Float, z: Float) = {
     GL20.glVertexAttrib3f(index, x, y, z)
   }
-  
+
   final def vertexAttrib3fv(index: Int, values: Data.Float) = {
     val slice = values.slice
     GL20.glVertexAttrib3f(index, slice.get(), slice.get(), slice.get())
   }
-  
+
   final def vertexAttrib4f(index: Int, x: Float, y: Float, z: Float, w: Float) = {
     GL20.glVertexAttrib4f(index, x, y, z, w)
   }
-  
+
   final def vertexAttrib4fv(index: Int, values: Data.Float) = {
     val slice = values.slice
     GL20.glVertexAttrib4f(index, slice.get(), slice.get(), slice.get(), slice.get())
   }
-  
+
   /*
    * Method vertexAttribPointer with signature glVertexAttribPointer(int index, int size, boolean normalized,
    * int stride, *Buffer buffer) discarded
@@ -775,54 +774,54 @@ class Macrogl () {
    * Note: available in the API GLES20 of Android
    * Note: the following available method requires the use of an array buffer currently bound to ARRAY_BUFFER
    */
-  
+
   final def vertexAttribPointer(index: Int, size: Int, `type`: Int, normalized: Boolean, stride: Int, offset: Long) = {
     GL20.glVertexAttribPointer(index, size, `type`, normalized, stride, offset)
   }
-  
+
   final def viewport(x: Int, y: Int, width: Int, height: Int) = {
     GL11.glViewport(x, y, width, height)
   }
-  
+
   private val maxResultSize = 16
   private val tmpByte = Macrogl.createByteData(maxResultSize)
   private val tmpShort = Macrogl.createShortData(maxResultSize)
   private val tmpInt = Macrogl.createIntData(maxResultSize)
   private val tmpFloat = Macrogl.createFloatData(maxResultSize)
   private val tmpDouble = Macrogl.createDoubleData(maxResultSize)
-  
+
   // Helper methods
-  
+
   final def checkError() {
     val code = this.getError()
-    if(code != Macrogl.NO_ERROR) {
+    if (code != Macrogl.NO_ERROR) {
       val msg = this.errorMessage(code)
-      throw new MacroglException("Error "+code+" : "+msg)
+      throw new MacroglException("Error " + code + " : " + msg)
     }
   }
-  
+
   final def errorMessage(code: Int) = {
     val msg: String = GLU.gluErrorString(code)
     msg
   }
-  
+
   final def errorMessage(): String = {
     val code = this.getError()
     this.errorMessage(code)
   }
-  
+
   final def getCurrentProgram(): Token.Program = {
     this.getParameterProgram(Macrogl.CURRENT_PROGRAM)
   }
-  
+
   final def getCurrentRenderbufferBinding(): Token.RenderBuffer = {
     this.getParameterRenderbuffer(Macrogl.RENDERBUFFER_BINDING)
   }
-  
+
   final def shaderSource(shader: Token.Shader, srcarray: Array[CharSequence]) {
     this.shaderSource(shader, srcarray.mkString("\n"))
   }
-  
+
   final def validProgram(program: Token.Program): Boolean = {
     (program > 0) && this.isProgram(program)
   }
@@ -846,37 +845,37 @@ class Macrogl () {
   final def validRenderbuffer(rb: Token.RenderBuffer): Boolean = {
     (rb > 0) && this.isRenderbuffer(rb)
   }
-  
+
   final def differentPrograms(p1: Token.Program, p2: Token.Program): Boolean = {
     p1 != p2
   }
-  
+
   final def uniform2f(location: Token.UniformLocation, vec: org.macrogl.math.Vector2f): Unit = {
     this.uniform2f(location, vec.x, vec.y)
   }
-  
+
   final def uniform3f(location: Token.UniformLocation, vec: org.macrogl.math.Vector3f): Unit = {
     this.uniform3f(location, vec.x, vec.y, vec.z)
   }
-  
+
   final def uniform4f(location: Token.UniformLocation, vec: org.macrogl.math.Vector4f): Unit = {
     this.uniform4f(location, vec.x, vec.y, vec.z, vec.w)
   }
-  
+
   final def uniformMatrix2f(location: Token.UniformLocation, mat: org.macrogl.math.Matrix2f): Unit = {
     this.tmpFloat.clear()
     mat.store(this.tmpFloat, org.macrogl.math.ColumnMajor)
     this.tmpFloat.flip()
     this.uniformMatrix2fv(location, false, this.tmpFloat.slice)
   }
-  
+
   final def uniformMatrix3f(location: Token.UniformLocation, mat: org.macrogl.math.Matrix3f): Unit = {
     this.tmpFloat.clear()
     mat.store(this.tmpFloat, org.macrogl.math.ColumnMajor)
     this.tmpFloat.flip()
     this.uniformMatrix3fv(location, false, this.tmpFloat.slice)
   }
-  
+
   final def uniformMatrix4f(location: Token.UniformLocation, mat: org.macrogl.math.Matrix4f): Unit = {
     this.tmpFloat.clear()
     mat.store(this.tmpFloat, org.macrogl.math.ColumnMajor)
@@ -884,7 +883,6 @@ class Macrogl () {
     this.uniformMatrix4fv(location, false, this.tmpFloat.slice)
   }
 }
-
 
 object Macrogl {
 
@@ -1191,15 +1189,15 @@ object Macrogl {
   final def createByteData(sz: Int): Data.Byte = {
     org.lwjgl.BufferUtils.createByteBuffer(sz)
   }
-  
+
   final def createShortData(sz: Int): Data.Short = {
     org.lwjgl.BufferUtils.createShortBuffer(sz)
   }
-  
+
   final def createIntData(sz: Int): Data.Int = {
     org.lwjgl.BufferUtils.createIntBuffer(sz)
   }
-  
+
   final def createFloatData(sz: Int): Data.Float = {
     org.lwjgl.BufferUtils.createFloatBuffer(sz)
   }

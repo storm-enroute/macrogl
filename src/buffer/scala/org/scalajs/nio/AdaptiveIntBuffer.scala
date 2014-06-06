@@ -5,7 +5,7 @@ import js.Dynamic.{ global => g }
 import org.scalajs.dom
 
 class AdaptiveIntBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: dom.ArrayBuffer, mBufferOffset: Int,
-    mByteOrder: ByteOrder) extends NativeIntBuffer(cap, lim, pos, mar, mBuffer, mBufferOffset) {
+  mByteOrder: ByteOrder) extends NativeIntBuffer(cap, lim, pos, mar, mBuffer, mBufferOffset) {
   protected val littleEndian: Boolean = mByteOrder == LittleEndian
 
   override protected def iGet(index: Int): Int = {
@@ -17,11 +17,11 @@ class AdaptiveIntBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: dom.Arr
 
   override def duplicate(): IntBuffer = {
     new AdaptiveIntBuffer(this.mCapacity, this.mLimit, this.mPosition, this.mMark,
-        this.mBuffer, this.mBufferOffset, mByteOrder)
+      this.mBuffer, this.mBufferOffset, mByteOrder)
   }
   override def slice(): IntBuffer = {
     new AdaptiveIntBuffer(this.remaining, this.remaining, 0, -1, this.mBuffer,
-        this.mBufferOffset + (this.mPosition * this.bytes_per_element), mByteOrder)
+      this.mBufferOffset + (this.mPosition * this.bytes_per_element), mByteOrder)
   }
   override def asReadOnlyBuffer(): IntBuffer = {
     new ReadOnlyIntBuffer(this.duplicate)
@@ -32,17 +32,17 @@ class AdaptiveIntBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: dom.Arr
     else
       BigEndian
   }
-  
+
   override val hasJsArray = order() == ByteOrder.nativeOrder
-  override def jsArray(): dom.Int32Array = if(!hasJsArray) throw new UnsupportedOperationException else super.jsArray
-  
+  override def jsArray(): dom.Int32Array = if (!hasJsArray) throw new UnsupportedOperationException else super.jsArray
+
   override def toString = "AdaptiveIntBuffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
 }
 
 object AdaptiveIntBuffer {
   def allocate(capacity: Int): NativeIntBuffer = this.allocate(capacity, ByteOrder.nativeOrder)
   def allocate(capacity: Int, byteOrder: ByteOrder): NativeIntBuffer = {
-    if (byteOrder == ByteOrder.nativeOrder){
+    if (byteOrder == ByteOrder.nativeOrder) {
       NativeIntBuffer.allocate(capacity)
     } else {
       val jsBuffer = js.Dynamic.newInstance(g.ArrayBuffer)(capacity * NativeIntBuffer.BYTES_PER_ELEMENT).asInstanceOf[dom.ArrayBuffer]

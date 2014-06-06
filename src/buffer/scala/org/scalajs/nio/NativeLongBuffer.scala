@@ -5,8 +5,8 @@ import js.Dynamic.{ global => g }
 import org.scalajs.dom
 
 class NativeLongBuffer(protected var mCapacity: Int, protected var mLimit: Int, protected var mPosition: Int,
-    protected var mMark: Int, mBuffer: dom.ArrayBuffer, mBufferOffset: Int) extends LongBuffer
-    with TypedBufferBehaviour[Long, LongBuffer] with JsNativeBuffer[Long] {
+  protected var mMark: Int, mBuffer: dom.ArrayBuffer, mBufferOffset: Int) extends LongBuffer
+  with TypedBufferBehaviour[Long, LongBuffer] with JsNativeBuffer[Long] {
 
   protected val littleEndian: Boolean = ByteOrder.nativeOrder == LittleEndian
 
@@ -51,9 +51,9 @@ class NativeLongBuffer(protected var mCapacity: Int, protected var mLimit: Int, 
 
   // Completing public methods of TypedBufferBehaviour
   def duplicate(): LongBuffer = new NativeLongBuffer(this.mCapacity, this.mLimit, this.mPosition, this.mMark,
-      this.mBuffer, this.mBufferOffset)
+    this.mBuffer, this.mBufferOffset)
   def slice(): LongBuffer = new NativeLongBuffer(this.remaining, this.remaining, 0, -1,
-      this.mBuffer, this.mBufferOffset + (this.mPosition * this.bytes_per_element))
+    this.mBuffer, this.mBufferOffset + (this.mPosition * this.bytes_per_element))
   def asReadOnlyBuffer(): LongBuffer = new ReadOnlyLongBuffer(this.duplicate)
   def order(): ByteOrder = ByteOrder.nativeOrder
 

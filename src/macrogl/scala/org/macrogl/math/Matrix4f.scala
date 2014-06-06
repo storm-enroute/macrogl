@@ -326,7 +326,7 @@ class Matrix4f extends Matrix {
     Matrix4f.mult(this, v, ret)
     ret
   }
-  
+
   def transform(v: Vector4f): Vector4f = {
     val ret = new Vector4f
     Matrix4f.mult(this, v, ret)

@@ -7,11 +7,11 @@ object Utils {
   def degToRad(deg: Float): Float = {
     deg * degToRadFactor
   }
-  
+
   def radToDeg(rad: Float): Float = {
     rad * radToDegFactor
   }
-  
+
   def cotan(v: Double): Double = {
     1.0 / Math.tan(v)
   }

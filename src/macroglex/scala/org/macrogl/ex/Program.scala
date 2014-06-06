@@ -1,13 +1,9 @@
 package org.macrogl
 package ex
 
-
-
 import language.experimental.macros
 import scala.reflect.macros.Context
 import scala.collection._
-
-
 
 class Program(n: String)(ss: org.macrogl.Program.Shader*)(implicit val glex: Macroglex) extends org.macrogl.Program(n)(ss: _*)(glex) {
 
@@ -26,7 +22,6 @@ class Program(n: String)(ss: org.macrogl.Program.Shader*)(implicit val glex: Mac
 
 }
 
-
 object Program {
 
   object Shader {
@@ -35,7 +30,7 @@ object Program {
       def name = "Geometry shader"
       def mode = Macroglex.GEOMETRY_SHADER
     }
-  
+
     case class Compute(source: String, afterAttach: Token.Program => Unit = x => {}) extends org.macrogl.Program.Shader {
       def name = "Compute shader"
       def mode = Macroglex.COMPUTE_SHADER

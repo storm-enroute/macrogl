@@ -11,7 +11,7 @@ object Texture2D {
 
   var magFilter = GL11.GL_NEAREST
   var minFilter = GL11.GL_NEAREST
-  
+
   def main(args: Array[String]) {
     val contextAttributes = new ContextAttribs(3, 2).withForwardCompatible(true).withProfileCore(true)
 
@@ -22,10 +22,9 @@ object Texture2D {
     GL30.glBindVertexArray(vao)
 
     val vertices = Array(
-      -0.5f,  0.5f, 0.0f,  0.0f,     0.0f,
-      -0.5f, -0.5f, 0.0f,  0.0f,     texCoord,
-       0.5f,  0.5f, 0.0f,  texCoord, 0.0f
-    )
+      -0.5f, 0.5f, 0.0f, 0.0f, 0.0f,
+      -0.5f, -0.5f, 0.0f, 0.0f, texCoord,
+      0.5f, 0.5f, 0.0f, texCoord, 0.0f)
 
     val fb = BufferUtils.createFloatBuffer(vertices.length)
     fb.put(vertices)
@@ -42,7 +41,7 @@ object Texture2D {
       i <- 0 until textureSize
       j <- 0 until textureSize
     } {
-      val half = textureSize / 2 
+      val half = textureSize / 2
       val black = (i < half && j < half) || (i >= half && j >= half)
       ab ++= { if (black) Seq(0, 0, 0) else Seq(0xFF.toByte, 0xFF.toByte, 0xFF.toByte) }
     }
@@ -61,13 +60,12 @@ object Texture2D {
     }
 
     texture.acquire()
-    
+
     def readResource(path: String) = io.Source.fromURL(getClass.getResource(path)).mkString
 
     val pp = new Program("test")(
-      Program.Shader.Vertex  (readResource("/org/macrogl/examples/Texture2D.vert")),
-      Program.Shader.Fragment(readResource("/org/macrogl/examples/Texture2D.frag"))
-    )
+      Program.Shader.Vertex(readResource("/org/macrogl/examples/Texture2D.vert")),
+      Program.Shader.Fragment(readResource("/org/macrogl/examples/Texture2D.frag")))
 
     pp.acquire()
 
@@ -76,7 +74,7 @@ object Texture2D {
     while (!Display.isCloseRequested) {
       val stateChanged = processInput()
       if (stateChanged) {
-        vertices(9)  = texCoord
+        vertices(9) = texCoord
         vertices(13) = texCoord
         fb.put(vertices)
         fb.flip()
@@ -88,8 +86,8 @@ object Texture2D {
       }
 
       for {
-        _   <- using.program(pp)
-        _   <- using.texture(GL13.GL_TEXTURE0, texture)
+        _ <- using.program(pp)
+        _ <- using.texture(GL13.GL_TEXTURE0, texture)
         acc <- using.attributebuffer(mb)
       } {
         GL11.glClearColor(0.0f, 0.64f, 0.91f, 1.0f)
@@ -117,19 +115,29 @@ object Texture2D {
 
         stateChanged ||= {
           Keyboard.getEventKey() match {
-            case Keyboard.KEY_1 if ctrlPressed => wrapS = GL12.GL_CLAMP_TO_EDGE;   true
-            case Keyboard.KEY_2 if ctrlPressed => wrapS = GL13.GL_CLAMP_TO_BORDER; true
-            case Keyboard.KEY_3 if ctrlPressed => wrapS = GL14.GL_MIRRORED_REPEAT; true
-            case Keyboard.KEY_4 if ctrlPressed => wrapS = GL11.GL_REPEAT;          true
+            case Keyboard.KEY_1 if ctrlPressed =>
+              wrapS = GL12.GL_CLAMP_TO_EDGE; true
+            case Keyboard.KEY_2 if ctrlPressed =>
+              wrapS = GL13.GL_CLAMP_TO_BORDER; true
+            case Keyboard.KEY_3 if ctrlPressed =>
+              wrapS = GL14.GL_MIRRORED_REPEAT; true
+            case Keyboard.KEY_4 if ctrlPressed =>
+              wrapS = GL11.GL_REPEAT; true
 
-            case Keyboard.KEY_A => texCoord += 0.1f; true
-            case Keyboard.KEY_S => texCoord -= 0.1f; true
+            case Keyboard.KEY_A =>
+              texCoord += 0.1f; true
+            case Keyboard.KEY_S =>
+              texCoord -= 0.1f; true
 
-            case Keyboard.KEY_Z => minFilter = GL11.GL_LINEAR;  true
-            case Keyboard.KEY_X => minFilter = GL11.GL_NEAREST; true
+            case Keyboard.KEY_Z =>
+              minFilter = GL11.GL_LINEAR; true
+            case Keyboard.KEY_X =>
+              minFilter = GL11.GL_NEAREST; true
 
-            case Keyboard.KEY_C => magFilter = GL11.GL_LINEAR;  true
-            case Keyboard.KEY_V => magFilter = GL11.GL_NEAREST; true
+            case Keyboard.KEY_C =>
+              magFilter = GL11.GL_LINEAR; true
+            case Keyboard.KEY_V =>
+              magFilter = GL11.GL_NEAREST; true
 
             case _ => false
           }

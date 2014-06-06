@@ -15,10 +15,9 @@ object SingleTriangle {
     GL30.glBindVertexArray(vao)
 
     val vertices = Array(
-      -0.5f,  0.5f, 0.0f,  1, 0, 0,
-       0.0f, -0.5f, 0.0f,  0, 1, 0,
-       0.5f,  0.5f, 0.0f,  0, 0, 1
-    )
+      -0.5f, 0.5f, 0.0f, 1, 0, 0,
+      0.0f, -0.5f, 0.0f, 0, 1, 0,
+      0.5f, 0.5f, 0.0f, 0, 0, 1)
 
     val fb = BufferUtils.createFloatBuffer(vertices.length)
     fb.put(vertices)
@@ -27,13 +26,12 @@ object SingleTriangle {
     val mb = new AttributeBuffer(GL15.GL_STATIC_DRAW, 3, 6)
     mb.acquire()
     mb.send(0, fb)
-    
+
     def readResource(path: String) = io.Source.fromURL(getClass.getResource(path)).mkString
 
     val pp = new Program("test")(
-      Program.Shader.Vertex  (readResource("/org/macrogl/examples/SingleTriangle.vert")),
-      Program.Shader.Fragment(readResource("/org/macrogl/examples/SingleTriangle.frag"))
-    )
+      Program.Shader.Vertex(readResource("/org/macrogl/examples/SingleTriangle.vert")),
+      Program.Shader.Fragment(readResource("/org/macrogl/examples/SingleTriangle.frag")))
 
     pp.acquire()
 
@@ -41,7 +39,7 @@ object SingleTriangle {
 
     while (!Display.isCloseRequested) {
       for {
-        _   <- using.program(pp)
+        _ <- using.program(pp)
         acc <- using.attributebuffer(mb)
       } {
         GL11.glClearColor(1.0f, 1.0f, 1.0f, 1.0f)

@@ -10,7 +10,7 @@ import org.macrogl.math._
  * Basic example of texturing
  */
 class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate: () => Boolean,
-    systemInit: () => Macrogl, systemClose: () => Unit)
+  systemInit: () => Macrogl, systemClose: () => Unit)
   extends DemoRenderable {
 
   class BasicTextureListener extends org.macrogl.FrameListener {
@@ -137,10 +137,11 @@ class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate:
 
       // Load the texture
       var textureReady = false
-      org.macrogl.Utils.loadTexture2DFromResources("/org/macrogl/examples/backend/common/macrogl.png", texture, mgl, { textureReady = true; print("Basic Texture: texture ready"); true })
+      org.macrogl.Utils.loadTexture2DFromResources("/org/macrogl/examples/backend/common/macrogl.png",
+        texture, mgl, { textureReady = true; print("Basic Texture: texture ready"); true })
 
       mgl.viewport(0, 0, width, height)
-      
+
       mgl.clearColor(0, 0, 1, 1)
 
       mgl.enableVertexAttribArray(attribPosLocation)
@@ -159,7 +160,7 @@ class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate:
 
         mgl.clear(GL.COLOR_BUFFER_BIT)
         mgl.uniform1i(uniformTexSamplerLocation, 0)
-        
+
         //if (textureReady) {
         mgl.drawElements(GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
         //}
@@ -189,7 +190,7 @@ class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate:
 
       funcs = Some(continue, render, close)
     }
-    
+
     val errMsg = "Basic Texture: not ready"
 
     def continue(): Boolean = {

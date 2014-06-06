@@ -186,10 +186,10 @@ class NativeByteBuffer(protected var mCapacity: Int, protected var mLimit: Int, 
       val srcLength = src.remaining
       if (srcLength > this.remaining)
         throw new BufferOverflowException
-        
+
       val srcSlice = src.slice
       val thisSlice = this.slice
-      
+
       thisSlice.jsArray.set(srcSlice.jsArray)
       this.position(this.position + srcLength)
       this

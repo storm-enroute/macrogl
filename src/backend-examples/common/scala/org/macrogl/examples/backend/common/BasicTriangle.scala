@@ -8,7 +8,7 @@ import org.macrogl.{ Macrogl => GL }
  * Basic example with a static triangle
  */
 class BasicTriangle(width: Int, height: Int, print: String => Unit, systemUpdate: () => Boolean,
-    systemInit: () => Macrogl, systemClose: () => Unit)
+  systemInit: () => Macrogl, systemClose: () => Unit)
   extends DemoRenderable {
 
   class BasicTriangleListener extends org.macrogl.FrameListener {
@@ -96,7 +96,7 @@ class BasicTriangle(width: Int, height: Int, print: String => Unit, systemUpdate
       mgl.bufferData(GL.ELEMENT_ARRAY_BUFFER, indicesBufferData, GL.STATIC_DRAW)
 
       mgl.viewport(0, 0, width, height)
-      
+
       mgl.clearColor(1, 0, 0, 1)
 
       mgl.enableVertexAttribArray(attribPosLocation)
@@ -114,7 +114,7 @@ class BasicTriangle(width: Int, height: Int, print: String => Unit, systemUpdate
 
         mgl.clear(GL.COLOR_BUFFER_BIT)
         mgl.uniform3f(uniformColorLocation, color)
-        
+
         mgl.drawElements(GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
 
         continueCondition = systemUpdate()
@@ -140,7 +140,7 @@ class BasicTriangle(width: Int, height: Int, print: String => Unit, systemUpdate
 
       funcs = Some(continue, render, close)
     }
-    
+
     val errMsg = "Basic Triangle: not ready"
 
     def continue(): Boolean = {

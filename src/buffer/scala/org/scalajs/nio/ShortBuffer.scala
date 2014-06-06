@@ -7,7 +7,7 @@ abstract class ShortBuffer extends Buffer with TypedBuffer[Short, ShortBuffer] w
   def put(src: Array[Short]): ShortBuffer = this.put(src, 0, src.length)
 
   override def toString = "ShortBuffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
-  
+
   def array(): Array[Short]
   def jsArray(): dom.Int16Array
 }

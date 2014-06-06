@@ -40,7 +40,7 @@ abstract class ByteBuffer extends Buffer with TypedBuffer[Byte, ByteBuffer] with
   def putFloat(index: Int, value: Float): ByteBuffer
   def putDouble(value: Double): ByteBuffer
   def putDouble(index: Int, value: Double): ByteBuffer
-  
+
   def array(): Array[Byte]
   def jsArray(): dom.Int8Array
 }
