@@ -22,29 +22,32 @@ object LwjglExamples {
   def macroGLTest(exampleName: String): Unit = {
     val width = 640
     val height = 360
-    
+
     def myPrint(msg: String) = println(msg)
     def myUpdate(): Boolean = {
       Display.update()
       !Display.isCloseRequested()
     }
-    def myInit(): Macrogl = {
-      val contextAttributes = new ContextAttribs(2, 1)
-      Display.setDisplayMode(new DisplayMode(width, height))
-      Display.create(new PixelFormat, contextAttributes)
+    def customInit(glMajor: Int, glMinor: Int) = {
+      def myInit(): Macrogl = {
+        val contextAttributes = new ContextAttribs(glMajor, glMinor)
+        Display.setDisplayMode(new DisplayMode(width, height))
+        Display.create(new PixelFormat, contextAttributes)
 
-      Macrogl.default
+        Macrogl.default
+      }
+      myInit _
     }
     def myClose(): Unit = {
       Display.destroy()
     }
-    
+
     val example: DemoRenderable = exampleName match {
-      case "1" => new BasicTriangle(width, height, myPrint, myUpdate, myInit, myClose)
-      case "2" => new BasicTexture(width, height, myPrint, myUpdate, myInit, myClose)
-      case "3" => new BasicProjection3D(width, height, myPrint, myUpdate, myInit, myClose)
-      case "4" => new BasicFractale3D(width, height, myPrint, myUpdate, myInit, myClose)
-      case "5" => new BasicRenderToTexture(width, height, myPrint, myUpdate, myInit, myClose)
+      case "1" => new BasicTriangle(width, height, myPrint, myUpdate, customInit(2, 1), myClose)
+      case "2" => new BasicTexture(width, height, myPrint, myUpdate, customInit(2, 1), myClose)
+      case "3" => new BasicProjection3D(width, height, myPrint, myUpdate, customInit(2, 1), myClose)
+      case "4" => new BasicFractale3D(width, height, myPrint, myUpdate, customInit(2, 1), myClose)
+      case "5" => new BasicRenderToTexture(width, height, myPrint, myUpdate, customInit(3, 0), myClose)
       case _ => {
         println("\"" + exampleName + "\" is not a valid example")
         return
