@@ -67,6 +67,59 @@ object Utils {
   }
 
   /**
+   * Asynchronously load a text file from the resources and pass it to the provided callback.
+   *
+   * @param resourceName The Fully qualified path of the resource image
+   * @param callback The function to call once the data are in memory
+   */
+  def getTextFileFromResources(resourceName: String)(callback: Array[String] => Unit): Unit = {
+    val xmlRequest = new dom.XMLHttpRequest()
+
+    val resource = WebGLSpecifics.getResourcePath + resourceName
+
+    xmlRequest.open("GET", resource, true)
+
+    val onLoadCallback = { (event: js.Any) =>
+    	val text: String = xmlRequest.responseText
+    	val lines = text.replaceAll("\r", "").split("\n")
+    	
+    	callback(lines)
+    }
+    
+    xmlRequest.onload = onLoadCallback
+    xmlRequest.send(null)
+  }
+
+  /**
+   * Asynchronously load a binary file from the resources and pass it to the provided callback.
+   *
+   * @param resourceName The Fully qualified path of the resource image
+   * @param callback The function to call once the data are in memory
+   */
+  def getBinaryFileFromResources(resourceName: String)(callback: org.macrogl.Data.Byte => Unit): Unit = {
+    val xmlRequest = new dom.XMLHttpRequest()
+
+    val resource = WebGLSpecifics.getResourcePath + resourceName
+
+    xmlRequest.open("GET", resource, true)
+    xmlRequest.responseType = "arraybuffer"
+
+    val onLoadCallback = { (event: js.Any) =>
+    	val arrayBuffer = xmlRequest.response.asInstanceOf[dom.ArrayBuffer]
+    	val bufferSize = arrayBuffer.byteLength.toInt
+    	
+    	val byteOrder = org.scalajs.nio.ByteOrder.nativeOrder()
+    	
+    	val byteBuffer = new org.scalajs.nio.NativeByteBuffer(bufferSize, bufferSize, 0, -1, arrayBuffer, 0, byteOrder)
+    	
+    	callback(byteBuffer)
+    }
+    
+    xmlRequest.onload = onLoadCallback
+    xmlRequest.send(null)
+  }
+
+  /**
    * Start the FrameListener into a separate thread while the following logical flow:
    * {{{
    * val fl:FrameListener = ...

@@ -4,8 +4,11 @@ import scala.concurrent._
 import ExecutionContext.Implicits.global
 import javax.imageio.ImageIO
 import java.util.concurrent.ConcurrentLinkedQueue
-
 import org.lwjgl.opengl._
+import java.io.InputStream
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.io.ByteArrayOutputStream
 
 object Utils {
   /**
@@ -42,6 +45,10 @@ object Utils {
    */
   def WebGLSpecifics: Nothing = throw new UnsupportedOperationException("Available only when using the Scala.js platform")
 
+  private def inputStreamForResource(resourceName: String): InputStream = {
+    this.getClass().getResourceAsStream(resourceName)
+  }
+
   /**
    * Load a image from the resources into an OpenGL 2D texture.
    * The textures are stored using the 32 bits per pixel RGBA format.
@@ -54,7 +61,7 @@ object Utils {
    * A returned value false means aborting the texture loading
    */
   def loadTexture2DFromResources(resourceName: String, texture: Token.Texture, gl: Macrogl, preload: => Boolean = { true }): Unit = {
-    val stream = this.getClass().getResourceAsStream(resourceName)
+    val stream = inputStreamForResource(resourceName)
 
     // TODO should we have our own ExecutionContext?
 
@@ -90,6 +97,7 @@ object Utils {
         y -= 1
       }
 
+      stream.close()
       byteBuffer.rewind
 
       // Don't load it now, we want it done synchronously in the main loop to avoid concurrency issue
@@ -100,6 +108,71 @@ object Utils {
           gl.texImage2D(Macrogl.TEXTURE_2D, 0, Macrogl.RGBA, width, height, 0, Macrogl.RGBA, Macrogl.UNSIGNED_BYTE, byteBuffer)
           gl.bindTexture(Macrogl.TEXTURE_2D, previousTexture)
         }
+      })
+    }
+  }
+
+  /**
+   * Asynchronously load a text file from the resources and pass it to the provided callback.
+   *
+   * @param resourceName The Fully qualified path of the resource image
+   * @param callback The function to call once the data are in memory
+   */
+  def getTextFileFromResources(resourceName: String)(callback: Array[String] => Unit): Unit = {
+    val stream = inputStreamForResource(resourceName)
+
+    Future {
+      val streamReader = new InputStreamReader(stream)
+      val reader = new BufferedReader(streamReader)
+
+      var list: List[String] = Nil
+      var line: String = null
+
+      while ({ line = reader.readLine(); line } != null) {
+        list = line :: list
+      }
+
+      reader.close()
+      streamReader.close()
+      stream.close()
+
+      val lines = list.toArray
+
+      LWJGLSpecifics.addPendingTask({ () =>
+        callback(lines)
+      })
+    }
+  }
+
+  /**
+   * Asynchronously load a binary file from the resources and pass it to the provided callback.
+   *
+   * @param resourceName The Fully qualified path of the resource image
+   * @param callback The function to call once the data are in memory
+   */
+  def getBinaryFileFromResources(resourceName: String)(callback: org.macrogl.Data.Byte => Unit): Unit = {
+    val stream = this.getClass().getResourceAsStream(resourceName)
+
+    Future {
+      val byteStream = new ByteArrayOutputStream()
+
+      val tmpData: Array[Byte] = new Array[Byte](1024) // 1KB of temp data
+      var tmpDataContentSize: Int = 0
+
+      while ({ tmpDataContentSize = stream.read(tmpData); tmpDataContentSize } >= 0) {
+        byteStream.write(tmpData, 0, tmpDataContentSize)
+      }
+      
+      stream.close()
+
+      val byteArray = byteStream.toByteArray()
+      val byteBuffer = org.macrogl.Macrogl.createByteData(byteArray.length)
+      
+      byteBuffer.put(byteArray)
+      byteBuffer.rewind()
+
+      LWJGLSpecifics.addPendingTask({ () =>
+        callback(byteBuffer)
       })
     }
   }

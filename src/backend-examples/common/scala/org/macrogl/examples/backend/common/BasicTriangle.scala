@@ -99,6 +99,18 @@ class BasicTriangle(width: Int, height: Int, print: String => Unit, systemUpdate
 
       mgl.clearColor(1, 0, 0, 1)
 
+      /*org.macrogl.Utils.getTextFileFromResources("/org/macrogl/examples/backend/common/test.txt") { lines =>
+        print("Basic Triangle: Text file received, lines = " + lines.length + "\n--- Start of file ---")
+        lines.foreach { line =>
+          print(line)
+        }
+        print("--- End of file ---")
+      }
+      
+      org.macrogl.Utils.getBinaryFileFromResources("/org/macrogl/examples/backend/common/macrogl.png") { buffer =>
+        print("Basic Triangle: Binary file received, size = " + buffer.remaining() + " bytes, first byte = " + buffer.get(0))
+      }*/
+      
       mgl.enableVertexAttribArray(attribPosLocation)
 
       print("Basic Triangle: ready")
