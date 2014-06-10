@@ -1,13 +1,9 @@
 package org.macrogl
 
-
-
 import scala.collection._
 
-
-
 final class RenderBuffer(val format: Int, val width: Int, val height: Int)(implicit gl: Macrogl)
-extends Handle {
+  extends Handle {
   private var rbtoken = Token.RenderBuffer.invalid
   private val result = new Array[Int](1)
 

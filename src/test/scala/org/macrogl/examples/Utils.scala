@@ -1,6 +1,6 @@
 package org.macrogl.examples
 
-import org.{macrogl => gl}
+import org.{ macrogl => gl }
 import org.macrogl.ex._
 
 object Utils {
@@ -15,58 +15,53 @@ object Utils {
     val t = -2 * farZ * nearZ / (farZ - nearZ)
 
     val arr = Array(
-      x, 0, 0,  0,
-      0, y, 0,  0,
+      x, 0, 0, 0,
+      0, y, 0, 0,
       0, 0, z, -1,
-      0, 0, t,  0
-    )
+      0, 0, t, 0)
 
     new Matrix.Plain(arr)
   }
 
   def orthoProjection(left: Double, right: Double, bottom: Double, top: Double, near: Double, far: Double): Matrix.Plain = {
-    val x =  2 / (right - left)
-    val y =  2 / (top - bottom)
+    val x = 2 / (right - left)
+    val y = 2 / (top - bottom)
     val z = -2 / (far - near)
-    val tx = - (right + left) / (right - left)
-    val ty = - (top + bottom) / (top - bottom)
-    val tz = - (far + near)   / (far - near)
+    val tx = -(right + left) / (right - left)
+    val ty = -(top + bottom) / (top - bottom)
+    val tz = -(far + near) / (far - near)
 
     new Matrix.Plain(
       Array(
-        x,  0,  0,  0,
-        0,  y,  0,  0,
-        0,  0,  z,  0,
-        tx, ty, tz, 1
-      )
-    )
+        x, 0, 0, 0,
+        0, y, 0, 0,
+        0, 0, z, 0,
+        tx, ty, tz, 1))
   }
 
   class Camera(x: Double, y: Double, z: Double) {
     val position = Array(x, y, z)
     var horizontalAngle = 0.0
-    var verticalAngle   = 0.0
+    var verticalAngle = 0.0
 
     def orientation = {
-      import scala.math.{sin, cos, toRadians => r}
+      import scala.math.{ sin, cos, toRadians => r }
 
       val cv = cos(r(verticalAngle))
       val sv = sin(r(verticalAngle))
       val vRotate = Array[Double](
-          1,  0,  0,  0,
-          0,  cv, sv, 0,
-          0, -sv, cv, 0,
-          0,  0,  0,  1
-        )
+        1, 0, 0, 0,
+        0, cv, sv, 0,
+        0, -sv, cv, 0,
+        0, 0, 0, 1)
 
       val ch = cos(r(horizontalAngle))
       val sh = sin(r(horizontalAngle))
       val hRotate = Array[Double](
-           ch, 0, sh, 0,
-           0,  1, 0,  0,
-          -sh, 0, ch, 0,
-           0,  0, 0,  1
-        )
+        ch, 0, sh, 0,
+        0, 1, 0, 0,
+        -sh, 0, ch, 0,
+        0, 0, 0, 1)
 
       gl.Matrix.multiply[Matrix.Plain](new Matrix.Plain(vRotate), new Matrix.Plain(hRotate))
     }
@@ -78,8 +73,7 @@ object Utils {
       Array(
         inv(0, 3) - inv(0, 2),
         inv(1, 3) - inv(1, 2),
-        inv(2, 3) - inv(2, 2)
-      )
+        inv(2, 3) - inv(2, 2))
     }
 
     def rightDirection = {
@@ -87,8 +81,7 @@ object Utils {
       Array(
         inv(0, 3) + inv(0, 0),
         inv(1, 3) + inv(1, 0),
-        inv(2, 3) + inv(2, 0)
-      )
+        inv(2, 3) + inv(2, 0))
     }
 
     def moveRight(distance: Double): Unit = {
@@ -113,26 +106,24 @@ object Utils {
           1, 0, 0, 0,
           0, 1, 0, 0,
           0, 0, 1, 0,
-          -position(0), -position(1), -position(2), 1
-        )
-      )
+          -position(0), -position(1), -position(2), 1))
       gl.Matrix.multiply[Matrix.Plain](orientation, translation)
     }
 
     def offsetOrientation(h: Double, v: Double): Unit = {
       horizontalAngle += h
-      verticalAngle   += v
+      verticalAngle += v
       normalizeAngles()
     }
 
     private def normalizeAngles(): Unit = {
       horizontalAngle %= 360.0
-      verticalAngle   %= 360.0
+      verticalAngle %= 360.0
 
       if (horizontalAngle < 0) horizontalAngle += 360.0
 
       val maxVerticalAngle = 85.0
-      if (verticalAngle >  maxVerticalAngle) verticalAngle =  maxVerticalAngle
+      if (verticalAngle > maxVerticalAngle) verticalAngle = maxVerticalAngle
       if (verticalAngle < -maxVerticalAngle) verticalAngle = -maxVerticalAngle
     }
   }

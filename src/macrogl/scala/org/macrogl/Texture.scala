@@ -1,10 +1,6 @@
 package org.macrogl
 
-
-
 import scala.collection._
-
-
 
 class Texture(val target: Int)(val init: Texture => Unit)(implicit gl: Macrogl) extends Handle {
   private var ttoken = Token.Texture.invalid
@@ -29,11 +25,11 @@ class Texture(val target: Int)(val init: Texture => Unit)(implicit gl: Macrogl) 
     def update(name: Int, v: Float) {
       gl.texParameterf(target, name, v)
     }
-  
+
     def update(name: Int, v: Int) {
       gl.texParameteri(target, name, v)
     }
-  
+
     def int(name: Int): Int = {
       gl.getTexParameteri(target, name)
     }
@@ -58,8 +54,8 @@ class Texture(val target: Int)(val init: Texture => Unit)(implicit gl: Macrogl) 
   def allocateImage2D(level: Int, internalFormat: Int, wdt: Int, hgt: Int, border: Int, format: Int, dataType: Int, data: Data = null) {
     target match {
       case Macrogl.TEXTURE_2D => data match {
-        case null            => gl.texImage2D(target, level, internalFormat, wdt, hgt, border, format, dataType, null: Data.Int)
-        case data: Data.Int  => gl.texImage2D(target, level, internalFormat, wdt, hgt, border, format, dataType, data)
+        case null => gl.texImage2D(target, level, internalFormat, wdt, hgt, border, format, dataType, null: Data.Int)
+        case data: Data.Int => gl.texImage2D(target, level, internalFormat, wdt, hgt, border, format, dataType, data)
         case data: Data.Byte => gl.texImage2D(target, level, internalFormat, wdt, hgt, border, format, dataType, data)
         case _ => throw new UnsupportedOperationException(s"Unknown data format: ${data.getClass}")
       }
@@ -74,7 +70,6 @@ class Texture(val target: Int)(val init: Texture => Unit)(implicit gl: Macrogl) 
   }
 
 }
-
 
 object Texture {
 

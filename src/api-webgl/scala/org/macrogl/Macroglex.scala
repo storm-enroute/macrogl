@@ -1,9 +1,7 @@
 package org.macrogl
 
-
 class Macroglex private[macrogl] (implicit gl: org.scalajs.dom.WebGLRenderingContext) extends Macrogl {
 }
-
 
 object Macroglex {
 

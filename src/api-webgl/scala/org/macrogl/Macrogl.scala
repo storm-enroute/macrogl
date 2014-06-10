@@ -9,9 +9,11 @@ import js.Dynamic.{ global => g }
 // See https://github.com/scala-js/scala-js-dom/blob/master/src/main/scala/org/scalajs/dom/WebGL.scala for documentation
 // about the WebGL DOM for ScalaJS
 
-class Macrogl(implicit gl: org.scalajs.dom.WebGLRenderingContext) {
+class Macrogl(implicit gl: dom.WebGLRenderingContext) {
 
   /* public API */
+  final def getWebGLRenderingContext(): dom.WebGLRenderingContext = gl
+
   final def bytesPerShort = 2
   final def bytesPerInt = 4
   final def bytesPerFloat = 4
@@ -324,7 +326,7 @@ class Macrogl(implicit gl: org.scalajs.dom.WebGLRenderingContext) {
   final def getParameterBuffer(pname: Int): Token.Buffer = {
     gl.getParameter(pname).asInstanceOf[Token.Buffer]
   }
-  
+
   final def getParameterTexture(pname: Int): Token.Texture = {
     gl.getParameter(pname).asInstanceOf[Token.Texture]
   }
@@ -614,19 +616,23 @@ class Macrogl(implicit gl: org.scalajs.dom.WebGLRenderingContext) {
 
   final def texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
     format: Int, `type`: Int, pixels: Data.Byte) = this._texImage2D(target, level, internalformat, width, height, border,
-    format, `type`, pixels.slice)
+    format, `type`, if (pixels != null) pixels.slice else null)
   final def texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
     format: Int, `type`: Int, pixels: Data.Short) = this._texImage2D(target, level, internalformat, width, height, border,
-    format, `type`, pixels.slice)
+    format, `type`, if (pixels != null) pixels.slice else null)
   final def texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
     format: Int, `type`: Int, pixels: Data.Int) = this._texImage2D(target, level, internalformat, width, height, border,
-    format, `type`, pixels.slice)
+    format, `type`, if (pixels != null) pixels.slice else null)
   final def texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
     format: Int, `type`: Int, pixels: Data.Float) = this._texImage2D(target, level, internalformat, width, height, border,
-    format, `type`, pixels.slice)
+    format, `type`, if (pixels != null) pixels.slice else null)
   final def texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
     format: Int, `type`: Int, pixels: Data.Double) = this._texImage2D(target, level, internalformat, width, height, border,
-    format, `type`, pixels.slice)
+    format, `type`, if (pixels != null) pixels.slice else null)
+  final def texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int,
+    format: Int, `type`: Int): Unit = {
+    gl.texImage2D(target, level, internalformat, width, height, border, format, `type`, null)
+  }
 
   final def texParameterf(target: Int, pname: Int, param: Float) = {
     gl.texParameterf(target, pname, param)
@@ -822,6 +828,13 @@ class Macrogl(implicit gl: org.scalajs.dom.WebGLRenderingContext) {
     gl.viewport(x, y, width, height)
   }
 
+  private val maxResultSize = 16
+  private val tmpByte = Macrogl.createByteData(maxResultSize)
+  private val tmpShort = Macrogl.createShortData(maxResultSize)
+  private val tmpInt = Macrogl.createIntData(maxResultSize)
+  private val tmpFloat = Macrogl.createFloatData(maxResultSize)
+  private val tmpDouble = Macrogl.createDoubleData(maxResultSize)
+
   // Helper methods
 
   final def checkError() {
@@ -880,6 +893,39 @@ class Macrogl(implicit gl: org.scalajs.dom.WebGLRenderingContext) {
 
   final def differentPrograms(p1: Token.Program, p2: Token.Program): Boolean = {
     p1 != p2
+  }
+
+  final def uniform2f(location: Token.UniformLocation, vec: org.macrogl.math.Vector2f): Unit = {
+    this.uniform2f(location, vec.x, vec.y)
+  }
+
+  final def uniform3f(location: Token.UniformLocation, vec: org.macrogl.math.Vector3f): Unit = {
+    this.uniform3f(location, vec.x, vec.y, vec.z)
+  }
+
+  final def uniform4f(location: Token.UniformLocation, vec: org.macrogl.math.Vector4f): Unit = {
+    this.uniform4f(location, vec.x, vec.y, vec.z, vec.w)
+  }
+
+  final def uniformMatrix2f(location: Token.UniformLocation, mat: org.macrogl.math.Matrix2f): Unit = {
+    this.tmpFloat.clear()
+    mat.store(this.tmpFloat, org.macrogl.math.ColumnMajor)
+    this.tmpFloat.flip()
+    this.uniformMatrix2fv(location, false, this.tmpFloat.slice)
+  }
+
+  final def uniformMatrix3f(location: Token.UniformLocation, mat: org.macrogl.math.Matrix3f): Unit = {
+    this.tmpFloat.clear()
+    mat.store(this.tmpFloat, org.macrogl.math.ColumnMajor)
+    this.tmpFloat.flip()
+    this.uniformMatrix3fv(location, false, this.tmpFloat.slice)
+  }
+
+  final def uniformMatrix4f(location: Token.UniformLocation, mat: org.macrogl.math.Matrix4f): Unit = {
+    this.tmpFloat.clear()
+    mat.store(this.tmpFloat, org.macrogl.math.ColumnMajor)
+    this.tmpFloat.flip()
+    this.uniformMatrix4fv(location, false, this.tmpFloat.slice)
   }
 }
 
@@ -991,7 +1037,7 @@ private object JSTypeHelper {
 
   def toBooleans(value: js.Any, data: Data.Byte): Unit = {
     val slice = data.slice
-    
+
     val typeName = org.scalajs.nio.JsUtils.typeName(value)
     typeName match {
       case "Boolean" => slice.put(this.booleanToByte(value.asInstanceOf[js.Boolean]))
@@ -1007,7 +1053,7 @@ private object JSTypeHelper {
           case "Boolean" => {
             jsArray.foreach { e => slice.put(this.booleanToByte(e.asInstanceOf[js.Boolean])) }
           }
-          case "Number" => { 
+          case "Number" => {
             jsArray.foreach { e => slice.put(this.booleanToByte(this.jsNumberToBoolean(e.asInstanceOf[js.Number]))) }
           }
           case _ => throw new RuntimeException("Cannot convert array of " + containedType + " to booleans")
@@ -1018,9 +1064,9 @@ private object JSTypeHelper {
         val array = value.asInstanceOf[dom.Int8Array]
         val l = array
         require(slice.remaining >= length)
-        
+
         var i = 0
-        while(i < length) {
+        while (i < length) {
           data.put(this.booleanToByte(this.jsNumberToBoolean(array(i).asInstanceOf[js.Number])))
           i += 1
         }
@@ -1030,9 +1076,9 @@ private object JSTypeHelper {
         val array = value.asInstanceOf[dom.Uint8Array]
         val l = array
         require(slice.remaining >= length)
-        
+
         var i = 0
-        while(i < length) {
+        while (i < length) {
           data.put(this.booleanToByte(this.jsNumberToBoolean(array(i).asInstanceOf[js.Number])))
           i += 1
         }
@@ -1042,9 +1088,9 @@ private object JSTypeHelper {
         val array = value.asInstanceOf[dom.Int16Array]
         val l = array
         require(slice.remaining >= length)
-        
+
         var i = 0
-        while(i < length) {
+        while (i < length) {
           data.put(this.booleanToByte(this.jsNumberToBoolean(array(i).asInstanceOf[js.Number])))
           i += 1
         }
@@ -1054,9 +1100,9 @@ private object JSTypeHelper {
         val array = value.asInstanceOf[dom.Uint16Array]
         val l = array
         require(slice.remaining >= length)
-        
+
         var i = 0
-        while(i < length) {
+        while (i < length) {
           data.put(this.booleanToByte(this.jsNumberToBoolean(array(i).asInstanceOf[js.Number])))
           i += 1
         }
@@ -1066,9 +1112,9 @@ private object JSTypeHelper {
         val array = value.asInstanceOf[dom.Int32Array]
         val l = array
         require(slice.remaining >= length)
-        
+
         var i = 0
-        while(i < length) {
+        while (i < length) {
           data.put(this.booleanToByte(this.jsNumberToBoolean(array(i).asInstanceOf[js.Number])))
           i += 1
         }
@@ -1078,9 +1124,9 @@ private object JSTypeHelper {
         val array = value.asInstanceOf[dom.Uint32Array]
         val l = array
         require(slice.remaining >= length)
-        
+
         var i = 0
-        while(i < length) {
+        while (i < length) {
           data.put(this.booleanToByte(this.jsNumberToBoolean(array(i).asInstanceOf[js.Number])))
           i += 1
         }
@@ -1090,9 +1136,9 @@ private object JSTypeHelper {
         val array = value.asInstanceOf[dom.Float32Array]
         val l = array
         require(slice.remaining >= length)
-        
+
         var i = 0
-        while(i < length) {
+        while (i < length) {
           data.put(this.booleanToByte(this.jsNumberToBoolean(array(i).asInstanceOf[js.Number])))
           i += 1
         }
@@ -1102,9 +1148,9 @@ private object JSTypeHelper {
         val array = value.asInstanceOf[dom.Float64Array]
         val l = array
         require(slice.remaining >= length)
-        
+
         var i = 0
-        while(i < length) {
+        while (i < length) {
           data.put(this.booleanToByte(this.jsNumberToBoolean(array(i).asInstanceOf[js.Number])))
           i += 1
         }

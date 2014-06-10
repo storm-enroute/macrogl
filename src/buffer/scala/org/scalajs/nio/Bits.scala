@@ -106,7 +106,7 @@ object Bits {
 
   // Private internal components
   // Binary buffer to keep the temporary elements
-  private val buffer = g.ArrayBuffer(8).asInstanceOf[dom.ArrayBuffer]
+  private val buffer = js.Dynamic.newInstance(g.ArrayBuffer)(8).asInstanceOf[dom.ArrayBuffer]
   // Accessors to the buffer
   private val viewByte = new dom.Int8Array(buffer)
   private val viewShort = new dom.Int16Array(buffer)

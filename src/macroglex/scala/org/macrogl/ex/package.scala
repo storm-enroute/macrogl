@@ -1,12 +1,8 @@
 package org.macrogl
 
-
-
 import language.experimental.macros
 import scala.reflect.macros.Context
 import scala.collection._
-
-
 
 package object ex {
 

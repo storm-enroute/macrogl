@@ -1,11 +1,7 @@
 package org.macrogl
 
-
-
 import scala.language.dynamics
 import scala.collection._
-
-
 
 class Program(val name: String)(val shaders: Program.Shader*)(implicit val gl: Macrogl) extends Handle {
   private var ptoken = Token.Program.invalid
@@ -67,10 +63,9 @@ class Program(val name: String)(val shaders: Program.Shader*)(implicit val gl: M
 
 }
 
-
 object Program {
   case class Exception(p: Program, msg: String)
-  extends java.lang.Exception(s"$p: $msg")
+    extends java.lang.Exception(s"$p: $msg")
 
   trait Shader {
     private var stoken = Token.Shader.invalid
@@ -131,7 +126,7 @@ object Program {
       def name = "Vertex shader"
       def mode = Macrogl.VERTEX_SHADER
     }
-  
+
     case class Fragment(source: String, afterAttach: Token.Program => Unit = x => {}) extends Shader {
       def name = "Fragment shader"
       def mode = Macrogl.FRAGMENT_SHADER

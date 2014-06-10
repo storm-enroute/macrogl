@@ -5,8 +5,8 @@ import js.Dynamic.{ global => g }
 import org.scalajs.dom
 
 class NativeFloatBuffer(protected var mCapacity: Int, protected var mLimit: Int, protected var mPosition: Int,
-    protected var mMark: Int, mBuffer: dom.ArrayBuffer, mBufferOffset: Int) extends FloatBuffer
-    with TypedBufferBehaviour[Float, FloatBuffer] with JsNativeBuffer[Float] {
+  protected var mMark: Int, mBuffer: dom.ArrayBuffer, mBufferOffset: Int) extends FloatBuffer
+  with TypedBufferBehaviour[Float, FloatBuffer] with JsNativeBuffer[Float] {
 
   // Completing internal implementation of TypedBufferBehaviour
   protected def iGet(index: Int): Float = {
@@ -36,9 +36,9 @@ class NativeFloatBuffer(protected var mCapacity: Int, protected var mLimit: Int,
 
   // Completing public methods of TypedBufferBehaviour
   def duplicate(): FloatBuffer = new NativeFloatBuffer(this.mCapacity, this.mLimit, this.mPosition, this.mMark,
-      this.mBuffer, this.mBufferOffset)
+    this.mBuffer, this.mBufferOffset)
   def slice(): FloatBuffer = new NativeFloatBuffer(this.remaining, this.remaining, 0, -1,
-      this.mBuffer, this.mBufferOffset + (this.mPosition * this.bytes_per_element))
+    this.mBuffer, this.mBufferOffset + (this.mPosition * this.bytes_per_element))
   def asReadOnlyBuffer(): FloatBuffer = new ReadOnlyFloatBuffer(this.duplicate)
   def order(): ByteOrder = ByteOrder.nativeOrder
 
@@ -49,10 +49,10 @@ class NativeFloatBuffer(protected var mCapacity: Int, protected var mLimit: Int,
       val srcLength = src.remaining
       if (srcLength > this.remaining)
         throw new BufferOverflowException
-        
+
       val srcSlice = src.slice
       val thisSlice = this.slice
-      
+
       thisSlice.jsArray.set(srcSlice.jsArray)
       this.position(this.position + srcLength)
       this
@@ -60,7 +60,7 @@ class NativeFloatBuffer(protected var mCapacity: Int, protected var mLimit: Int,
       super.put(src)
     }
   }
-  
+
   // ScalaJS specifics
   def hasJsArray(): Boolean = true
   protected val typedArray = new dom.Float32Array(mBuffer, mBufferOffset, mCapacity)
@@ -74,7 +74,7 @@ class NativeFloatBuffer(protected var mCapacity: Int, protected var mLimit: Int,
 
 object NativeFloatBuffer {
   def allocate(capacity: Int): NativeFloatBuffer = {
-    val jsBuffer = g.ArrayBuffer(capacity * BYTES_PER_ELEMENT).asInstanceOf[dom.ArrayBuffer]
+    val jsBuffer = js.Dynamic.newInstance(g.ArrayBuffer)(capacity * BYTES_PER_ELEMENT).asInstanceOf[dom.ArrayBuffer]
     val floatBuffer = new NativeFloatBuffer(capacity, capacity, 0, -1, jsBuffer, 0)
     floatBuffer
   }

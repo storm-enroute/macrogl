@@ -131,7 +131,7 @@ trait TypedBufferBehaviour[ContentType <: AnyVal, BufferType <: TypedBuffer[Cont
 
       if (cmp != 0)
         return cmp
-        
+
       k += 1
     }
 
@@ -153,7 +153,7 @@ trait TypedBufferBehaviour[ContentType <: AnyVal, BufferType <: TypedBuffer[Cont
 
         if (iCmpElements(curI, curJ) != 0)
           return false
-          
+
         k += 1
       }
 

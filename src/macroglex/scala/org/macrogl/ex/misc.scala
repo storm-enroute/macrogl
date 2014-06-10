@@ -4,8 +4,7 @@ import language.experimental.macros
 import scala.reflect.macros.Context
 
 package ex {
-  
-  
+
   object rasterEx {
     def drawbuffers(b0: Int, b1: Int, b2: Int)(implicit gl: Macroglex) {
       val ib = Results.intResult
@@ -34,12 +33,12 @@ package ex {
       gl.end()
     }
   }
-  
+
   object settingEx {
     object Color {
       def foreach[U](f: Unit => U)(implicit gl: Macroglex): Unit = macro MacrosEx.setColor[U]
     }
-    
+
     def color(r: Float, g: Float, b: Float, a: Float) = Color
   }
 
@@ -52,9 +51,9 @@ package ex {
   }
 
   object MacrosEx {
-    
+
     implicit def c2utils(c: Context) = new org.macrogl.Macros.Util[c.type](c)
-    
+
     def useMatrix[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U])(gl: c.Expr[Macroglex]): c.Expr[Unit] = {
       import c.universe._
 

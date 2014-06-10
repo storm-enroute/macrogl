@@ -7,7 +7,7 @@ abstract class FloatBuffer extends Buffer with TypedBuffer[Float, FloatBuffer] w
   def put(src: Array[Float]): FloatBuffer = this.put(src, 0, src.length)
 
   override def toString = "FloatBuffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
-  
+
   def array(): Array[Float]
   def jsArray(): dom.Float32Array
 }

@@ -1,14 +1,14 @@
 package org.macrogl.examples
 
 import org.lwjgl.opengl._
-import org.lwjgl.input.{Keyboard, Mouse}
+import org.lwjgl.input.{ Keyboard, Mouse }
 import org.lwjgl.BufferUtils
 import org.macrogl
 import org.macrogl._
 import org.macrogl.ex._
 
 object BasicLighting {
-  
+
   def main(args: Array[String]) {
     val contextAttributes = new ContextAttribs(3, 2).withForwardCompatible(true).withProfileCore(true)
 
@@ -40,9 +40,8 @@ object BasicLighting {
     GL30.glBindVertexArray(0)
 
     val pp = new macrogl.Program("test")(
-      macrogl.Program.Shader.Vertex  (Utils.readResource("/org/macrogl/examples/BasicLighting.vert")),
-      macrogl.Program.Shader.Fragment(Utils.readResource("/org/macrogl/examples/BasicLighting.frag"))
-    )
+      macrogl.Program.Shader.Vertex(Utils.readResource("/org/macrogl/examples/BasicLighting.vert")),
+      macrogl.Program.Shader.Fragment(Utils.readResource("/org/macrogl/examples/BasicLighting.frag")))
 
     pp.acquire()
 
@@ -58,21 +57,17 @@ object BasicLighting {
 
     val leftTransform = new macrogl.ex.Matrix.Plain(
       Array[Double](
-         1, 0,  0, 0,
-         0, 1,  0, 0,
-         0, 0,  1, 0,
-        -3, 0, -5, 1
-      )
-    )
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        -3, 0, -5, 1))
 
     val rightTransform = new macrogl.ex.Matrix.Plain(
       Array[Double](
-        1, 0,  0, 0,
-        0, 1,  0, 0,
-        0, 0,  1, 0,
-        3, 0, -5, 1
-      )
-    )
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        3, 0, -5, 1))
 
     for (_ <- using.program(pp)) {
       def normalize(x: Float, y: Float, z: Float) = {
@@ -103,17 +98,17 @@ object BasicLighting {
           camera.position(2) = 4
 
           camera.horizontalAngle = 0
-          camera.verticalAngle   = 0
+          camera.verticalAngle = 0
 
           cameraResetRequested = false
         }
       }
 
       // update camera
-      if (movingForward)  camera.moveForward(cameraSpeed * dtSeconds)
+      if (movingForward) camera.moveForward(cameraSpeed * dtSeconds)
       if (movingBackward) camera.moveBackward(cameraSpeed * dtSeconds)
-      if (movingLeft)     camera.moveLeft(cameraSpeed * dtSeconds)
-      if (movingRight)    camera.moveRight(cameraSpeed * dtSeconds)
+      if (movingLeft) camera.moveLeft(cameraSpeed * dtSeconds)
+      if (movingRight) camera.moveRight(cameraSpeed * dtSeconds)
 
       val xOffset = 400 - Mouse.getX
       val yOffset = 300 - Mouse.getY
@@ -123,19 +118,19 @@ object BasicLighting {
       // update animations
       val angle = time / 1000.0
 
-      import scala.math.{sin, cos}
+      import scala.math.{ sin, cos }
       val c = cos(angle)
       val s = sin(angle)
 
-      leftTransform.array(0)  =  c
-      leftTransform.array(2)  =  s
-      leftTransform.array(8)  = -s
-      leftTransform.array(10) =  c
+      leftTransform.array(0) = c
+      leftTransform.array(2) = s
+      leftTransform.array(8) = -s
+      leftTransform.array(10) = c
 
-      rightTransform.array(5)  =  c
-      rightTransform.array(6)  =  s
-      rightTransform.array(9)  = -s
-      rightTransform.array(10) =  c
+      rightTransform.array(5) = c
+      rightTransform.array(6) = s
+      rightTransform.array(9) = -s
+      rightTransform.array(10) = c
 
       // draw
       for (_ <- using.program(pp)) {
@@ -154,7 +149,7 @@ object BasicLighting {
 
         pp.uniform.worldTransform = rightTransform
         GL11.glDrawElements(GL11.GL_TRIANGLES, Cube.indices.length, GL11.GL_UNSIGNED_BYTE, 0)
-        
+
         vertexBuffer.disableAttributeArrays(attrsCfg)
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0)
 
@@ -171,9 +166,9 @@ object BasicLighting {
     Display.destroy()
   }
 
-  var movingForward  = false
+  var movingForward = false
   var movingBackward = false
-  var movingLeft  = false
+  var movingLeft = false
   var movingRight = false
 
   var closeRequested = false
@@ -183,18 +178,20 @@ object BasicLighting {
     var stateChanged = false
 
     while (Keyboard.next()) {
-      movingForward  = Keyboard.isKeyDown(Keyboard.KEY_W)
+      movingForward = Keyboard.isKeyDown(Keyboard.KEY_W)
       movingBackward = !movingForward && Keyboard.isKeyDown(Keyboard.KEY_S)
 
-      movingLeft  = Keyboard.isKeyDown(Keyboard.KEY_A)
+      movingLeft = Keyboard.isKeyDown(Keyboard.KEY_A)
       movingRight = !movingLeft && Keyboard.isKeyDown(Keyboard.KEY_D)
 
       if (Keyboard.getEventKeyState()) {
         stateChanged ||= {
           Keyboard.getEventKey() match {
-            case Keyboard.KEY_ESCAPE => closeRequested = true; false
+            case Keyboard.KEY_ESCAPE =>
+              closeRequested = true; false
 
-            case Keyboard.KEY_F5 => cameraResetRequested = true; true
+            case Keyboard.KEY_F5 =>
+              cameraResetRequested = true; true
 
             case _ => false
           }
@@ -212,50 +209,48 @@ object BasicLighting {
     // position, normal, color
     val vertices = Array[Float](
       // bottom
-      -1.0f, -1.0f, -1.0f,   0, -1, 0,   1, 0, 0,
-       1.0f, -1.0f, -1.0f,   0, -1, 0,   1, 0, 0,
-      -1.0f, -1.0f,  1.0f,   0, -1, 0,   1, 0, 0,
-       1.0f, -1.0f,  1.0f,   0, -1, 0,   1, 0, 0,
+      -1.0f, -1.0f, -1.0f, 0, -1, 0, 1, 0, 0,
+      1.0f, -1.0f, -1.0f, 0, -1, 0, 1, 0, 0,
+      -1.0f, -1.0f, 1.0f, 0, -1, 0, 1, 0, 0,
+      1.0f, -1.0f, 1.0f, 0, -1, 0, 1, 0, 0,
       // top
-      -1.0f,  1.0f, -1.0f,   0, 1, 0,   0, 1, 0,
-      -1.0f,  1.0f,  1.0f,   0, 1, 0,   0, 1, 0,
-       1.0f,  1.0f, -1.0f,   0, 1, 0,   0, 1, 0,
-       1.0f,  1.0f,  1.0f,   0, 1, 0,   0, 1, 0,
+      -1.0f, 1.0f, -1.0f, 0, 1, 0, 0, 1, 0,
+      -1.0f, 1.0f, 1.0f, 0, 1, 0, 0, 1, 0,
+      1.0f, 1.0f, -1.0f, 0, 1, 0, 0, 1, 0,
+      1.0f, 1.0f, 1.0f, 0, 1, 0, 0, 1, 0,
       // front
-      -1.0f,  1.0f,  1.0f,   0, 0, 1,   0, 0, 1,
-      -1.0f, -1.0f,  1.0f,   0, 0, 1,   0, 0, 1,
-       1.0f,  1.0f,  1.0f,   0, 0, 1,   0, 0, 1,
-       1.0f, -1.0f,  1.0f,   0, 0, 1,   0, 0, 1,
+      -1.0f, 1.0f, 1.0f, 0, 0, 1, 0, 0, 1,
+      -1.0f, -1.0f, 1.0f, 0, 0, 1, 0, 0, 1,
+      1.0f, 1.0f, 1.0f, 0, 0, 1, 0, 0, 1,
+      1.0f, -1.0f, 1.0f, 0, 0, 1, 0, 0, 1,
       // back
-       1.0f,  1.0f, -1.0f,   0, 0, -1,   1, 1, 0,
-       1.0f, -1.0f, -1.0f,   0, 0, -1,   1, 1, 0,
-      -1.0f,  1.0f, -1.0f,   0, 0, -1,   1, 1, 0,
-      -1.0f, -1.0f, -1.0f,   0, 0, -1,   1, 1, 0,
+      1.0f, 1.0f, -1.0f, 0, 0, -1, 1, 1, 0,
+      1.0f, -1.0f, -1.0f, 0, 0, -1, 1, 1, 0,
+      -1.0f, 1.0f, -1.0f, 0, 0, -1, 1, 1, 0,
+      -1.0f, -1.0f, -1.0f, 0, 0, -1, 1, 1, 0,
       // left
-      -1.0f,  1.0f,  1.0f,   -1, 0, 0,   1, 0, 1,
-      -1.0f,  1.0f, -1.0f,   -1, 0, 0,   1, 0, 1,
-      -1.0f, -1.0f,  1.0f,   -1, 0, 0,   1, 0, 1,
-      -1.0f, -1.0f, -1.0f,   -1, 0, 0,   1, 0, 1,
+      -1.0f, 1.0f, 1.0f, -1, 0, 0, 1, 0, 1,
+      -1.0f, 1.0f, -1.0f, -1, 0, 0, 1, 0, 1,
+      -1.0f, -1.0f, 1.0f, -1, 0, 0, 1, 0, 1,
+      -1.0f, -1.0f, -1.0f, -1, 0, 0, 1, 0, 1,
       // right
-       1.0f,  1.0f, -1.0f,   1, 0, 0,   0, 1, 1,
-       1.0f,  1.0f,  1.0f,   1, 0, 0,   0, 1, 1,
-       1.0f, -1.0f, -1.0f,   1, 0, 0,   0, 1, 1,
-       1.0f, -1.0f,  1.0f,   1, 0, 0,   0, 1, 1
-    )
-    
+      1.0f, 1.0f, -1.0f, 1, 0, 0, 0, 1, 1,
+      1.0f, 1.0f, 1.0f, 1, 0, 0, 0, 1, 1,
+      1.0f, -1.0f, -1.0f, 1, 0, 0, 0, 1, 1,
+      1.0f, -1.0f, 1.0f, 1, 0, 0, 0, 1, 1)
+
     val indices = Array[Byte](
       // bottom
-      0, 1, 2,  1, 3, 2,
+      0, 1, 2, 1, 3, 2,
       // top
-      4, 5, 6,  6, 5, 7,
+      4, 5, 6, 6, 5, 7,
       // front
-      8, 9, 10,  9, 11, 10,
+      8, 9, 10, 9, 11, 10,
       // back
-      12, 13, 14,  13, 15, 14,
+      12, 13, 14, 13, 15, 14,
       // left
-      16, 17, 18,  17, 19, 18,
+      16, 17, 18, 17, 19, 18,
       // right
-      20, 21, 22,  21, 23, 22
-    )
+      20, 21, 22, 21, 23, 22)
   }
 }

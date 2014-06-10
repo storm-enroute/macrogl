@@ -165,8 +165,6 @@ package macrogl {
       c.inlineAndReset(r)
     }
 
-    
-
     def setCullFace[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U])(gl: c.Expr[Macrogl]): c.Expr[Unit] = {
       import c.universe._
 
@@ -294,10 +292,10 @@ package macrogl {
 
       def inlineAndReset[T](expr: c.Expr[T]): c.Expr[T] =
         c.Expr[T](inlineApplyRecursive(c untypecheck expr.tree))
-  
+
       def inlineApplyRecursive(tree: Tree): Tree = {
         val ApplyName = TermName("apply")
-  
+
         object inliner extends Transformer {
           override def transform(tree: Tree): Tree = {
             tree match {

@@ -1,10 +1,5 @@
 package org.macrogl
 
-
-
-
-
-
 object Token {
 
   type Buffer = Int

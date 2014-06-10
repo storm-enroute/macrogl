@@ -1,15 +1,11 @@
 package org.macrogl
 
-
-
 import language.experimental.macros
 import scala.reflect.macros.whitebox.Context
 import scala.collection._
 
-
-
 class MeshBuffer(val usage: Int, val capacityVertices: Int)(implicit gl: Macrogl)
-extends Handle {
+  extends Handle {
   protected var vtoken = Token.Buffer.invalid
   protected var result = new Array[Int](2)
 
@@ -97,7 +93,6 @@ extends Handle {
   }
 
 }
-
 
 object MeshBuffer {
 

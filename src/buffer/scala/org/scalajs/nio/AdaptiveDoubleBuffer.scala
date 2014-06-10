@@ -5,7 +5,7 @@ import js.Dynamic.{ global => g }
 import org.scalajs.dom
 
 class AdaptiveDoubleBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: dom.ArrayBuffer, mBufferOffset: Int,
-    mByteOrder: ByteOrder) extends NativeDoubleBuffer(cap, lim, pos, mar, mBuffer, mBufferOffset) {
+  mByteOrder: ByteOrder) extends NativeDoubleBuffer(cap, lim, pos, mar, mBuffer, mBufferOffset) {
   protected val littleEndian: Boolean = mByteOrder == LittleEndian
 
   override protected def iGet(index: Int): Double = {
@@ -17,11 +17,11 @@ class AdaptiveDoubleBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: dom.
 
   override def duplicate(): DoubleBuffer = {
     new AdaptiveDoubleBuffer(this.mCapacity, this.mLimit, this.mPosition, this.mMark,
-        this.mBuffer, this.mBufferOffset, mByteOrder)
+      this.mBuffer, this.mBufferOffset, mByteOrder)
   }
   override def slice(): DoubleBuffer = {
     new AdaptiveDoubleBuffer(this.remaining, this.remaining, 0, -1, this.mBuffer,
-        this.mBufferOffset + (this.mPosition * this.bytes_per_element), mByteOrder)
+      this.mBufferOffset + (this.mPosition * this.bytes_per_element), mByteOrder)
   }
   override def asReadOnlyBuffer(): DoubleBuffer = {
     new ReadOnlyDoubleBuffer(this.duplicate)
@@ -32,9 +32,9 @@ class AdaptiveDoubleBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: dom.
     else
       BigEndian
   }
-  
+
   override val hasJsArray = order() == ByteOrder.nativeOrder
-  override def jsArray(): dom.Float64Array = if(!hasJsArray) throw new UnsupportedOperationException else super.jsArray
+  override def jsArray(): dom.Float64Array = if (!hasJsArray) throw new UnsupportedOperationException else super.jsArray
 
   override def toString = "AdaptiveDoubleBuffer[pos=" + this.position + " lim=" + this.limit + " cap=" + this.capacity + "]"
 }
@@ -42,10 +42,10 @@ class AdaptiveDoubleBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: dom.
 object AdaptiveDoubleBuffer {
   def allocate(capacity: Int): NativeDoubleBuffer = this.allocate(capacity, ByteOrder.nativeOrder)
   def allocate(capacity: Int, byteOrder: ByteOrder): NativeDoubleBuffer = {
-    if (byteOrder == ByteOrder.nativeOrder){
+    if (byteOrder == ByteOrder.nativeOrder) {
       NativeDoubleBuffer.allocate(capacity)
     } else {
-      val jsBuffer = g.ArrayBuffer(capacity * NativeDoubleBuffer.BYTES_PER_ELEMENT).asInstanceOf[dom.ArrayBuffer]
+      val jsBuffer = js.Dynamic.newInstance(g.ArrayBuffer)(capacity * NativeDoubleBuffer.BYTES_PER_ELEMENT).asInstanceOf[dom.ArrayBuffer]
       val doubleBuffer = new AdaptiveDoubleBuffer(capacity, capacity, 0, -1, jsBuffer, 0, byteOrder)
       doubleBuffer
     }
