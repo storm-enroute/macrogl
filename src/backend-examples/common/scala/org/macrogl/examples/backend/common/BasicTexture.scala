@@ -109,25 +109,18 @@ class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate:
         texCoordBuffer.setAttributePointers()
       }
 
+      val textureUnit = 0
       val texture = macrogl.Texture(GL.TEXTURE_2D) { texture =>
         macrogl.Utils.loadTexture2DFromResources("/org/macrogl/examples/backend/common/macrogl.png", texture.token)
+        // Be careful about WebGL and textures: http://www.khronos.org/webgl/wiki/WebGL_and_OpenGL_Differences
+        texture.magFilter = GL.LINEAR
+        texture.minFilter = GL.LINEAR
+
+        // Not mandatory, but good to have
+        texture.wrapS = GL.CLAMP_TO_EDGE
+        texture.wrapT = GL.CLAMP_TO_EDGE
       }
       texture.acquire()
-
-      val textureUnit = 0
-
-      mgl.activeTexture(GL.TEXTURE0 + textureUnit)
-      mgl.bindTexture(GL.TEXTURE_2D, texture.token)
-      //for(_ <- using texture(GL.TEXTURE0, texture)) { // Buggy for now
-
-      // Be careful about WebGL and textures: http://www.khronos.org/webgl/wiki/WebGL_and_OpenGL_Differences
-      texture.magFilter = GL.LINEAR
-      texture.minFilter = GL.LINEAR
-
-      // Not mandatory, but good to have
-      texture.wrapS = GL.CLAMP_TO_EDGE
-      texture.wrapT = GL.CLAMP_TO_EDGE
-      //}
 
       // Enable transparency (looks better for textures that support it)
       mgl.enable(GL.BLEND)
@@ -147,6 +140,7 @@ class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate:
 
         for {
           _ <- using program (pp)
+          _ <- using texture (GL.TEXTURE0 + textureUnit, texture)
         } {
           vertexBuffer.enableAttributeArrays()
           texCoordBuffer.enableAttributeArrays()

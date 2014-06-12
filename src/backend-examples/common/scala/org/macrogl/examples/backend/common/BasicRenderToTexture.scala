@@ -212,6 +212,8 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
 
       //#### RENDER TO TEXTURE ####
 
+      val textureUnit = 0
+
       val targetTexture = macrogl.Texture(GL.TEXTURE_2D) { texture =>
         mgl.texImage2D(GL.TEXTURE_2D, 0, GL.RGB, textureWidth, textureHeight, 0, GL.RGB, GL.UNSIGNED_BYTE) // Allocate memory
         texture.magFilter = GL.LINEAR
@@ -301,7 +303,10 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
         fullscreenTransformStack.current = Matrix3f.scale2D(new Vector2f(scaleFactor, scaleFactor)) *
           Matrix3f.rotation2D(currentScreenRotation)
 
-        for (_ <- using program (fullProgram)) {
+        for {
+          _ <- using program (fullProgram)
+          _ <- using texture (GL.TEXTURE0 + textureUnit, targetTexture)
+        } {
           mgl.clearColor(0f, 0f, 0f, 1)
           mgl.clear(GL.COLOR_BUFFER_BIT)
 
@@ -312,12 +317,8 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
             fullscreenTexCoordBuffer.setAttributePointers()
           }
 
-          mgl.activeTexture(GL.TEXTURE0)
-          mgl.bindTexture(GL.TEXTURE_2D, targetTexture.token)
-          //for(_ <- using texture(GL.TEXTURE0, texture)) { // Buggy for now
-
           val fullscreenUniformTexLocation = mgl.getUniformLocation(fullProgram.token, "texSampler")
-          mgl.uniform1i(fullscreenUniformTexLocation, 0)
+          mgl.uniform1i(fullscreenUniformTexLocation, textureUnit)
 
           fullscreenVertexBuffer.enableAttributeArrays()
           fullscreenTexCoordBuffer.enableAttributeArrays()
@@ -327,7 +328,6 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
 
           mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, fullscreenIndicesBuffer)
           mgl.drawElements(GL.TRIANGLES, fullscreenIndicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
-          //}
 
           fullscreenTexCoordBuffer.disableAttributeArrays()
           fullscreenVertexBuffer.disableAttributeArrays()
