@@ -36,29 +36,67 @@ class AttributeBuffer(val usage: Int, val capacity: Int, val attributes: Int)(im
     gl.bindBuffer(Macrogl.ARRAY_BUFFER, Token.Buffer.none)
   }
 
+  var locations: Option[Array[Int]] = None
+
+  def setLocations(locs: Array[Int]): Unit = {
+    locations = Some(locs)
+  }
+
+  def unsetLocations(): Unit = {
+    locations = None
+  }
+  
   def enableAttributeArrays(attribs: Array[(Int, Int)]) {
+    locations match {
+      case Some(locs) => require(locs.length == attribs.length)
+      case None =>
+    }
+
     var i = 0
     while (i < attribs.length) {
-      gl.enableVertexAttribArray(i)
+      locations match {
+        case Some(locs) => gl.enableVertexAttribArray(locs(i))
+        case None => gl.enableVertexAttribArray(i)
+      }
       i += 1
     }
   }
 
   def disableAttributeArrays(attribs: Array[(Int, Int)]) {
+    locations match {
+      case Some(locs) => require(locs.length == attribs.length)
+      case None =>
+    }
+
     var i = 0
     while (i < attribs.length) {
-      gl.disableVertexAttribArray(i)
+      locations match {
+        case Some(locs) => gl.disableVertexAttribArray(locs(i))
+        case None => gl.disableVertexAttribArray(i)
+      }
       i += 1
     }
   }
 
+  /**
+   * First element of the tuple is the element offset
+   * Second element of the tuple is the number of element
+   */
   def setAttributePointers(attribs: Array[(Int, Int)]) {
+    locations match {
+      case Some(locs) => require(locs.length == attribs.length)
+      case None =>
+    }
+
     val stride = attributes * gl.bytesPerFloat
     var i = 0
     while (i < attribs.length) {
       val byteOffset = attribs(i)._1 * gl.bytesPerFloat
       val num = attribs(i)._2
-      gl.vertexAttribPointer(i, num, Macrogl.FLOAT, false, stride, byteOffset)
+      locations match {
+        case Some(locs) => gl.vertexAttribPointer(locs(i), num, Macrogl.FLOAT, false, stride, byteOffset)
+        case None => gl.vertexAttribPointer(i, num, Macrogl.FLOAT, false, stride, byteOffset)
+      }
       i += 1
     }
   }

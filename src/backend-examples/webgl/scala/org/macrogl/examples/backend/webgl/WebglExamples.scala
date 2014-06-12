@@ -45,9 +45,9 @@ object WebglExamples {
     }
 
     new BasicTriangle(width, height, myPrint, myUpdate, customInit("canvas-triangle"), myClose).start()
-    new BasicTexture(width, height, myPrint, myUpdate, customInit("canvas-texture"), myClose).start()
-    new BasicProjection3D(width, height, myPrint, myUpdate, customInit("canvas-projection"), myClose).start()
-    new BasicFractale3D(width, height, myPrint, myUpdate, customInit("canvas-fractale"), myClose).start()
-    new BasicRenderToTexture(width, height, myPrint, myUpdate, customInit("canvas-renderToTexture"), myClose).start()
+    //new BasicTexture(width, height, myPrint, myUpdate, customInit("canvas-texture"), myClose).start()
+    //new BasicProjection3D(width, height, myPrint, myUpdate, customInit("canvas-projection"), myClose).start()
+    //new BasicFractale3D(width, height, myPrint, myUpdate, customInit("canvas-fractale"), myClose).start()
+    //new BasicRenderToTexture(width, height, myPrint, myUpdate, customInit("canvas-renderToTexture"), myClose).start()
   }
 }

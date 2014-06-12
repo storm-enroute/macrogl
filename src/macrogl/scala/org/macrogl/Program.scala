@@ -50,10 +50,24 @@ class Program(val name: String)(val shaders: Program.Shader*)(implicit val gl: M
 
   def token = ptoken
 
+  private def processProgramErrors(flag: Int, phase: String, ptoken: Token.Program)(implicit gl: Macrogl) {
+    val res = gl.getProgramParameteri(ptoken, flag)
+    if (res == Macrogl.FALSE) {
+      val errormsg = gl.getProgramInfoLog(ptoken)
+      throw new Program.Exception(this, "error %s program %s\n%s".format(phase, name, errormsg))
+    }
+  }
+
   def acquire() {
     release()
     ptoken = gl.createProgram()
     for (s <- shaders) s.attach(this)
+
+    gl.linkProgram(ptoken)
+    processProgramErrors(Macrogl.LINK_STATUS, "linking", ptoken)
+    gl.validateProgram(ptoken)
+    processProgramErrors(Macrogl.VALIDATE_STATUS, "validating", ptoken)
+
     gl.checkError()
   }
 
@@ -87,15 +101,6 @@ object Program {
       }
     }
 
-    private def processProgramErrors(flag: Int, phase: String, p: Program)(implicit gl: Macrogl) {
-      val pname = p.name
-      val res = gl.getProgramParameteri(p.token, flag)
-      if (res == Macrogl.FALSE) {
-        val errormsg = gl.getProgramInfoLog(p.token)
-        throw new Program.Exception(p, "error %s program %s\n%s".format(phase, pname, errormsg))
-      }
-    }
-
     def name: String
 
     def mode: Int
@@ -111,10 +116,6 @@ object Program {
       processShaderErrors(name, Macrogl.COMPILE_STATUS, "compiling", s, p)
       gl.attachShader(p.token, s)
       afterAttach(p.token)
-      gl.linkProgram(p.token)
-      processProgramErrors(Macrogl.LINK_STATUS, "linking", p)
-      gl.validateProgram(p.token)
-      processProgramErrors(Macrogl.VALIDATE_STATUS, "validating", p)
       gl.checkError()
     }
 

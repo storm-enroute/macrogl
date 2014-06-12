@@ -1,8 +1,11 @@
 package org.macrogl.examples.backend.common
 
+import org.macrogl
 import org.macrogl.Utils
 import org.macrogl.Macrogl
 import org.macrogl.{ Macrogl => GL }
+
+import org.macrogl.using
 
 /**
  * Basic example with a static triangle
@@ -12,13 +15,16 @@ class BasicTriangle(width: Int, height: Int, print: String => Unit, systemUpdate
   extends DemoRenderable {
 
   class BasicTriangleListener extends org.macrogl.FrameListener {
+
     // (continue, render, close)
     var funcs: Option[(() => Boolean, org.macrogl.FrameEvent => Unit, () => Unit)] = None
 
     def init(): Unit = {
       print("Basic Triangle: init")
 
-      val mgl = systemInit()
+      implicit val mgl: Macrogl = systemInit()
+
+      // Prepare Data
 
       val vertexSource = """
         attribute vec3 position;
@@ -40,42 +46,6 @@ class BasicTriangle(width: Int, height: Int, print: String => Unit, systemUpdate
         }
         """
 
-      val program = mgl.createProgram()
-      val vertex = mgl.createShader(GL.VERTEX_SHADER)
-      val fragment = mgl.createShader(GL.FRAGMENT_SHADER)
-
-      mgl.shaderSource(vertex, vertexSource)
-      mgl.shaderSource(fragment, fragmentSource)
-
-      mgl.compileShader(vertex)
-      mgl.compileShader(fragment)
-
-      if (mgl.getShaderParameterb(vertex, GL.COMPILE_STATUS) == false)
-        print("Vertex compilation error: " + mgl.getShaderInfoLog(vertex))
-      if (mgl.getShaderParameterb(fragment, GL.COMPILE_STATUS) == false)
-        print("Fragment compilation error: " + mgl.getShaderInfoLog(fragment))
-
-      mgl.attachShader(program, vertex)
-      mgl.attachShader(program, fragment)
-
-      mgl.linkProgram(program)
-
-      if (mgl.getProgramParameterb(program, GL.LINK_STATUS) == false)
-        print("Program linking error: " + mgl.getProgramInfoLog(program))
-
-      mgl.validateProgram(program)
-
-      if (mgl.getProgramParameterb(program, GL.VALIDATE_STATUS) == false)
-        print("Program validation error: " + mgl.getProgramInfoLog(program))
-
-      mgl.useProgram(program)
-
-      val attribPosLocation = mgl.getAttribLocation(program, "position")
-      val uniformColorLocation = mgl.getUniformLocation(program, "color")
-
-      val vertexBuffer = mgl.createBuffer
-      val indicesBuffer = mgl.createBuffer
-
       val vertexBufferData = Macrogl.createFloatData(3 * 3)
       vertexBufferData.put(-0.2f).put(-0.2f).put(0)
       vertexBufferData.put(0.2f).put(-0.2f).put(0)
@@ -86,44 +56,33 @@ class BasicTriangle(width: Int, height: Int, print: String => Unit, systemUpdate
       indicesBufferData.put(0.toShort).put(1.toShort).put(2.toShort)
       indicesBufferData.rewind
 
-      val color = new org.macrogl.math.Vector3f(0, 0, 1)
+      val triangleColor = new org.macrogl.math.Vector3f(0, 0, 1)
 
-      mgl.bindBuffer(GL.ARRAY_BUFFER, vertexBuffer)
-      mgl.bufferData(GL.ARRAY_BUFFER, vertexBufferData, GL.STATIC_DRAW)
-      mgl.vertexAttribPointer(attribPosLocation, 3, GL.FLOAT, false, 0, 0)
+      // General OpenGL
+      mgl.viewport(0, 0, width, height)
+      mgl.clearColor(1, 0, 0, 1) // red background
 
+      // Setup
+      val pp = new macrogl.Program("BasicTriangle")(
+        macrogl.Program.Shader.Vertex(vertexSource),
+        macrogl.Program.Shader.Fragment(fragmentSource))
+      pp.acquire()
+
+      val vertexBuffer = new macrogl.AttributeBuffer(GL.STATIC_DRAW, vertexBufferData.remaining() / 3, 3)
+      vertexBuffer.acquire()
+      vertexBuffer.send(0, vertexBufferData)
+
+      val indicesBuffer = mgl.createBuffer
       mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indicesBuffer)
       mgl.bufferData(GL.ELEMENT_ARRAY_BUFFER, indicesBufferData, GL.STATIC_DRAW)
 
-      mgl.viewport(0, 0, width, height)
+      val attrsCfg = Array((0, 3))
+      val attrsLocs = Array(mgl.getAttribLocation(pp.token, "position"))
 
-      mgl.clearColor(1, 0, 0, 1)
-
-      /*org.macrogl.Utils.getTextFileFromResources("/org/macrogl/examples/backend/common/test.txt") { lines =>
-        print("Basic Triangle: Text file received, lines = " + lines.length + "\n--- Start of file ---")
-        lines.foreach { line =>
-          print(line)
-        }
-        print("--- End of file ---")
+      for (_ <- using attributebuffer (vertexBuffer)) {
+        vertexBuffer.setLocations(attrsLocs)
+        vertexBuffer.setAttributePointers(attrsCfg)
       }
-      
-      org.macrogl.Utils.getBinaryFileFromResources("/org/macrogl/examples/backend/common/macrogl.png") { buffer =>
-        print("Basic Triangle: Binary file received, size = " + buffer.remaining() + " bytes, first byte = " + buffer.get(0))
-      }*/
-      
-      /*org.macrogl.utils.TextResources.get(
-          "/org/macrogl/examples/backend/common/test1.txt",
-          "/org/macrogl/examples/backend/common/test2.txt") {
-        case Array(test1Content, test2Content) =>
-          
-        print("Files received:\n--- test1.txt ---")
-        print(test1Content.mkString("\n"))
-        print("--- test2.txt ---")
-        print(test2Content.mkString("\n"))
-        print("--- End of Files ---")
-      }*/
-
-      mgl.enableVertexAttribArray(attribPosLocation)
 
       print("Basic Triangle: ready")
 
@@ -134,12 +93,19 @@ class BasicTriangle(width: Int, height: Int, print: String => Unit, systemUpdate
       }
 
       def render(fe: org.macrogl.FrameEvent): Unit = {
-        //print("Elapsed seconds since last frame: " + fe.elapsedTime)
-
         mgl.clear(GL.COLOR_BUFFER_BIT)
-        mgl.uniform3f(uniformColorLocation, color)
 
-        mgl.drawElements(GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
+        for {
+          _ <- using program (pp)
+          _ <- using attributebuffer (vertexBuffer)
+        } {
+          vertexBuffer.enableAttributeArrays(attrsCfg)
+          
+          pp.uniform.color = triangleColor
+          mgl.drawElements(GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
+          
+          vertexBuffer.disableAttributeArrays(attrsCfg)
+        }
 
         continueCondition = systemUpdate()
       }
@@ -147,15 +113,9 @@ class BasicTriangle(width: Int, height: Int, print: String => Unit, systemUpdate
       def close(): Unit = {
         print("Basic Triangle: closing")
 
-        mgl.disableVertexAttribArray(attribPosLocation)
-
         mgl.deleteBuffer(indicesBuffer)
-        mgl.deleteBuffer(vertexBuffer)
-
-        mgl.deleteShader(vertex)
-        mgl.deleteShader(fragment)
-
-        mgl.deleteProgram(program)
+        vertexBuffer.release()
+        pp.release()
 
         systemClose()
 
