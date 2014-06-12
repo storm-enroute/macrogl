@@ -111,9 +111,9 @@ class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate:
         texCoordBuffer.setAttributePointers(coordAttrsCfg)
       }
       
-      val texture = new macrogl.Texture(GL.TEXTURE_2D) ( texture =>
+      val texture = macrogl.Texture(GL.TEXTURE_2D) { texture =>
         org.macrogl.Utils.loadTexture2DFromResources("/org/macrogl/examples/backend/common/macrogl.png", texture.token)
-      )
+      }
       texture.acquire()
       
       val textureUnit = 0
