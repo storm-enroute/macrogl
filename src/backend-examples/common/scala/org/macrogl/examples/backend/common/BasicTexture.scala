@@ -120,7 +120,6 @@ class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate:
       
       mgl.activeTexture(GL.TEXTURE0 + textureUnit)
       mgl.bindTexture(GL.TEXTURE_2D, texture.token)
-      
       //for(_ <- using texture(GL.TEXTURE0, texture)) {
 
       // Be careful about WebGL and textures: http://www.khronos.org/webgl/wiki/WebGL_and_OpenGL_Differences
@@ -130,11 +129,11 @@ class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate:
       // Not mandatory, but good to have
       texture.wrapS = GL.CLAMP_TO_EDGE
       texture.wrapT = GL.CLAMP_TO_EDGE
-
+      //}
+      
       // Enable transparency (looks better for textures that support it)
       mgl.enable(GL.BLEND)
       mgl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
-      //}
 
       print("Basic Texture: ready")
 
