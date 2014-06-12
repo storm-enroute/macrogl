@@ -30,6 +30,12 @@ class Program(val name: String)(val shaders: Program.Shader*)(implicit val gl: M
         case (x: Int, y: Int) => gl.uniform2i(l, x, y)
         case (x: Int, y: Int, z: Int) => gl.uniform3i(l, x, y, z)
         case (x: Int, y: Int, z: Int, w: Int) => gl.uniform4i(l, x, y, z, w)
+        case v2: math.Vector2f => gl.uniform2f(l, v2)
+        case v3: math.Vector3f => gl.uniform3f(l, v3)
+        case v4: math.Vector4f => gl.uniform4f(l, v4)
+        case m2: math.Matrix2f => gl.uniformMatrix2f(l, m2)
+        case m3: math.Matrix3f => gl.uniformMatrix3f(l, m3)
+        case m4: math.Matrix4f => gl.uniformMatrix4f(l, m4)
         case m: Matrix =>
           var i = 0
           while (i < 16) {
