@@ -69,7 +69,7 @@ object Utils {
   /**
    * Asynchronously load a text file from the resources and pass it to the provided callback.
    *
-   * @param resourceName The Fully qualified path of the resource image
+   * @param resourceName The Fully qualified path of the resource
    * @param callback The function to call once the data are in memory
    */
   def getTextFileFromResources(resourceName: String)(callback: Array[String] => Unit): Unit = {
@@ -93,7 +93,7 @@ object Utils {
   /**
    * Asynchronously load a binary file from the resources and pass it to the provided callback.
    *
-   * @param resourceName The Fully qualified path of the resource image
+   * @param resourceName The Fully qualified path of the resource
    * @param callback The function to call once the data are in memory
    */
   def getBinaryFileFromResources(resourceName: String)(callback: org.macrogl.Data.Byte => Unit): Unit = {
