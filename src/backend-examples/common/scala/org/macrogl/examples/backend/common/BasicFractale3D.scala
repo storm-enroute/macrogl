@@ -49,7 +49,7 @@ class BasicFractale3D(width: Int, height: Int, print: String => Unit, systemUpda
         }
         """
 
-      val pp = new macrogl.Program("BasicTriangle")(
+      val pp = new macrogl.Program("BasicProjection3D")(
         macrogl.Program.Shader.Vertex(vertexSource),
         macrogl.Program.Shader.Fragment(fragmentSource))
       pp.acquire()
