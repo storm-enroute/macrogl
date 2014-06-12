@@ -60,7 +60,7 @@ object Utils {
    * @param preload Optional function called by the OpenGL thread after the image has been decoded but before it is loaded into OpenGL.
    * A returned value false means aborting the texture loading
    */
-  def loadTexture2DFromResources(resourceName: String, texture: Token.Texture, gl: Macrogl, preload: => Boolean = { true }): Unit = {
+  def loadTexture2DFromResources(resourceName: String, texture: Token.Texture, preload: => Boolean = { true })(implicit gl: Macrogl): Unit = {
     val stream = inputStreamForResource(resourceName)
 
     // TODO should we have our own ExecutionContext?

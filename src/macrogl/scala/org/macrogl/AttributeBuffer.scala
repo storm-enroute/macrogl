@@ -37,13 +37,30 @@ class AttributeBuffer(val usage: Int, val capacity: Int, val attributes: Int)(im
   }
 
   var locations: Option[Array[Int]] = None
-
   def setLocations(locs: Array[Int]): Unit = {
     locations = Some(locs)
   }
-
   def unsetLocations(): Unit = {
     locations = None
+  }
+  
+  var attribsCfg: Option[Array[(Int, Int)]] = None
+  def setAttribsCfg(attribs: Array[(Int, Int)]) : Unit = {
+    attribsCfg = Some(attribs)
+  }
+  
+  def unsetAttribsCfg() {
+    attribsCfg = None
+  }
+  
+  def enableAttributeArrays(): Unit = attribsCfg match {
+    case Some(attribs) => enableAttributeArrays(attribs)
+    case None => throw new RuntimeException("Attribs undefined")
+  }
+  
+  def disableAttributeArrays(): Unit = attribsCfg match {
+    case Some(attribs) => disableAttributeArrays(attribs)
+    case None => throw new RuntimeException("Attribs undefined")
   }
   
   def enableAttributeArrays(attribs: Array[(Int, Int)]) {
