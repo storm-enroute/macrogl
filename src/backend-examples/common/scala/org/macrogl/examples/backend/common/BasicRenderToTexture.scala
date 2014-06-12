@@ -343,11 +343,15 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
 
         targetTexture.release()
 
+        mgl.deleteBuffer(fullscreenIndicesBuffer)
+        
         fullscreenTexCoordBuffer.release()
         fullscreenVertexBuffer.release()
 
         fullProgram.release()
 
+        mgl.deleteBuffer(indicesBuffer)
+        
         colorBuffer.release()
         vertexBuffer.release()
 
