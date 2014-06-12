@@ -1,8 +1,6 @@
 package org.macrogl.examples.backend.common
 
 import org.macrogl
-import org.macrogl.Utils
-import org.macrogl.Macrogl
 import org.macrogl.{ Macrogl => GL }
 import org.macrogl.using
 
@@ -14,7 +12,7 @@ import org.macrogl.math._
  * you should use at least a Sandy Bridge processor, though we had it working with an Arrandale and an OpenGL 2.1 context.
  */
 class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, systemUpdate: () => Boolean,
-  systemInit: () => Macrogl, systemClose: () => Unit)
+  systemInit: () => macrogl.Macrogl, systemClose: () => Unit)
   extends DemoRenderable {
 
   class BasicRenderToTextureListener extends org.macrogl.FrameListener {
@@ -69,7 +67,7 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
       val indicesBuffer = mgl.createBuffer
 
       // position: 1 face (4 vertices)
-      val vertexBufferData = Macrogl.createFloatData(4 * 3)
+      val vertexBufferData = macrogl.Macrogl.createFloatData(4 * 3)
       vertexBufferData.put(-1f).put(-0.5f).put(0f)
       vertexBufferData.put(1f).put(-0.5f).put(0f)
       vertexBufferData.put(1f).put(0.5f).put(0f)
@@ -77,7 +75,7 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
       vertexBufferData.rewind
 
       // color: 1 face (4 vertices)
-      val colorBufferData = Macrogl.createFloatData(4 * 3)
+      val colorBufferData = macrogl.Macrogl.createFloatData(4 * 3)
       colorBufferData.put(1f).put(0f).put(0f)
       colorBufferData.put(0f).put(1f).put(0f)
       colorBufferData.put(1f).put(1f).put(0f)
@@ -85,7 +83,7 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
       colorBufferData.rewind
 
       // 1 faces = 2 triangles
-      val indicesBufferData = Macrogl.createShortData(2 * 3)
+      val indicesBufferData = macrogl.Macrogl.createShortData(2 * 3)
       indicesBufferData.put(0.toShort).put(1.toShort).put(3.toShort)
       indicesBufferData.put(1.toShort).put(2.toShort).put(3.toShort)
       indicesBufferData.rewind
@@ -164,21 +162,21 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
       val w = textureWidth.toFloat / 2
       val h = textureHeight.toFloat / 2
 
-      val fullscreenVertexBufferData = Macrogl.createFloatData(4 * 2)
+      val fullscreenVertexBufferData = macrogl.Macrogl.createFloatData(4 * 2)
       fullscreenVertexBufferData.put(-w).put(-h)
       fullscreenVertexBufferData.put(w).put(-h)
       fullscreenVertexBufferData.put(w).put(h)
       fullscreenVertexBufferData.put(-w).put(h)
       fullscreenVertexBufferData.rewind
 
-      val fullscreenTexCoordBufferData = Macrogl.createFloatData(4 * 2)
+      val fullscreenTexCoordBufferData = macrogl.Macrogl.createFloatData(4 * 2)
       fullscreenTexCoordBufferData.put(0f).put(0f)
       fullscreenTexCoordBufferData.put(1f).put(0f)
       fullscreenTexCoordBufferData.put(1f).put(1f)
       fullscreenTexCoordBufferData.put(0f).put(1f)
       fullscreenTexCoordBufferData.rewind
 
-      val fullscreenIndicesBufferData = Macrogl.createShortData(2 * 3)
+      val fullscreenIndicesBufferData = macrogl.Macrogl.createShortData(2 * 3)
       fullscreenIndicesBufferData.put(0.toShort).put(1.toShort).put(3.toShort)
       fullscreenIndicesBufferData.put(1.toShort).put(2.toShort).put(3.toShort)
       fullscreenIndicesBufferData.rewind
@@ -316,6 +314,7 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
 
           mgl.activeTexture(GL.TEXTURE0)
           mgl.bindTexture(GL.TEXTURE_2D, targetTexture.token)
+          //for(_ <- using texture(GL.TEXTURE0, texture)) { // Buggy for now
 
           val fullscreenUniformTexLocation = mgl.getUniformLocation(fullProgram.token, "texSampler")
           mgl.uniform1i(fullscreenUniformTexLocation, 0)
@@ -328,6 +327,7 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
 
           mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, fullscreenIndicesBuffer)
           mgl.drawElements(GL.TRIANGLES, fullscreenIndicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
+          //}
 
           fullscreenTexCoordBuffer.disableAttributeArrays()
           fullscreenVertexBuffer.disableAttributeArrays()

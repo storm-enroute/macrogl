@@ -98,11 +98,11 @@ class BasicTriangle(width: Int, height: Int, print: String => Unit, systemUpdate
           _ <- using attributebuffer (vertexBuffer)
         } {
           vertexBuffer.enableAttributeArrays(attrsCfg)
-          
+
           pp.uniform.color = triangleColor
           mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indicesBuffer)
           mgl.drawElements(GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
-          
+
           vertexBuffer.disableAttributeArrays(attrsCfg)
         }
 

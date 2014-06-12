@@ -21,7 +21,7 @@ class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate:
       implicit val mgl = systemInit()
 
       // Prepare data 
-      
+
       val vertexSource = """
         attribute vec3 position;
         attribute vec2 texCoord;
@@ -76,49 +76,49 @@ class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate:
       // Setup
       mgl.viewport(0, 0, width, height)
       mgl.clearColor(0, 0, 1, 1)
-      
+
       val pp = new macrogl.Program("BasicTexture")(
         macrogl.Program.Shader.Vertex(vertexSource),
         macrogl.Program.Shader.Fragment(fragmentSource))
       pp.acquire()
-      
+
       val vertexAttrsCfg = Array((0, 3))
       val vertexAttrsLocs = Array(mgl.getAttribLocation(pp.token, "position"))
       val coordAttrsCfg = Array((0, 2))
       val coordAttrsLocs = Array(mgl.getAttribLocation(pp.token, "texCoord"))
-      
+
       val vertexBuffer = new macrogl.AttributeBuffer(GL.STATIC_DRAW, vertexBufferData.remaining() / 3, 3)
       vertexBuffer.acquire()
       vertexBuffer.send(0, vertexBufferData)
-      
+
       val texCoordBuffer = new macrogl.AttributeBuffer(GL.STATIC_DRAW, textureCoordBufferData.remaining() / 2, 2)
       texCoordBuffer.acquire()
       texCoordBuffer.send(0, textureCoordBufferData)
-      
+
       for (_ <- using attributebuffer (vertexBuffer)) {
         vertexBuffer.setLocations(vertexAttrsLocs)
         vertexBuffer.setAttribsCfg(vertexAttrsCfg)
-        
+
         vertexBuffer.setAttributePointers()
       }
-      
+
       for (_ <- using attributebuffer (texCoordBuffer)) {
         texCoordBuffer.setLocations(coordAttrsLocs)
         texCoordBuffer.setAttribsCfg(coordAttrsCfg)
-        
+
         texCoordBuffer.setAttributePointers()
       }
-      
+
       val texture = macrogl.Texture(GL.TEXTURE_2D) { texture =>
         macrogl.Utils.loadTexture2DFromResources("/org/macrogl/examples/backend/common/macrogl.png", texture.token)
       }
       texture.acquire()
-      
+
       val textureUnit = 0
-      
+
       mgl.activeTexture(GL.TEXTURE0 + textureUnit)
       mgl.bindTexture(GL.TEXTURE_2D, texture.token)
-      //for(_ <- using texture(GL.TEXTURE0, texture)) {
+      //for(_ <- using texture(GL.TEXTURE0, texture)) { // Buggy for now
 
       // Be careful about WebGL and textures: http://www.khronos.org/webgl/wiki/WebGL_and_OpenGL_Differences
       texture.magFilter = GL.LINEAR
@@ -128,7 +128,7 @@ class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate:
       texture.wrapS = GL.CLAMP_TO_EDGE
       texture.wrapT = GL.CLAMP_TO_EDGE
       //}
-      
+
       // Enable transparency (looks better for textures that support it)
       mgl.enable(GL.BLEND)
       mgl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
@@ -150,12 +150,12 @@ class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate:
         } {
           vertexBuffer.enableAttributeArrays()
           texCoordBuffer.enableAttributeArrays()
-          
+
           pp.uniform.texSampler = textureUnit
-          
+
           mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indicesBuffer)
           mgl.drawElements(GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
-          
+
           texCoordBuffer.disableAttributeArrays()
           vertexBuffer.disableAttributeArrays()
         }

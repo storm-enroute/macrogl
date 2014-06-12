@@ -137,13 +137,13 @@ class BasicProjection3D(width: Int, height: Int, print: String => Unit, systemUp
           _ <- using program (pp)
         } {
           mgl.clear(GL.COLOR_BUFFER_BIT)
-          
+
           vertexBuffer.enableAttributeArrays()
           colorBuffer.enableAttributeArrays()
 
           pp.uniform.projection = projection
           pp.uniform.transform = transformStack.current
-          
+
           mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indicesBuffer)
           mgl.drawElements(GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
 
