@@ -1,8 +1,10 @@
 package org.macrogl.examples.backend.common
 
+import org.macrogl
 import org.macrogl.Utils
 import org.macrogl.Macrogl
 import org.macrogl.{ Macrogl => GL }
+import org.macrogl.using
 
 import org.macrogl.math._
 
@@ -26,7 +28,7 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
     def init(): Unit = {
       print("Basic RenderToTexture: init")
 
-      val mgl = systemInit()
+      implicit val mgl = systemInit()
 
       //#### PROJECTION (3D) ####
 
@@ -58,42 +60,12 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
         }
         """
 
-      val projectionProgram = mgl.createProgram()
-      val projectionVertex = mgl.createShader(GL.VERTEX_SHADER)
-      val projectionFragment = mgl.createShader(GL.FRAGMENT_SHADER)
-
-      mgl.shaderSource(projectionVertex, projectionVertexSource)
-      mgl.shaderSource(projectionFragment, projectionFragmentSource)
-
-      mgl.compileShader(projectionVertex)
-      mgl.compileShader(projectionFragment)
-
-      if (mgl.getShaderParameterb(projectionVertex, GL.COMPILE_STATUS) == false)
-        print("Vertex compilation error: " + mgl.getShaderInfoLog(projectionVertex))
-      if (mgl.getShaderParameterb(projectionFragment, GL.COMPILE_STATUS) == false)
-        print("Fragment compilation error: " + mgl.getShaderInfoLog(projectionFragment))
-
-      mgl.attachShader(projectionProgram, projectionVertex)
-      mgl.attachShader(projectionProgram, projectionFragment)
-
-      mgl.linkProgram(projectionProgram)
-
-      if (mgl.getProgramParameterb(projectionProgram, GL.LINK_STATUS) == false)
-        print("Program linking error: " + mgl.getProgramInfoLog(projectionProgram))
-
-      mgl.validateProgram(projectionProgram)
-
-      if (mgl.getProgramParameterb(projectionProgram, GL.VALIDATE_STATUS) == false)
-        print("Program validation error: " + mgl.getProgramInfoLog(projectionProgram))
-
-      val attribPosLocation = mgl.getAttribLocation(projectionProgram, "position")
-      val attribColorLocation = mgl.getAttribLocation(projectionProgram, "color")
-      val uniformProjectionLocation = mgl.getUniformLocation(projectionProgram, "projection")
-      val uniformTransformLocation = mgl.getUniformLocation(projectionProgram, "transform")
+      val projProgram = new macrogl.Program("BasicRenderToTexture(projection)")(
+        macrogl.Program.Shader.Vertex(projectionVertexSource),
+        macrogl.Program.Shader.Fragment(projectionFragmentSource))
+      projProgram.acquire()
 
       // Buffers
-      val vertexBuffer = mgl.createBuffer
-      val colorBuffer = mgl.createBuffer
       val indicesBuffer = mgl.createBuffer
 
       // position: 1 face (4 vertices)
@@ -119,11 +91,27 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
       indicesBufferData.rewind
 
       // Fill the OpenGL buffers with the data
-      mgl.bindBuffer(GL.ARRAY_BUFFER, vertexBuffer)
-      mgl.bufferData(GL.ARRAY_BUFFER, vertexBufferData, GL.STATIC_DRAW)
+      val vertexBuffer = new macrogl.AttributeBuffer(GL.STATIC_DRAW, vertexBufferData.remaining() / 3, 3)
+      vertexBuffer.acquire()
+      vertexBuffer.send(0, vertexBufferData)
+      for (_ <- using attributebuffer (vertexBuffer)) {
+        val vertexAttrsLocs = Array(mgl.getAttribLocation(projProgram.token, "position"))
+        val vertexAttrsCfg = Array((0, 3))
 
-      mgl.bindBuffer(GL.ARRAY_BUFFER, colorBuffer)
-      mgl.bufferData(GL.ARRAY_BUFFER, colorBufferData, GL.STATIC_DRAW)
+        vertexBuffer.setLocations(vertexAttrsLocs)
+        vertexBuffer.setAttribsCfg(vertexAttrsCfg)
+      }
+
+      val colorBuffer = new macrogl.AttributeBuffer(GL.STATIC_DRAW, colorBufferData.remaining() / 3, 3)
+      colorBuffer.acquire()
+      colorBuffer.send(0, colorBufferData)
+      for (_ <- using attributebuffer (colorBuffer)) {
+        val colorAttrsLocs = Array(mgl.getAttribLocation(projProgram.token, "color"))
+        val colorAttrsCfg = Array((0, 3))
+
+        colorBuffer.setLocations(colorAttrsLocs)
+        colorBuffer.setAttribsCfg(colorAttrsCfg)
+      }
 
       mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indicesBuffer)
       mgl.bufferData(GL.ELEMENT_ARRAY_BUFFER, indicesBufferData, GL.STATIC_DRAW)
@@ -165,43 +153,12 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
         }
         """
 
-      val fullscreenProgram = mgl.createProgram
-      val fullscreenVertex = mgl.createShader(GL.VERTEX_SHADER)
-      val fullscreenFragment = mgl.createShader(GL.FRAGMENT_SHADER)
-
-      mgl.shaderSource(fullscreenVertex, fullscreenVertexSource)
-      mgl.shaderSource(fullscreenFragment, fullscreenFragmentSource)
-
-      mgl.compileShader(fullscreenVertex)
-      mgl.compileShader(fullscreenFragment)
-
-      if (mgl.getShaderParameterb(fullscreenVertex, GL.COMPILE_STATUS) == false)
-        print("Vertex compilation error: " + mgl.getShaderInfoLog(fullscreenVertex))
-      if (mgl.getShaderParameterb(fullscreenFragment, GL.COMPILE_STATUS) == false)
-        print("Fragment compilation error: " + mgl.getShaderInfoLog(fullscreenFragment))
-
-      mgl.attachShader(fullscreenProgram, fullscreenVertex)
-      mgl.attachShader(fullscreenProgram, fullscreenFragment)
-
-      mgl.linkProgram(fullscreenProgram)
-
-      if (mgl.getProgramParameterb(fullscreenProgram, GL.LINK_STATUS) == false)
-        print("Program linking error: " + mgl.getProgramInfoLog(fullscreenProgram))
-
-      mgl.validateProgram(fullscreenProgram)
-
-      if (mgl.getProgramParameterb(fullscreenProgram, GL.VALIDATE_STATUS) == false)
-        print("Program validation error: " + mgl.getProgramInfoLog(fullscreenProgram))
-
-      val fullscreenAttribPosLocation = mgl.getAttribLocation(fullscreenProgram, "position")
-      val fullscreenAttribTexCoordLocation = mgl.getAttribLocation(fullscreenProgram, "texCoord")
-      val fullscreenUniformTexLocation = mgl.getUniformLocation(fullscreenProgram, "texSampler")
-      val fullscreenUniformTransformLocation = mgl.getUniformLocation(fullscreenProgram, "transform")
-      val fullscreenUniformProjectionLocation = mgl.getUniformLocation(fullscreenProgram, "projection")
+      val fullProgram = new macrogl.Program("BasicRenderToTexture(fullscreen)")(
+        macrogl.Program.Shader.Vertex(fullscreenVertexSource),
+        macrogl.Program.Shader.Fragment(fullscreenFragmentSource))
+      fullProgram.acquire()
 
       // Buffers
-      val fullscreenVertexBuffer = mgl.createBuffer
-      val fullscreenTexCoordBuffer = mgl.createBuffer
       val fullscreenIndicesBuffer = mgl.createBuffer
 
       val w = textureWidth.toFloat / 2
@@ -226,11 +183,27 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
       fullscreenIndicesBufferData.put(1.toShort).put(2.toShort).put(3.toShort)
       fullscreenIndicesBufferData.rewind
 
-      mgl.bindBuffer(GL.ARRAY_BUFFER, fullscreenVertexBuffer)
-      mgl.bufferData(GL.ARRAY_BUFFER, fullscreenVertexBufferData, GL.STATIC_DRAW)
+      val fullscreenVertexBuffer = new macrogl.AttributeBuffer(GL.STATIC_DRAW, fullscreenVertexBufferData.remaining() / 2, 2)
+      fullscreenVertexBuffer.acquire()
+      fullscreenVertexBuffer.send(0, fullscreenVertexBufferData)
+      for (_ <- using attributebuffer (fullscreenVertexBuffer)) {
+        val vertexAttrsLocs = Array(mgl.getAttribLocation(fullProgram.token, "position"))
+        val vertexAttrsCfg = Array((0, 2))
 
-      mgl.bindBuffer(GL.ARRAY_BUFFER, fullscreenTexCoordBuffer)
-      mgl.bufferData(GL.ARRAY_BUFFER, fullscreenTexCoordBufferData, GL.STATIC_DRAW)
+        fullscreenVertexBuffer.setLocations(vertexAttrsLocs)
+        fullscreenVertexBuffer.setAttribsCfg(vertexAttrsCfg)
+      }
+
+      val fullscreenTexCoordBuffer = new macrogl.AttributeBuffer(GL.STATIC_DRAW, colorBufferData.remaining() / 2, 2)
+      fullscreenTexCoordBuffer.acquire()
+      fullscreenTexCoordBuffer.send(0, fullscreenTexCoordBufferData)
+      for (_ <- using attributebuffer (fullscreenTexCoordBuffer)) {
+        val texCoordAttrsLocs = Array(mgl.getAttribLocation(fullProgram.token, "texCoord"))
+        val texCoordAttrsCfg = Array((0, 2))
+
+        fullscreenTexCoordBuffer.setLocations(texCoordAttrsLocs)
+        fullscreenTexCoordBuffer.setAttribsCfg(texCoordAttrsCfg)
+      }
 
       mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, fullscreenIndicesBuffer)
       mgl.bufferData(GL.ELEMENT_ARRAY_BUFFER, fullscreenIndicesBufferData, GL.STATIC_DRAW)
@@ -241,13 +214,14 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
 
       //#### RENDER TO TEXTURE ####
 
-      val targetTexture = mgl.createTexture
-      mgl.bindTexture(GL.TEXTURE_2D, targetTexture)
-      mgl.texImage2D(GL.TEXTURE_2D, 0, GL.RGB, textureWidth, textureHeight, 0, GL.RGB, GL.UNSIGNED_BYTE) // Allocate memory
-      mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR)
-      mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR)
-      mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE)
-      mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE)
+      val targetTexture = macrogl.Texture(GL.TEXTURE_2D) { texture =>
+        mgl.texImage2D(GL.TEXTURE_2D, 0, GL.RGB, textureWidth, textureHeight, 0, GL.RGB, GL.UNSIGNED_BYTE) // Allocate memory
+        texture.magFilter = GL.LINEAR
+        texture.minFilter = GL.LINEAR
+        texture.wrapS = GL.CLAMP_TO_EDGE
+        texture.wrapT = GL.CLAMP_TO_EDGE
+      }
+      targetTexture.acquire()
 
       val renderbufferDepth = mgl.createRenderbuffer
       mgl.bindRenderbuffer(GL.RENDERBUFFER, renderbufferDepth)
@@ -255,7 +229,7 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
 
       val framebuffer = mgl.createFramebuffer
       mgl.bindFramebuffer(GL.FRAMEBUFFER, framebuffer)
-      mgl.framebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, targetTexture, 0) // attach the color buffer
+      mgl.framebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, targetTexture.token, 0) // attach the color buffer
       mgl.framebufferRenderbuffer(GL.FRAMEBUFFER, GL.DEPTH_ATTACHMENT, GL.RENDERBUFFER, renderbufferDepth) // attach the depth buffer
 
       if (mgl.checkFramebufferStatus(GL.FRAMEBUFFER) != GL.FRAMEBUFFER_COMPLETE)
@@ -290,30 +264,29 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
         projectionTransformStack.current = Matrix4f.translate3D(new Vector3f(0, 0, -2)) *
           Matrix4f.rotation3D(currentRotation, new Vector3f(0, 1, 0))
 
-        mgl.useProgram(projectionProgram)
+        for (_ <- using program (projProgram)) {
+          mgl.clearColor(0.5f, 0.5f, 0.5f, 1)
+          mgl.clear(GL.COLOR_BUFFER_BIT)
 
-        mgl.clearColor(0.5f, 0.5f, 0.5f, 1)
-        mgl.clear(GL.COLOR_BUFFER_BIT)
+          for (_ <- using attributebuffer (vertexBuffer)) {
+            vertexBuffer.setAttributePointers()
+          }
+          for (_ <- using attributebuffer (colorBuffer)) {
+            colorBuffer.setAttributePointers()
+          }
 
-        mgl.bindBuffer(GL.ARRAY_BUFFER, vertexBuffer)
-        mgl.vertexAttribPointer(attribPosLocation, 3, GL.FLOAT, false, 0, 0)
-        mgl.enableVertexAttribArray(attribPosLocation)
+          vertexBuffer.enableAttributeArrays()
+          colorBuffer.enableAttributeArrays()
 
-        mgl.bindBuffer(GL.ARRAY_BUFFER, colorBuffer)
-        mgl.enableVertexAttribArray(attribColorLocation)
-        mgl.vertexAttribPointer(attribColorLocation, 3, GL.FLOAT, false, 0, 0)
+          projProgram.uniform.projection = projection
+          projProgram.uniform.transform = projectionTransformStack.current
 
-        // Send the current transformation to the shader
-        mgl.uniformMatrix4f(uniformTransformLocation, projectionTransformStack.current)
+          mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indicesBuffer)
+          mgl.drawElements(GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
 
-        // Send the projection to the shader
-        mgl.uniformMatrix4f(uniformProjectionLocation, projection)
-
-        mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indicesBuffer)
-        mgl.drawElements(GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
-
-        mgl.disableVertexAttribArray(attribColorLocation)
-        mgl.disableVertexAttribArray(attribPosLocation)
+          colorBuffer.disableAttributeArrays()
+          vertexBuffer.disableAttributeArrays()
+        }
 
         projectionTransformStack.pop // Restore the transformation matrix
 
@@ -330,33 +303,35 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
         fullscreenTransformStack.current = Matrix3f.scale2D(new Vector2f(scaleFactor, scaleFactor)) *
           Matrix3f.rotation2D(currentScreenRotation)
 
-        mgl.useProgram(fullscreenProgram)
+        for (_ <- using program (fullProgram)) {
+          mgl.clearColor(0f, 0f, 0f, 1)
+          mgl.clear(GL.COLOR_BUFFER_BIT)
 
-        mgl.clearColor(0f, 0f, 0f, 1)
-        mgl.clear(GL.COLOR_BUFFER_BIT)
+          for (_ <- using attributebuffer (fullscreenVertexBuffer)) {
+            fullscreenVertexBuffer.setAttributePointers()
+          }
+          for (_ <- using attributebuffer (fullscreenTexCoordBuffer)) {
+            fullscreenTexCoordBuffer.setAttributePointers()
+          }
 
-        mgl.uniformMatrix3f(fullscreenUniformTransformLocation, fullscreenTransformStack.current)
+          mgl.activeTexture(GL.TEXTURE0)
+          mgl.bindTexture(GL.TEXTURE_2D, targetTexture.token)
 
-        mgl.uniformMatrix3f(fullscreenUniformProjectionLocation, fullscreenProjection)
+          val fullscreenUniformTexLocation = mgl.getUniformLocation(fullProgram.token, "texSampler")
+          mgl.uniform1i(fullscreenUniformTexLocation, 0)
 
-        mgl.activeTexture(GL.TEXTURE0)
-        mgl.bindTexture(GL.TEXTURE_2D, targetTexture)
+          fullscreenVertexBuffer.enableAttributeArrays()
+          fullscreenTexCoordBuffer.enableAttributeArrays()
 
-        mgl.uniform1i(fullscreenUniformTexLocation, 0)
+          fullProgram.uniform.projection = fullscreenProjection
+          fullProgram.uniform.transform = fullscreenTransformStack.current
 
-        mgl.bindBuffer(GL.ARRAY_BUFFER, fullscreenVertexBuffer)
-        mgl.vertexAttribPointer(fullscreenAttribPosLocation, 2, GL.FLOAT, false, 0, 0)
-        mgl.enableVertexAttribArray(fullscreenAttribPosLocation)
+          mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, fullscreenIndicesBuffer)
+          mgl.drawElements(GL.TRIANGLES, fullscreenIndicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
 
-        mgl.bindBuffer(GL.ARRAY_BUFFER, fullscreenTexCoordBuffer)
-        mgl.vertexAttribPointer(fullscreenAttribTexCoordLocation, 2, GL.FLOAT, false, 0, 0)
-        mgl.enableVertexAttribArray(fullscreenAttribTexCoordLocation)
-
-        mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, fullscreenIndicesBuffer)
-        mgl.drawElements(GL.TRIANGLES, fullscreenIndicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
-
-        mgl.disableVertexAttribArray(fullscreenAttribTexCoordLocation)
-        mgl.disableVertexAttribArray(fullscreenAttribPosLocation)
+          fullscreenTexCoordBuffer.disableAttributeArrays()
+          fullscreenVertexBuffer.disableAttributeArrays()
+        }
 
         fullscreenTransformStack.pop
 
@@ -366,23 +341,17 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
       def close(): Unit = {
         print("Basic RenderToTexture: closing")
 
-        mgl.deleteBuffer(fullscreenVertexBuffer)
-        mgl.deleteBuffer(fullscreenTexCoordBuffer)
-        mgl.deleteBuffer(fullscreenIndicesBuffer)
+        targetTexture.release()
 
-        mgl.deleteShader(fullscreenVertex)
-        mgl.deleteShader(fullscreenFragment)
+        fullscreenTexCoordBuffer.release()
+        fullscreenVertexBuffer.release()
 
-        mgl.deleteProgram(fullscreenProgram)
+        fullProgram.release()
 
-        mgl.deleteBuffer(indicesBuffer)
-        mgl.deleteBuffer(colorBuffer)
-        mgl.deleteBuffer(vertexBuffer)
+        colorBuffer.release()
+        vertexBuffer.release()
 
-        mgl.deleteShader(projectionVertex)
-        mgl.deleteShader(projectionFragment)
-
-        mgl.deleteProgram(projectionProgram)
+        projProgram.release()
 
         systemClose()
 

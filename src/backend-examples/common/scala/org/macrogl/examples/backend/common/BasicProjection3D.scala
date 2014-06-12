@@ -90,7 +90,6 @@ class BasicProjection3D(width: Int, height: Int, print: String => Unit, systemUp
       val vertexBuffer = new macrogl.AttributeBuffer(GL.STATIC_DRAW, vertexBufferData.remaining() / 3, 3)
       vertexBuffer.acquire()
       vertexBuffer.send(0, vertexBufferData)
-
       for (_ <- using attributebuffer (vertexBuffer)) {
         val vertexAttrsLocs = Array(mgl.getAttribLocation(pp.token, "position"))
         val vertexAttrsCfg = Array((0, 3))
@@ -104,7 +103,6 @@ class BasicProjection3D(width: Int, height: Int, print: String => Unit, systemUp
       val colorBuffer = new macrogl.AttributeBuffer(GL.STATIC_DRAW, colorBufferData.remaining() / 3, 3)
       colorBuffer.acquire()
       colorBuffer.send(0, colorBufferData)
-
       for (_ <- using attributebuffer (colorBuffer)) {
         val colorAttrsLocs = Array(mgl.getAttribLocation(pp.token, "color"))
         val colorAttrsCfg = Array((0, 3))
