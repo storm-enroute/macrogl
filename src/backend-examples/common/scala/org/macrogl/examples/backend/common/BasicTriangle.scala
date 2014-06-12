@@ -1,8 +1,6 @@
 package org.macrogl.examples.backend.common
 
 import org.macrogl
-import org.macrogl.Utils
-import org.macrogl.Macrogl
 import org.macrogl.{ Macrogl => GL }
 
 import org.macrogl.using
@@ -11,7 +9,7 @@ import org.macrogl.using
  * Basic example with a static triangle
  */
 class BasicTriangle(width: Int, height: Int, print: String => Unit, systemUpdate: () => Boolean,
-  systemInit: () => Macrogl, systemClose: () => Unit)
+  systemInit: () => macrogl.Macrogl, systemClose: () => Unit)
   extends DemoRenderable {
 
   class BasicTriangleListener extends org.macrogl.FrameListener {
@@ -22,7 +20,7 @@ class BasicTriangle(width: Int, height: Int, print: String => Unit, systemUpdate
     def init(): Unit = {
       print("Basic Triangle: init")
 
-      implicit val mgl: Macrogl = systemInit()
+      implicit val mgl = systemInit()
 
       // Prepare Data
 
@@ -46,13 +44,13 @@ class BasicTriangle(width: Int, height: Int, print: String => Unit, systemUpdate
         }
         """
 
-      val vertexBufferData = Macrogl.createFloatData(3 * 3)
+      val vertexBufferData = macrogl.Macrogl.createFloatData(3 * 3)
       vertexBufferData.put(-0.2f).put(-0.2f).put(0)
       vertexBufferData.put(0.2f).put(-0.2f).put(0)
       vertexBufferData.put(0).put(0.2f).put(0)
       vertexBufferData.rewind
 
-      val indicesBufferData = Macrogl.createShortData(3 * 1)
+      val indicesBufferData = macrogl.Macrogl.createShortData(3 * 1)
       indicesBufferData.put(0.toShort).put(1.toShort).put(2.toShort)
       indicesBufferData.rewind
 

@@ -1,18 +1,14 @@
 package org.macrogl.examples.backend.common
 
 import org.macrogl
-import org.macrogl.Utils
-import org.macrogl.Macrogl
 import org.macrogl.{ Macrogl => GL }
 import org.macrogl.using
-
-import org.macrogl.math._
 
 /**
  * Basic example of texturing
  */
 class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate: () => Boolean,
-  systemInit: () => Macrogl, systemClose: () => Unit)
+  systemInit: () => macrogl.Macrogl, systemClose: () => Unit)
   extends DemoRenderable {
 
   class BasicTextureListener extends org.macrogl.FrameListener {
@@ -54,7 +50,7 @@ class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate:
 
       val indicesBuffer = mgl.createBuffer
 
-      val vertexBufferData = Macrogl.createFloatData(4 * 3) // 4 vertices (3 components each)
+      val vertexBufferData = macrogl.Macrogl.createFloatData(4 * 3) // 4 vertices (3 components each)
       vertexBufferData.put(-0.4f).put(-0.25f).put(0)
       vertexBufferData.put(0.4f).put(-0.25f).put(0)
       vertexBufferData.put(0.4f).put(0.25f).put(0)
@@ -62,12 +58,12 @@ class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate:
       vertexBufferData.rewind()
 
       // WebGL does not support INTEGER for index buffers, use SHORT instead if you want a portable behavior
-      val indicesBufferData = Macrogl.createShortData(2 * 3) // 2 triangles (3 vertices each)
+      val indicesBufferData = macrogl.Macrogl.createShortData(2 * 3) // 2 triangles (3 vertices each)
       indicesBufferData.put(0.toShort).put(1.toShort).put(2.toShort)
       indicesBufferData.put(0.toShort).put(2.toShort).put(3.toShort)
       indicesBufferData.rewind()
 
-      val textureCoordBufferData = Macrogl.createFloatData(4 * 2) // 4 vertices (2 components each)
+      val textureCoordBufferData = macrogl.Macrogl.createFloatData(4 * 2) // 4 vertices (2 components each)
       textureCoordBufferData.put(0).put(0)
       textureCoordBufferData.put(1).put(0)
       textureCoordBufferData.put(1).put(1)
@@ -81,7 +77,7 @@ class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate:
       mgl.viewport(0, 0, width, height)
       mgl.clearColor(0, 0, 1, 1)
       
-      val pp = new macrogl.Program("BasicTriangle")(
+      val pp = new macrogl.Program("BasicTexture")(
         macrogl.Program.Shader.Vertex(vertexSource),
         macrogl.Program.Shader.Fragment(fragmentSource))
       pp.acquire()
@@ -102,17 +98,19 @@ class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate:
       for (_ <- using attributebuffer (vertexBuffer)) {
         vertexBuffer.setLocations(vertexAttrsLocs)
         vertexBuffer.setAttribsCfg(vertexAttrsCfg)
-        vertexBuffer.setAttributePointers(vertexAttrsCfg)
+        
+        vertexBuffer.setAttributePointers()
       }
       
       for (_ <- using attributebuffer (texCoordBuffer)) {
         texCoordBuffer.setLocations(coordAttrsLocs)
         texCoordBuffer.setAttribsCfg(coordAttrsCfg)
-        texCoordBuffer.setAttributePointers(coordAttrsCfg)
+        
+        texCoordBuffer.setAttributePointers()
       }
       
       val texture = macrogl.Texture(GL.TEXTURE_2D) { texture =>
-        org.macrogl.Utils.loadTexture2DFromResources("/org/macrogl/examples/backend/common/macrogl.png", texture.token)
+        macrogl.Utils.loadTexture2DFromResources("/org/macrogl/examples/backend/common/macrogl.png", texture.token)
       }
       texture.acquire()
       
@@ -154,6 +152,7 @@ class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate:
           texCoordBuffer.enableAttributeArrays()
           
           pp.uniform.texSampler = textureUnit
+          
           mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indicesBuffer)
           mgl.drawElements(GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
           

@@ -44,6 +44,10 @@ class AttributeBuffer(val usage: Int, val capacity: Int, val attributes: Int)(im
     locations = None
   }
   
+  /**
+   * First element of the tuple is the element offset
+   * Second element of the tuple is the number of element
+   */
   var attribsCfg: Option[Array[(Int, Int)]] = None
   def setAttribsCfg(attribs: Array[(Int, Int)]) : Unit = {
     attribsCfg = Some(attribs)
@@ -63,7 +67,7 @@ class AttributeBuffer(val usage: Int, val capacity: Int, val attributes: Int)(im
     case None => throw new RuntimeException("Attribs undefined")
   }
   
-  def enableAttributeArrays(attribs: Array[(Int, Int)]) {
+  def enableAttributeArrays(attribs: Array[(Int, Int)]): Unit = {
     locations match {
       case Some(locs) => require(locs.length == attribs.length)
       case None =>
@@ -79,7 +83,7 @@ class AttributeBuffer(val usage: Int, val capacity: Int, val attributes: Int)(im
     }
   }
 
-  def disableAttributeArrays(attribs: Array[(Int, Int)]) {
+  def disableAttributeArrays(attribs: Array[(Int, Int)]): Unit = {
     locations match {
       case Some(locs) => require(locs.length == attribs.length)
       case None =>
@@ -95,11 +99,12 @@ class AttributeBuffer(val usage: Int, val capacity: Int, val attributes: Int)(im
     }
   }
 
-  /**
-   * First element of the tuple is the element offset
-   * Second element of the tuple is the number of element
-   */
-  def setAttributePointers(attribs: Array[(Int, Int)]) {
+  def setAttributePointers(): Unit = attribsCfg match {
+    case Some(attribs) => setAttributePointers(attribs)
+    case None => throw new RuntimeException("Attribs undefined")
+  }
+  
+  def setAttributePointers(attribs: Array[(Int, Int)]): Unit = {
     locations match {
       case Some(locs) => require(locs.length == attribs.length)
       case None =>
