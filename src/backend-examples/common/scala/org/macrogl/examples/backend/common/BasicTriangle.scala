@@ -111,6 +111,18 @@ class BasicTriangle(width: Int, height: Int, print: String => Unit, systemUpdate
         print("Basic Triangle: Binary file received, size = " + buffer.remaining() + " bytes, first byte = " + buffer.get(0))
       }*/
       
+      /*org.macrogl.utils.TextResources.get(
+          "/org/macrogl/examples/backend/common/test1.txt",
+          "/org/macrogl/examples/backend/common/test2.txt") {
+        case Array(test1Content, test2Content) =>
+          
+        print("Files received:\n--- test1.txt ---")
+        print(test1Content.mkString("\n"))
+        print("--- test2.txt ---")
+        print(test2Content.mkString("\n"))
+        print("--- End of Files ---")
+      }*/
+
       mgl.enableVertexAttribArray(attribPosLocation)
 
       print("Basic Triangle: ready")

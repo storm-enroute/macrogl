@@ -30,7 +30,7 @@ object SimpleOBJParser {
     override def toString(): String = "Mesh("+name+")"
   }
   
-  def parse(objFile: Array[String], mtlFiles: Map[String, Array[String]]): Map[String, Mesh] = {
+  def parse(objFile: TextFileContent, mtlFiles: Map[String, TextFileContent]): Map[String, Mesh] = {
     ??? // Work In Progress
   }
 }
