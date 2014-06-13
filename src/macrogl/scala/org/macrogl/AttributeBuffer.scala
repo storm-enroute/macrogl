@@ -9,6 +9,12 @@ class AttributeBuffer(val usage: Int, val capacity: Int, val attributes: Int)(im
   private var vtoken = Token.Buffer.invalid
   private var result = new Array[Int](1)
   private var totalelems = 0
+  /**
+   * First element of the tuple is the element offset
+   * Second element of the tuple is the number of element
+   */
+  private var optAttribsCfg: Option[Array[(Int, Int)]] = None
+  private var optLocations: Option[Array[Int]] = None
 
   def acquire() {
     release()
@@ -36,7 +42,6 @@ class AttributeBuffer(val usage: Int, val capacity: Int, val attributes: Int)(im
     gl.bindBuffer(Macrogl.ARRAY_BUFFER, Token.Buffer.none)
   }
 
-  private var optLocations: Option[Array[Int]] = None
   def locations = optLocations match {
     case Some(locs) => locs
     case None => throw new RuntimeException("Locations undefined")
@@ -48,11 +53,6 @@ class AttributeBuffer(val usage: Int, val capacity: Int, val attributes: Int)(im
     optLocations = None
   }
 
-  /**
-   * First element of the tuple is the element offset
-   * Second element of the tuple is the number of element
-   */
-  private var optAttribsCfg: Option[Array[(Int, Int)]] = None
   def attribs = optAttribsCfg match {
     case Some(attribs) => attribs
     case None => throw new RuntimeException("Attribs undefined")
@@ -65,14 +65,12 @@ class AttributeBuffer(val usage: Int, val capacity: Int, val attributes: Int)(im
     optAttribsCfg = None
   }
 
-  def enableAttributeArrays(): Unit = optAttribsCfg match {
-    case Some(attribs) => enableAttributeArrays(attribs)
-    case None => throw new RuntimeException("Attribs undefined")
+  def enableAttributeArrays(): Unit = {
+    enableAttributeArrays(attribs)
   }
 
-  def disableAttributeArrays(): Unit = optAttribsCfg match {
-    case Some(attribs) => disableAttributeArrays(attribs)
-    case None => throw new RuntimeException("Attribs undefined")
+  def disableAttributeArrays(): Unit = {
+    disableAttributeArrays(attribs)
   }
 
   def enableAttributeArrays(attribs: Array[(Int, Int)]): Unit = {
@@ -107,9 +105,8 @@ class AttributeBuffer(val usage: Int, val capacity: Int, val attributes: Int)(im
     }
   }
 
-  def setAttributePointers(): Unit = optAttribsCfg match {
-    case Some(attribs) => setAttributePointers(attribs)
-    case None => throw new RuntimeException("Attribs undefined")
+  def setAttributePointers(): Unit = {
+    setAttributePointers(attribs)
   }
 
   def setAttributePointers(attribs: Array[(Int, Int)]): Unit = {
