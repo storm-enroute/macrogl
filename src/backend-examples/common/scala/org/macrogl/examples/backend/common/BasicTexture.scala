@@ -1,16 +1,14 @@
 package org.macrogl.examples.backend.common
 
-import org.macrogl.Utils
-import org.macrogl.Macrogl
+import org.macrogl
 import org.macrogl.{ Macrogl => GL }
-
-import org.macrogl.math._
+import org.macrogl.using
 
 /**
  * Basic example of texturing
  */
 class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate: () => Boolean,
-  systemInit: () => Macrogl, systemClose: () => Unit)
+  systemInit: () => macrogl.Macrogl, systemClose: () => Unit)
   extends DemoRenderable {
 
   class BasicTextureListener extends org.macrogl.FrameListener {
@@ -20,7 +18,9 @@ class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate:
     def init(): Unit = {
       print("Basic Texture: init")
 
-      val mgl = systemInit()
+      implicit val mgl = systemInit()
+
+      // Prepare data 
 
       val vertexSource = """
         attribute vec3 position;
@@ -48,47 +48,9 @@ class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate:
         }
         """
 
-      // Prepare the shader program
-      val program = mgl.createProgram()
-      val vertex = mgl.createShader(GL.VERTEX_SHADER)
-      val fragment = mgl.createShader(GL.FRAGMENT_SHADER)
-
-      mgl.shaderSource(vertex, vertexSource)
-      mgl.shaderSource(fragment, fragmentSource)
-
-      mgl.compileShader(vertex)
-      mgl.compileShader(fragment)
-
-      if (mgl.getShaderParameterb(vertex, GL.COMPILE_STATUS) == false)
-        print("Vertex compilation error: " + mgl.getShaderInfoLog(vertex))
-      if (mgl.getShaderParameterb(fragment, GL.COMPILE_STATUS) == false)
-        print("Fragment compilation error: " + mgl.getShaderInfoLog(fragment))
-
-      mgl.attachShader(program, vertex)
-      mgl.attachShader(program, fragment)
-
-      mgl.linkProgram(program)
-
-      if (mgl.getProgramParameterb(program, GL.LINK_STATUS) == false)
-        print("Program linking error: " + mgl.getProgramInfoLog(program))
-
-      mgl.validateProgram(program)
-
-      if (mgl.getProgramParameterb(program, GL.VALIDATE_STATUS) == false)
-        print("Program validation error: " + mgl.getProgramInfoLog(program))
-
-      mgl.useProgram(program)
-
-      // Prepare the data to send to the GPU
-      val attribPosLocation = mgl.getAttribLocation(program, "position")
-      val attribCoordLocation = mgl.getAttribLocation(program, "texCoord")
-      val uniformTexSamplerLocation = mgl.getUniformLocation(program, "texSampler")
-
-      val vertexBuffer = mgl.createBuffer
       val indicesBuffer = mgl.createBuffer
-      val textureCoordBuffer = mgl.createBuffer
 
-      val vertexBufferData = Macrogl.createFloatData(4 * 3) // 4 vertices (3 components each)
+      val vertexBufferData = macrogl.Macrogl.createFloatData(4 * 3) // 4 vertices (3 components each)
       vertexBufferData.put(-0.4f).put(-0.25f).put(0)
       vertexBufferData.put(0.4f).put(-0.25f).put(0)
       vertexBufferData.put(0.4f).put(0.25f).put(0)
@@ -96,56 +58,73 @@ class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate:
       vertexBufferData.rewind()
 
       // WebGL does not support INTEGER for index buffers, use SHORT instead if you want a portable behavior
-      val indicesBufferData = Macrogl.createShortData(2 * 3) // 2 triangles (3 vertices each)
+      val indicesBufferData = macrogl.Macrogl.createShortData(2 * 3) // 2 triangles (3 vertices each)
       indicesBufferData.put(0.toShort).put(1.toShort).put(2.toShort)
       indicesBufferData.put(0.toShort).put(2.toShort).put(3.toShort)
       indicesBufferData.rewind()
 
-      val textureCoordBufferData = Macrogl.createFloatData(4 * 2) // 4 vertices (2 components each)
+      val textureCoordBufferData = macrogl.Macrogl.createFloatData(4 * 2) // 4 vertices (2 components each)
       textureCoordBufferData.put(0).put(0)
       textureCoordBufferData.put(1).put(0)
       textureCoordBufferData.put(1).put(1)
       textureCoordBufferData.put(0).put(1)
       textureCoordBufferData.rewind()
 
-      mgl.bindBuffer(GL.ARRAY_BUFFER, vertexBuffer)
-      mgl.bufferData(GL.ARRAY_BUFFER, vertexBufferData, GL.STATIC_DRAW)
-      mgl.vertexAttribPointer(attribPosLocation, 3, GL.FLOAT, false, 0, 0)
-
-      mgl.bindBuffer(GL.ARRAY_BUFFER, textureCoordBuffer)
-      mgl.bufferData(GL.ARRAY_BUFFER, textureCoordBufferData, GL.STATIC_DRAW)
-      mgl.vertexAttribPointer(attribCoordLocation, 2, GL.FLOAT, false, 0, 0)
-
       mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indicesBuffer)
       mgl.bufferData(GL.ELEMENT_ARRAY_BUFFER, indicesBufferData, GL.STATIC_DRAW)
 
-      val texture = mgl.createTexture()
-      mgl.activeTexture(GL.TEXTURE0)
-      mgl.bindTexture(GL.TEXTURE_2D, texture)
+      // Setup
+      mgl.viewport(0, 0, width, height)
+      mgl.clearColor(0, 0, 1, 1)
 
-      // Be careful about WebGL and textures: http://www.khronos.org/webgl/wiki/WebGL_and_OpenGL_Differences
-      mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR)
-      mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR)
+      val pp = new macrogl.Program("BasicTexture")(
+        macrogl.Program.Shader.Vertex(vertexSource),
+        macrogl.Program.Shader.Fragment(fragmentSource))
+      pp.acquire()
 
-      // Not mandatory, but good to have
-      mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE)
-      mgl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE)
+      val vertexAttrsCfg = Array((0, 3))
+      val vertexAttrsLocs = Array(mgl.getAttribLocation(pp.token, "position"))
+      val coordAttrsCfg = Array((0, 2))
+      val coordAttrsLocs = Array(mgl.getAttribLocation(pp.token, "texCoord"))
+
+      val vertexBuffer = new macrogl.AttributeBuffer(GL.STATIC_DRAW, vertexBufferData.remaining() / 3, 3)
+      vertexBuffer.acquire()
+      vertexBuffer.send(0, vertexBufferData)
+
+      val texCoordBuffer = new macrogl.AttributeBuffer(GL.STATIC_DRAW, textureCoordBufferData.remaining() / 2, 2)
+      texCoordBuffer.acquire()
+      texCoordBuffer.send(0, textureCoordBufferData)
+
+      for (_ <- using attributebuffer (vertexBuffer)) {
+        vertexBuffer.locations = vertexAttrsLocs
+        vertexBuffer.attribs = vertexAttrsCfg
+
+        vertexBuffer.setAttributePointers()
+      }
+
+      for (_ <- using attributebuffer (texCoordBuffer)) {
+        texCoordBuffer.locations = coordAttrsLocs
+        texCoordBuffer.attribs = coordAttrsCfg
+
+        texCoordBuffer.setAttributePointers()
+      }
+
+      val textureUnit = 0
+      val texture = macrogl.Texture(GL.TEXTURE_2D) { texture =>
+        macrogl.Utils.loadTexture2DFromResources("/org/macrogl/examples/backend/common/macrogl.png", texture.token)
+        // Be careful about WebGL and textures: http://www.khronos.org/webgl/wiki/WebGL_and_OpenGL_Differences
+        texture.magFilter = GL.LINEAR
+        texture.minFilter = GL.LINEAR
+
+        // Not mandatory, but good to have
+        texture.wrapS = GL.CLAMP_TO_EDGE
+        texture.wrapT = GL.CLAMP_TO_EDGE
+      }
+      texture.acquire()
 
       // Enable transparency (looks better for textures that support it)
       mgl.enable(GL.BLEND)
       mgl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
-
-      // Load the texture
-      var textureReady = false
-      org.macrogl.Utils.loadTexture2DFromResources("/org/macrogl/examples/backend/common/macrogl.png",
-        texture, mgl, { textureReady = true; print("Basic Texture: texture ready"); true })
-
-      mgl.viewport(0, 0, width, height)
-
-      mgl.clearColor(0, 0, 1, 1)
-
-      mgl.enableVertexAttribArray(attribPosLocation)
-      mgl.enableVertexAttribArray(attribCoordLocation)
 
       print("Basic Texture: ready")
 
@@ -156,14 +135,24 @@ class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate:
       }
 
       def render(fe: org.macrogl.FrameEvent): Unit = {
-        //print("Elapsed seconds since last frame: " + fe.elapsedTime)
 
         mgl.clear(GL.COLOR_BUFFER_BIT)
-        mgl.uniform1i(uniformTexSamplerLocation, 0)
 
-        //if (textureReady) {
-        mgl.drawElements(GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
-        //}
+        for {
+          _ <- using program (pp)
+          _ <- using texture (GL.TEXTURE0 + textureUnit, texture)
+        } {
+          vertexBuffer.enableAttributeArrays()
+          texCoordBuffer.enableAttributeArrays()
+
+          pp.uniform.texSampler = textureUnit
+
+          mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indicesBuffer)
+          mgl.drawElements(GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
+
+          texCoordBuffer.disableAttributeArrays()
+          vertexBuffer.disableAttributeArrays()
+        }
 
         continueCondition = systemUpdate()
       }
@@ -171,17 +160,11 @@ class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate:
       def close(): Unit = {
         print("Basic Texture: closing")
 
-        mgl.disableVertexAttribArray(attribCoordLocation)
-        mgl.disableVertexAttribArray(attribPosLocation)
-
-        mgl.deleteBuffer(textureCoordBuffer)
+        texture.release()
+        texCoordBuffer.release()
+        vertexBuffer.release()
         mgl.deleteBuffer(indicesBuffer)
-        mgl.deleteBuffer(vertexBuffer)
-
-        mgl.deleteShader(vertex)
-        mgl.deleteShader(fragment)
-
-        mgl.deleteProgram(program)
+        pp.release()
 
         systemClose()
 

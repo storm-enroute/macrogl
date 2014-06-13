@@ -133,8 +133,8 @@ package macrogl {
 
       val r = reify {
         val t = (c.Expr[Texture](tt)).splice
-        val oldbinding = gl.splice.getParameterTexture(t.binding)
         gl.splice.activeTexture((c.Expr[Int](texnum)).splice)
+        val oldbinding = gl.splice.getParameterTexture(t.binding)
         gl.splice.bindTexture(t.target, t.token)
         try f.splice(())
         finally gl.splice.bindTexture(t.target, oldbinding)

@@ -30,6 +30,12 @@ class Program(val name: String)(val shaders: Program.Shader*)(implicit val gl: M
         case (x: Int, y: Int) => gl.uniform2i(l, x, y)
         case (x: Int, y: Int, z: Int) => gl.uniform3i(l, x, y, z)
         case (x: Int, y: Int, z: Int, w: Int) => gl.uniform4i(l, x, y, z, w)
+        case v2: math.Vector2f => gl.uniform2f(l, v2)
+        case v3: math.Vector3f => gl.uniform3f(l, v3)
+        case v4: math.Vector4f => gl.uniform4f(l, v4)
+        case m2: math.Matrix2f => gl.uniformMatrix2f(l, m2)
+        case m3: math.Matrix3f => gl.uniformMatrix3f(l, m3)
+        case m4: math.Matrix4f => gl.uniformMatrix4f(l, m4)
         case m: Matrix =>
           var i = 0
           while (i < 16) {
@@ -44,10 +50,24 @@ class Program(val name: String)(val shaders: Program.Shader*)(implicit val gl: M
 
   def token = ptoken
 
+  private def processProgramErrors(flag: Int, phase: String, ptoken: Token.Program)(implicit gl: Macrogl) {
+    val res = gl.getProgramParameteri(ptoken, flag)
+    if (res == Macrogl.FALSE) {
+      val errormsg = gl.getProgramInfoLog(ptoken)
+      throw new Program.Exception(this, "error %s program %s\n%s".format(phase, name, errormsg))
+    }
+  }
+
   def acquire() {
     release()
     ptoken = gl.createProgram()
     for (s <- shaders) s.attach(this)
+
+    gl.linkProgram(ptoken)
+    processProgramErrors(Macrogl.LINK_STATUS, "linking", ptoken)
+    gl.validateProgram(ptoken)
+    processProgramErrors(Macrogl.VALIDATE_STATUS, "validating", ptoken)
+
     gl.checkError()
   }
 
@@ -81,15 +101,6 @@ object Program {
       }
     }
 
-    private def processProgramErrors(flag: Int, phase: String, p: Program)(implicit gl: Macrogl) {
-      val pname = p.name
-      val res = gl.getProgramParameteri(p.token, flag)
-      if (res == Macrogl.FALSE) {
-        val errormsg = gl.getProgramInfoLog(p.token)
-        throw new Program.Exception(p, "error %s program %s\n%s".format(phase, pname, errormsg))
-      }
-    }
-
     def name: String
 
     def mode: Int
@@ -105,10 +116,6 @@ object Program {
       processShaderErrors(name, Macrogl.COMPILE_STATUS, "compiling", s, p)
       gl.attachShader(p.token, s)
       afterAttach(p.token)
-      gl.linkProgram(p.token)
-      processProgramErrors(Macrogl.LINK_STATUS, "linking", p)
-      gl.validateProgram(p.token)
-      processProgramErrors(Macrogl.VALIDATE_STATUS, "validating", p)
       gl.checkError()
     }
 
