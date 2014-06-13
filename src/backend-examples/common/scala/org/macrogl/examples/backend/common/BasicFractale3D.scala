@@ -98,8 +98,8 @@ class BasicFractale3D(width: Int, height: Int, print: String => Unit, systemUpda
         val vertexAttrsLocs = Array(mgl.getAttribLocation(pp.token, "position"))
         val vertexAttrsCfg = Array((0, 3))
 
-        vertexBuffer.setLocations(vertexAttrsLocs)
-        vertexBuffer.setAttribsCfg(vertexAttrsCfg)
+        vertexBuffer.locations = vertexAttrsLocs
+        vertexBuffer.attribs = vertexAttrsCfg
 
         vertexBuffer.setAttributePointers()
       }
@@ -111,8 +111,8 @@ class BasicFractale3D(width: Int, height: Int, print: String => Unit, systemUpda
         val colorAttrsLocs = Array(mgl.getAttribLocation(pp.token, "color"))
         val colorAttrsCfg = Array((0, 3))
 
-        colorBuffer.setLocations(colorAttrsLocs)
-        colorBuffer.setAttribsCfg(colorAttrsCfg)
+        colorBuffer.locations = colorAttrsLocs
+        colorBuffer.attribs = colorAttrsCfg
 
         colorBuffer.setAttributePointers()
       }

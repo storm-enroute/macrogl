@@ -36,46 +36,54 @@ class AttributeBuffer(val usage: Int, val capacity: Int, val attributes: Int)(im
     gl.bindBuffer(Macrogl.ARRAY_BUFFER, Token.Buffer.none)
   }
 
-  var locations: Option[Array[Int]] = None
-  def setLocations(locs: Array[Int]): Unit = {
-    locations = Some(locs)
+  private var optLocations: Option[Array[Int]] = None
+  def locations = optLocations match {
+    case Some(locs) => locs
+    case None => throw new RuntimeException("Locations undefined")
   }
-  def unsetLocations(): Unit = {
-    locations = None
+  def locations_=(locs: Array[Int]) {
+    optLocations = Some(locs)
   }
-  
+  def clearLocations(): Unit = {
+    optLocations = None
+  }
+
   /**
    * First element of the tuple is the element offset
    * Second element of the tuple is the number of element
    */
-  var attribsCfg: Option[Array[(Int, Int)]] = None
-  def setAttribsCfg(attribs: Array[(Int, Int)]) : Unit = {
-    attribsCfg = Some(attribs)
+  private var optAttribsCfg: Option[Array[(Int, Int)]] = None
+  def attribs = optAttribsCfg match {
+    case Some(attribs) => attribs
+    case None => throw new RuntimeException("Attribs undefined")
   }
-  
-  def unsetAttribsCfg() {
-    attribsCfg = None
+  def attribs_=(attribs: Array[(Int, Int)]) {
+    optAttribsCfg = Some(attribs)
   }
-  
-  def enableAttributeArrays(): Unit = attribsCfg match {
+
+  def clearAttribs() {
+    optAttribsCfg = None
+  }
+
+  def enableAttributeArrays(): Unit = optAttribsCfg match {
     case Some(attribs) => enableAttributeArrays(attribs)
     case None => throw new RuntimeException("Attribs undefined")
   }
-  
-  def disableAttributeArrays(): Unit = attribsCfg match {
+
+  def disableAttributeArrays(): Unit = optAttribsCfg match {
     case Some(attribs) => disableAttributeArrays(attribs)
     case None => throw new RuntimeException("Attribs undefined")
   }
-  
+
   def enableAttributeArrays(attribs: Array[(Int, Int)]): Unit = {
-    locations match {
+    optLocations match {
       case Some(locs) => require(locs.length == attribs.length)
       case None =>
     }
 
     var i = 0
     while (i < attribs.length) {
-      locations match {
+      optLocations match {
         case Some(locs) => gl.enableVertexAttribArray(locs(i))
         case None => gl.enableVertexAttribArray(i)
       }
@@ -84,14 +92,14 @@ class AttributeBuffer(val usage: Int, val capacity: Int, val attributes: Int)(im
   }
 
   def disableAttributeArrays(attribs: Array[(Int, Int)]): Unit = {
-    locations match {
+    optLocations match {
       case Some(locs) => require(locs.length == attribs.length)
       case None =>
     }
 
     var i = 0
     while (i < attribs.length) {
-      locations match {
+      optLocations match {
         case Some(locs) => gl.disableVertexAttribArray(locs(i))
         case None => gl.disableVertexAttribArray(i)
       }
@@ -99,13 +107,13 @@ class AttributeBuffer(val usage: Int, val capacity: Int, val attributes: Int)(im
     }
   }
 
-  def setAttributePointers(): Unit = attribsCfg match {
+  def setAttributePointers(): Unit = optAttribsCfg match {
     case Some(attribs) => setAttributePointers(attribs)
     case None => throw new RuntimeException("Attribs undefined")
   }
-  
+
   def setAttributePointers(attribs: Array[(Int, Int)]): Unit = {
-    locations match {
+    optLocations match {
       case Some(locs) => require(locs.length == attribs.length)
       case None =>
     }
@@ -115,7 +123,7 @@ class AttributeBuffer(val usage: Int, val capacity: Int, val attributes: Int)(im
     while (i < attribs.length) {
       val byteOffset = attribs(i)._1 * gl.bytesPerFloat
       val num = attribs(i)._2
-      locations match {
+      optLocations match {
         case Some(locs) => gl.vertexAttribPointer(locs(i), num, Macrogl.FLOAT, false, stride, byteOffset)
         case None => gl.vertexAttribPointer(i, num, Macrogl.FLOAT, false, stride, byteOffset)
       }

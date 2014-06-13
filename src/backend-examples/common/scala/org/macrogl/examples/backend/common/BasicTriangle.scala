@@ -78,7 +78,8 @@ class BasicTriangle(width: Int, height: Int, print: String => Unit, systemUpdate
       val attrsLocs = Array(mgl.getAttribLocation(pp.token, "position"))
 
       for (_ <- using attributebuffer (vertexBuffer)) {
-        vertexBuffer.setLocations(attrsLocs)
+        vertexBuffer.locations = attrsLocs
+        
         vertexBuffer.setAttributePointers(attrsCfg)
       }
 

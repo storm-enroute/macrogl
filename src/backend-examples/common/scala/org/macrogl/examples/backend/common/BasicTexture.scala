@@ -96,15 +96,15 @@ class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate:
       texCoordBuffer.send(0, textureCoordBufferData)
 
       for (_ <- using attributebuffer (vertexBuffer)) {
-        vertexBuffer.setLocations(vertexAttrsLocs)
-        vertexBuffer.setAttribsCfg(vertexAttrsCfg)
+        vertexBuffer.locations = vertexAttrsLocs
+        vertexBuffer.attribs = vertexAttrsCfg
 
         vertexBuffer.setAttributePointers()
       }
 
       for (_ <- using attributebuffer (texCoordBuffer)) {
-        texCoordBuffer.setLocations(coordAttrsLocs)
-        texCoordBuffer.setAttribsCfg(coordAttrsCfg)
+        texCoordBuffer.locations = coordAttrsLocs
+        texCoordBuffer.attribs = coordAttrsCfg
 
         texCoordBuffer.setAttributePointers()
       }

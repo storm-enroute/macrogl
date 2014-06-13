@@ -44,7 +44,7 @@ object Utils {
    * @param preload Optional function called by the OpenGL thread after the image has been decoded but before it is loaded into OpenGL.
    * A returned value false means aborting the texture loading
    */
-  def loadTexture2DFromResources(resourceName: String, texture: Token.Texture, preload: => Boolean = { true })(implicit gl: Macrogl): Unit = {
+  def loadTexture2DFromResources(resourceName: String, texture: Token.Texture, preload: => Boolean = true)(implicit gl: Macrogl): Unit = {
     val image = dom.document.createElement("img").asInstanceOf[js.Dynamic]
     image.onload = ({ (e: dom.Event) =>
       if (preload) {
@@ -80,12 +80,12 @@ object Utils {
     xmlRequest.open("GET", resource, true)
 
     val onLoadCallback = { (event: js.Any) =>
-    	val text: String = xmlRequest.responseText
-    	val lines = text.replaceAll("\r", "").split("\n")
-    	
-    	callback(lines)
+      val text: String = xmlRequest.responseText
+      val lines = text.replaceAll("\r", "").split("\n")
+
+      callback(lines)
     }
-    
+
     xmlRequest.onload = onLoadCallback
     xmlRequest.send(null)
   }
@@ -105,16 +105,16 @@ object Utils {
     xmlRequest.responseType = "arraybuffer"
 
     val onLoadCallback = { (event: js.Any) =>
-    	val arrayBuffer = xmlRequest.response.asInstanceOf[dom.ArrayBuffer]
-    	val bufferSize = arrayBuffer.byteLength.toInt
-    	
-    	val byteOrder = org.scalajs.nio.ByteOrder.nativeOrder()
-    	
-    	val byteBuffer = new org.scalajs.nio.NativeByteBuffer(bufferSize, bufferSize, 0, -1, arrayBuffer, 0, byteOrder)
-    	
-    	callback(byteBuffer)
+      val arrayBuffer = xmlRequest.response.asInstanceOf[dom.ArrayBuffer]
+      val bufferSize = arrayBuffer.byteLength.toInt
+
+      val byteOrder = org.scalajs.nio.ByteOrder.nativeOrder()
+
+      val byteBuffer = new org.scalajs.nio.NativeByteBuffer(bufferSize, bufferSize, 0, -1, arrayBuffer, 0, byteOrder)
+
+      callback(byteBuffer)
     }
-    
+
     xmlRequest.onload = onLoadCallback
     xmlRequest.send(null)
   }

@@ -96,8 +96,8 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
         val vertexAttrsLocs = Array(mgl.getAttribLocation(projProgram.token, "position"))
         val vertexAttrsCfg = Array((0, 3))
 
-        vertexBuffer.setLocations(vertexAttrsLocs)
-        vertexBuffer.setAttribsCfg(vertexAttrsCfg)
+        vertexBuffer.locations = vertexAttrsLocs
+        vertexBuffer.attribs = vertexAttrsCfg
       }
 
       val colorBuffer = new macrogl.AttributeBuffer(GL.STATIC_DRAW, colorBufferData.remaining() / 3, 3)
@@ -107,8 +107,8 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
         val colorAttrsLocs = Array(mgl.getAttribLocation(projProgram.token, "color"))
         val colorAttrsCfg = Array((0, 3))
 
-        colorBuffer.setLocations(colorAttrsLocs)
-        colorBuffer.setAttribsCfg(colorAttrsCfg)
+        colorBuffer.locations = colorAttrsLocs
+        colorBuffer.attribs = colorAttrsCfg
       }
 
       mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indicesBuffer)
@@ -188,8 +188,8 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
         val vertexAttrsLocs = Array(mgl.getAttribLocation(fullProgram.token, "position"))
         val vertexAttrsCfg = Array((0, 2))
 
-        fullscreenVertexBuffer.setLocations(vertexAttrsLocs)
-        fullscreenVertexBuffer.setAttribsCfg(vertexAttrsCfg)
+        fullscreenVertexBuffer.locations = vertexAttrsLocs
+        fullscreenVertexBuffer.attribs = vertexAttrsCfg
       }
 
       val fullscreenTexCoordBuffer = new macrogl.AttributeBuffer(GL.STATIC_DRAW, colorBufferData.remaining() / 2, 2)
@@ -199,8 +199,8 @@ class BasicRenderToTexture(width: Int, height: Int, print: String => Unit, syste
         val texCoordAttrsLocs = Array(mgl.getAttribLocation(fullProgram.token, "texCoord"))
         val texCoordAttrsCfg = Array((0, 2))
 
-        fullscreenTexCoordBuffer.setLocations(texCoordAttrsLocs)
-        fullscreenTexCoordBuffer.setAttribsCfg(texCoordAttrsCfg)
+        fullscreenTexCoordBuffer.locations = texCoordAttrsLocs
+        fullscreenTexCoordBuffer.attribs = texCoordAttrsCfg
       }
 
       mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, fullscreenIndicesBuffer)
