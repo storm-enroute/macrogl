@@ -42,7 +42,7 @@ object SimpleOBJParser {
     var displacementMapTexture: Option[TexInfo] = None
     var decalTexture: Option[TexInfo] = None
 
-    override def toString(): String = "Material(" + name + ")"
+    override def toString(): String = "Material(name=" + name + ")"
   }
 
   private def onOff(value: String): Boolean = value match {
@@ -333,26 +333,27 @@ object SimpleOBJParser {
         case (arg, _) => macrogl.Utils.err.println("Unknown MTL command \"" + arg + "\", ignoring the line")
       }
     }
+
     flushCurMat()
 
     mats
   }
 
-  /*case class SubMesh(material: Material, var vertices: Array[Vector3f],
-    var textureCoordinates: Option[Array[Vector3f]], var normals: Option[Array[Vector3f]],
-    var triIndices: Array[(Int, Int, Int)]) {
-    override def toString(): String = "SubMesh(mat:" + material.name + ")"
+  type TmpVertex = (Int, Option[Int], Option[Int]) // position index, texture index, normal index
+  type TmpFace = Array[TmpVertex]
+
+  case class PartGroupTmpObject(material: Material) {
+    val faces: ArrayBuffer[TmpFace] = new ArrayBuffer[TmpFace]()
+
+    override def toString(): String = "ObjectPart(mat=" + material.name + ")"
   }
 
-  case class Mesh(name: String, var submeshes: Array[SubMesh]) {
-    override def toString(): String = "Mesh(" + name + ")"
-  }*/
-
-  case class SubTmpObject(material: Material) {
-    val faces: ArrayBuffer[Array[Int]] = new ArrayBuffer[Array[Int]]()
+  case class GroupTmpObject(name: String) {
     var smooth: Boolean = false
 
-    override def toString(): String = "ObjectPart(mat:" + material.name + ")"
+    val parts: ArrayBuffer[PartGroupTmpObject] = new ArrayBuffer[PartGroupTmpObject]()
+
+    override def toString(): String = "ObjectGroup(name=" + name + ")"
   }
 
   case class TmpObject(name: String) {
@@ -361,24 +362,28 @@ object SimpleOBJParser {
     val normals: ArrayBuffer[Vector3f] = new ArrayBuffer[Vector3f]()
     val parameterVertices: ArrayBuffer[Vector3f] = new ArrayBuffer[Vector3f]()
 
-    val subParts: ArrayBuffer[SubTmpObject] = ArrayBuffer[SubTmpObject]()
+    val groups: ArrayBuffer[GroupTmpObject] = ArrayBuffer[GroupTmpObject]()
 
-    override def toString(): String = "Object(" + name + ")"
+    override def toString(): String = "Object(name=" + name + ")"
   }
 
   def parseOBJ(objFile: TextFileContent, extraFiles: Map[String, TextFileContent]): Map[String, TmpObject] = {
     val objs: Map[String, TmpObject] = Map()
 
-    var curSubObj: Option[SubTmpObject] = None
+    var curPartGroupObj: Option[PartGroupTmpObject] = None
+    var curGroupObj: Option[GroupTmpObject] = None
     var curObj: Option[TmpObject] = None
 
     val availableMats: Map[String, Material] = Map()
-    
-    var smooth: Boolean = false
 
-    def subObj(): SubTmpObject = curSubObj match {
+    def partGroupObj(): PartGroupTmpObject = curPartGroupObj match {
       case Some(cur) => cur
       case None => throw new MacroglException("No material currently selected for object")
+    }
+
+    def groupObj(): GroupTmpObject = curGroupObj match {
+      case Some(cur) => cur
+      case None => throw new MacroglException("No group currently selected for object")
     }
 
     def obj(): TmpObject = curObj match {
@@ -386,17 +391,27 @@ object SimpleOBJParser {
       case None => throw new MacroglException("No object currently selected")
     }
 
-    def flushCurSubObj(): Unit = curSubObj match {
+    def flushCurPartGroupObj(): Unit = curPartGroupObj match {
       case Some(cur) => {
-        obj().subParts += cur
-        curSubObj = None
+        groupObj().parts += cur
+        curPartGroupObj = None
+      }
+      case None =>
+    }
+
+    def flushCurGroupObj(): Unit = curGroupObj match {
+      case Some(cur) => {
+        flushCurPartGroupObj()
+
+        obj().groups += cur
+        curGroupObj = None
       }
       case None =>
     }
 
     def flushCurObj(): Unit = curObj match {
       case Some(cur) => {
-        flushCurSubObj()
+        flushCurGroupObj()
 
         objs += (cur.name -> cur)
         curObj = None
@@ -411,9 +426,9 @@ object SimpleOBJParser {
       val tokens = line.split(" ")
 
       tokens(0).toLowerCase() match {
-        
+
         // Vertex data
-        
+
         case "v" if (tokens.size >= 4) => {
           val x = tokens(1).toFloat
           val y = tokens(2).toFloat
@@ -424,9 +439,9 @@ object SimpleOBJParser {
           obj().vertices += pos
         }
 
-        case "vp" if (tokens.size >= 3) => {
+        case "vp" if (tokens.size >= 2) => {
           val u = tokens(1).toFloat
-          val v = tokens(2).toFloat
+          val v = if (tokens.size >= 3) tokens(2).toFloat else 1.0f
           val w = if (tokens.size >= 4) tokens(3).toFloat else 1.0f
 
           val param = new Vector3f(u, v, w)
@@ -450,126 +465,148 @@ object SimpleOBJParser {
           val coord = new Vector3f(u, v, w)
           obj().texCoordinates += coord
         }
-        
+
         // Free-form curve/surface attributes
-        
+
         case "cstype" => macrogl.Utils.err.println("Type of curve not supported")
-        
+
         case "deg" => macrogl.Utils.err.println("Degree for curves and surfaces not supported")
-        
+
         case "bmat" => macrogl.Utils.err.println("Basis matrices not supported")
-        
+
         case "step" => macrogl.Utils.err.println("Step size for surces and surfaces not supported")
-        
+
         // Elements
-        
+
         case "p" => macrogl.Utils.err.println("Point element not supported")
-        
+
         case "l" => macrogl.Utils.err.println("Line element not supported")
-        
+
         case "f" => {
-          ??? // TODO
-        }
-        
-        case "curv" => macrogl.Utils.err.println("Curve element not supported")
-        
-        case "curv2" => macrogl.Utils.err.println("2D curve element not supported")
-        
-        case "surf" => macrogl.Utils.err.println("Surface element not supported")
-        
-        // Special curve and point
-        
-        case "parm" => macrogl.Utils.err.println("Parameter not supported")
-        
-        case "trim" => macrogl.Utils.err.println("Trimming not supported")
-        
-        case "hole" => macrogl.Utils.err.println("Hole not supported")
-        
-        case "scrv" => macrogl.Utils.err.println("Curve sequence not supported")
-        
-        case "sp" => macrogl.Utils.err.println("Special point not supported")
-        
-        case "end" => macrogl.Utils.err.println("End not supported")
-        
-        // Connectivity
-        
-        case "con" => macrogl.Utils.err.println("Connectivity not supported")
-        
-        // Grouping
-        
-        case "g" => macrogl.Utils.err.println("Group not supported")
-        
-        case "s" if (tokens.size >= 2) => {
-          smooth = onOff(tokens(1))
+          var currentToken = 1
           
-          curSubObj match {
-            case Some(cur) => cur.smooth = smooth
-            case None =>
+          val face = new Array[TmpVertex](tokens.size - 1)
+          
+          while(currentToken < tokens.size) {
+            val indices = tokens(currentToken).split("/")
+            
+            val vertex: TmpVertex = indices.length match {
+              case 1 => (indices(0).toInt, None, None)
+              case 2 => (indices(0).toInt, Some(indices(1).toInt), None)
+              case 3 if (indices(1) == "") => (indices(0).toInt, None, Some(indices(2).toInt))
+              case 3 => (indices(0).toInt, Some(indices(1).toInt), Some(indices(2).toInt))
+              case _ => throw new MacroglException("Malformed vertex data \"" + tokens(currentToken) + "\"")
+            }
+            
+            face(currentToken - 1) = vertex
+            
+            currentToken += 1
           }
+          
+          partGroupObj().faces += face
         }
-        
+
+        case "curv" => macrogl.Utils.err.println("Curve element not supported")
+
+        case "curv2" => macrogl.Utils.err.println("2D curve element not supported")
+
+        case "surf" => macrogl.Utils.err.println("Surface element not supported")
+
+        // Special curve and point
+
+        case "parm" => macrogl.Utils.err.println("Parameter not supported")
+
+        case "trim" => macrogl.Utils.err.println("Trimming not supported")
+
+        case "hole" => macrogl.Utils.err.println("Hole not supported")
+
+        case "scrv" => macrogl.Utils.err.println("Curve sequence not supported")
+
+        case "sp" => macrogl.Utils.err.println("Special point not supported")
+
+        case "end" => macrogl.Utils.err.println("End not supported")
+
+        // Connectivity
+
+        case "con" => macrogl.Utils.err.println("Connectivity not supported")
+
+        // Grouping
+
+        case "g" if (tokens.size >= 2) => {
+          flushCurGroupObj()
+
+          val groupName = tokens(1)
+          val newGroupObj = new GroupTmpObject(groupName)
+          curGroupObj = Some(newGroupObj)
+        }
+
+        case "s" if (tokens.size >= 2) => {
+          val smooth = onOff(tokens(1))
+          groupObj().smooth = smooth
+        }
+
         case "mg" => macrogl.Utils.err.println("Merging group not supported")
-        
-        case "o" => {
+
+        case "o" if (tokens.size >= 2) => {
           flushCurObj()
 
           val objName = tokens(1)
-
           val newObj = new TmpObject(objName)
           curObj = Some(newObj)
+
+          val newGroupObj = new GroupTmpObject("default")
+          curGroupObj = Some(newGroupObj)
         }
-        
+
         // Display/render attributes
-        
+
         case "bevel" => macrogl.Utils.err.println("Bevel not supported")
-        
+
         case "c_interp" => macrogl.Utils.err.println("Color interopolation not supported")
-        
+
         case "d_interp" => macrogl.Utils.err.println("Dissolve interpolation not supported")
-        
+
         case "lod" => macrogl.Utils.err.println("Level of detail not supported")
-        
+
         case "maplib" => macrogl.Utils.err.println("Library mapping not supported")
-        
+
         case "usemap" => macrogl.Utils.err.println("Use mapping not supported")
-        
+
         case "usemtl" => {
-          flushCurSubObj()
+          flushCurPartGroupObj()
 
           val selectedMatName = tokens(1)
           val selectedMat = availableMats(selectedMatName)
-          
-          val newSubObj = new SubTmpObject(selectedMat)
-          newSubObj.smooth = smooth
-          curSubObj = Some(newSubObj)
+          val newSubObj = new PartGroupTmpObject(selectedMat)
+          curPartGroupObj = Some(newSubObj)
         }
-        
+
         case "mtllib" if (tokens.size >= 2) => {
           val mtlFileContent = extraFiles(tokens(1))
 
           availableMats ++= parseMTL(mtlFileContent)
         }
-        
+
         case "shadow_obj" => macrogl.Utils.err.println("Shadow object not supported")
-        
+
         case "trace_obj" => macrogl.Utils.err.println("Tracing object not supported")
-        
+
         case "ctech" => macrogl.Utils.err.println("Curve approximation not supported")
-        
+
         case "stech" => macrogl.Utils.err.println("Surface approximation not supported")
-        
+
         // Curve and surface operation
-        
+
         case "bsp" => macrogl.Utils.err.println("B-spline patch not supported")
-        
+
         case "bzp" => macrogl.Utils.err.println("Bezier patch not supported")
-        
+
         case "cdc" => macrogl.Utils.err.println("Cardinal curve not supported")
-        
+
         case "cdp" => macrogl.Utils.err.println("Cardinal patch not supported")
-        
+
         case "res" => macrogl.Utils.err.println("Reference and display not supported")
-        
+
         // Misc
 
         case "" => // Empty line (probably a comment), ignore
@@ -579,6 +616,21 @@ object SimpleOBJParser {
 
     flushCurObj()
 
+    objs
+  }
+
+  case class SubTriMesh(material: Material, vertices: Array[Vector3f], texCoordinates: Option[Array[Vector2f]],
+    normals: Option[Array[Vector3f]], tris: Array[(Int, Int, Int)]) {
+    override def toString(): String = "SubTriMesh(material=" + material.name  + ")"
+  }
+
+  case class TriMesh(name: String, submeshes: Array[SubTriMesh]) {
+    override def toString(): String = "TriMesh(name=" + name + ")"
+  }
+
+  def load(objFile: TextFileContent, extraFiles: Map[String, TextFileContent]): Map[String, TriMesh] = {
+    val objs = parseOBJ(objFile, extraFiles)
+    
     ???
   }
 }
