@@ -212,8 +212,8 @@ object SimpleOBJParser {
 
       val tokens = line.split(" ")
 
-      (tokens(0).toLowerCase(), if (tokens.size > 2) Some(tokens(1).toLowerCase()) else None) match {
-        case ("newmtl", _) => {
+      (tokens(0).toLowerCase(), if (tokens.size >= 2) Some(tokens(1).toLowerCase()) else None) match {
+        case ("newmtl", _) if (tokens.size >= 2) => {
           flushCurMat()
 
           val matName = tokens(1)
@@ -484,12 +484,12 @@ object SimpleOBJParser {
 
         case "f" => {
           var currentToken = 1
-          
+
           val face = new Array[TmpVertex](tokens.size - 1)
-          
-          while(currentToken < tokens.size) {
+
+          while (currentToken < tokens.size) {
             val indices = tokens(currentToken).split("/")
-            
+
             val vertex: TmpVertex = indices.length match {
               case 1 => (indices(0).toInt, None, None)
               case 2 => (indices(0).toInt, Some(indices(1).toInt), None)
@@ -497,12 +497,12 @@ object SimpleOBJParser {
               case 3 => (indices(0).toInt, Some(indices(1).toInt), Some(indices(2).toInt))
               case _ => throw new MacroglException("Malformed vertex data \"" + tokens(currentToken) + "\"")
             }
-            
+
             face(currentToken - 1) = vertex
-            
+
             currentToken += 1
           }
-          
+
           partGroupObj().faces += face
         }
 
@@ -572,7 +572,7 @@ object SimpleOBJParser {
 
         case "usemap" => macrogl.Utils.err.println("Use mapping not supported")
 
-        case "usemtl" => {
+        case "usemtl" if (tokens.size >= 2) => {
           flushCurPartGroupObj()
 
           val selectedMatName = tokens(1)
@@ -621,7 +621,7 @@ object SimpleOBJParser {
 
   case class SubTriMesh(material: Material, vertices: Array[Vector3f], texCoordinates: Option[Array[Vector2f]],
     normals: Option[Array[Vector3f]], tris: Array[(Int, Int, Int)]) {
-    override def toString(): String = "SubTriMesh(material=" + material.name  + ")"
+    override def toString(): String = "SubTriMesh(material=" + material.name + ")"
   }
 
   case class TriMesh(name: String, submeshes: Array[SubTriMesh]) {
@@ -630,7 +630,7 @@ object SimpleOBJParser {
 
   def load(objFile: TextFileContent, extraFiles: Map[String, TextFileContent]): Map[String, TriMesh] = {
     val objs = parseOBJ(objFile, extraFiles)
-    
+
     ???
   }
 }
