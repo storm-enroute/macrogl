@@ -215,4 +215,16 @@ object Utils {
     // Start listener
     frameListenerThread.start()
   }
+  
+  object out {
+    def println(msg: Any): Unit = {
+      System.out.println(if(msg != null) msg.toString() else "<null>")
+    }
+  }
+  
+  object err {
+    def println(msg: Any): Unit = {
+      System.err.println(if(msg != null) msg.toString() else "<null>")
+    }
+  }
 }

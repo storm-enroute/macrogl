@@ -160,4 +160,16 @@ object Utils {
     // Start listener
     g.window.requestAnimationFrame(loopInit _)
   }
+  
+  object out {
+    def println(msg: Any): Unit = {
+      g.console.log(if(msg != null) msg.toString() else "<null>")
+    }
+  }
+  
+  object err {
+    def println(msg: Any): Unit = {
+      g.console.error(if(msg != null) msg.toString() else "<null>")
+    }
+  }
 }

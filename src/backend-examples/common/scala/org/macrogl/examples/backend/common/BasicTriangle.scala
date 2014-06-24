@@ -5,6 +5,8 @@ import org.macrogl.{ Macrogl => GL }
 
 import org.macrogl.using
 
+import scala.collection.mutable.ArrayBuffer
+
 /**
  * Basic example with a static triangle
  */
