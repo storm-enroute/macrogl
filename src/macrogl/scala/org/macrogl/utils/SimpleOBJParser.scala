@@ -1,7 +1,6 @@
 package org.macrogl.utils
 
 import scala.collection.mutable.Map
-import scala.collection.mutable.Set
 import scala.collection.mutable.ArrayBuffer
 
 import org.macrogl
@@ -189,7 +188,7 @@ object SimpleOBJParser {
     texInfo
   }
 
-  def parseMTL(mtlFile: TextFileContent): Map[String, Material] = {
+  def parseMTL(mtlFile: TextFileContent): scala.collection.Map[String, Material] = {
     val mats: Map[String, Material] = Map()
     var curMat: Option[Material] = None
 
@@ -330,7 +329,7 @@ object SimpleOBJParser {
         }
 
         case ("", _) => // Empty line (probably a comment), ignore
-        case (arg, _) => macrogl.Utils.err.println("Unknown MTL command \"" + arg + "\", ignoring the line")
+        case (arg, _) => macrogl.Utils.err.println("Unknown or invalid MTL command \"" + arg + "\", ignoring the line")
       }
     }
 
@@ -342,76 +341,76 @@ object SimpleOBJParser {
   type TmpVertex = (Int, Option[Int], Option[Int]) // position index, texture index, normal index
   type TmpFace = Array[TmpVertex]
 
-  case class PartGroupTmpObject(material: Material) {
+  case class OBJObjectGroupPart(material: Material) {
     val faces: ArrayBuffer[TmpFace] = new ArrayBuffer[TmpFace]()
 
     override def toString(): String = "ObjectPart(mat=" + material.name + ")"
   }
 
-  case class GroupTmpObject(name: String) {
+  case class OBJObjectGroup(name: String) {
     var smooth: Boolean = false
 
-    val parts: ArrayBuffer[PartGroupTmpObject] = new ArrayBuffer[PartGroupTmpObject]()
+    val parts: ArrayBuffer[OBJObjectGroupPart] = new ArrayBuffer[OBJObjectGroupPart]()
 
     override def toString(): String = "ObjectGroup(name=" + name + ")"
   }
 
-  case class TmpObject(name: String) {
+  case class OBJObject(name: String) {
     val vertices: ArrayBuffer[Vector4f] = new ArrayBuffer[Vector4f]()
     val texCoordinates: ArrayBuffer[Vector3f] = new ArrayBuffer[Vector3f]()
     val normals: ArrayBuffer[Vector3f] = new ArrayBuffer[Vector3f]()
     val parameterVertices: ArrayBuffer[Vector3f] = new ArrayBuffer[Vector3f]()
 
-    val groups: ArrayBuffer[GroupTmpObject] = ArrayBuffer[GroupTmpObject]()
+    val groups: ArrayBuffer[OBJObjectGroup] = ArrayBuffer[OBJObjectGroup]()
 
     override def toString(): String = "Object(name=" + name + ")"
   }
 
-  def parseOBJ(objFile: TextFileContent, extraFiles: Map[String, TextFileContent]): Map[String, TmpObject] = {
-    val objs: Map[String, TmpObject] = Map()
+  def parseOBJ(objFile: TextFileContent, extraFiles: Map[String, TextFileContent]): scala.collection.Map[String, OBJObject] = {
+    val objs: Map[String, OBJObject] = Map()
 
-    var curPartGroupObj: Option[PartGroupTmpObject] = None
-    var curGroupObj: Option[GroupTmpObject] = None
-    var curObj: Option[TmpObject] = None
+    var curObjGroupPart: Option[OBJObjectGroupPart] = None
+    var curObjGroup: Option[OBJObjectGroup] = None
+    var curObj: Option[OBJObject] = None
 
     val availableMats: Map[String, Material] = Map()
 
-    def partGroupObj(): PartGroupTmpObject = curPartGroupObj match {
+    def objGroupPart(): OBJObjectGroupPart = curObjGroupPart match {
       case Some(cur) => cur
       case None => throw new MacroglException("No material currently selected for object")
     }
 
-    def groupObj(): GroupTmpObject = curGroupObj match {
+    def objGroup(): OBJObjectGroup = curObjGroup match {
       case Some(cur) => cur
       case None => throw new MacroglException("No group currently selected for object")
     }
 
-    def obj(): TmpObject = curObj match {
+    def obj(): OBJObject = curObj match {
       case Some(cur) => cur
       case None => throw new MacroglException("No object currently selected")
     }
 
-    def flushCurPartGroupObj(): Unit = curPartGroupObj match {
+    def flushCurObjGroupPart(): Unit = curObjGroupPart match {
       case Some(cur) => {
-        groupObj().parts += cur
-        curPartGroupObj = None
+        objGroup().parts += cur
+        curObjGroupPart = None
       }
       case None =>
     }
 
-    def flushCurGroupObj(): Unit = curGroupObj match {
+    def flushCurObjGroup(): Unit = curObjGroup match {
       case Some(cur) => {
-        flushCurPartGroupObj()
+        flushCurObjGroupPart()
 
         obj().groups += cur
-        curGroupObj = None
+        curObjGroup = None
       }
       case None =>
     }
 
     def flushCurObj(): Unit = curObj match {
       case Some(cur) => {
-        flushCurGroupObj()
+        flushCurObjGroup()
 
         objs += (cur.name -> cur)
         curObj = None
@@ -483,18 +482,21 @@ object SimpleOBJParser {
         case "l" => macrogl.Utils.err.println("Line element not supported")
 
         case "f" => {
-          var currentToken = 1
-
           val face = new Array[TmpVertex](tokens.size - 1)
 
+          def strToInt(str: String): Option[Int] = {
+            if (str == "") None
+            else Some(str.toInt)
+          }
+
+          var currentToken = 1
           while (currentToken < tokens.size) {
             val indices = tokens(currentToken).split("/")
 
             val vertex: TmpVertex = indices.length match {
               case 1 => (indices(0).toInt, None, None)
-              case 2 => (indices(0).toInt, Some(indices(1).toInt), None)
-              case 3 if (indices(1) == "") => (indices(0).toInt, None, Some(indices(2).toInt))
-              case 3 => (indices(0).toInt, Some(indices(1).toInt), Some(indices(2).toInt))
+              case 2 => (indices(0).toInt, strToInt(indices(1)), None)
+              case 3 => (indices(0).toInt, strToInt(indices(1)), strToInt(indices(2)))
               case _ => throw new MacroglException("Malformed vertex data \"" + tokens(currentToken) + "\"")
             }
 
@@ -503,7 +505,7 @@ object SimpleOBJParser {
             currentToken += 1
           }
 
-          partGroupObj().faces += face
+          objGroupPart().faces += face
         }
 
         case "curv" => macrogl.Utils.err.println("Curve element not supported")
@@ -533,16 +535,16 @@ object SimpleOBJParser {
         // Grouping
 
         case "g" if (tokens.size >= 2) => {
-          flushCurGroupObj()
+          flushCurObjGroup()
 
           val groupName = tokens(1)
-          val newGroupObj = new GroupTmpObject(groupName)
-          curGroupObj = Some(newGroupObj)
+          val newGroupObj = new OBJObjectGroup(groupName)
+          curObjGroup = Some(newGroupObj)
         }
 
         case "s" if (tokens.size >= 2) => {
           val smooth = onOff(tokens(1))
-          groupObj().smooth = smooth
+          objGroup().smooth = smooth
         }
 
         case "mg" => macrogl.Utils.err.println("Merging group not supported")
@@ -551,11 +553,11 @@ object SimpleOBJParser {
           flushCurObj()
 
           val objName = tokens(1)
-          val newObj = new TmpObject(objName)
+          val newObj = new OBJObject(objName)
           curObj = Some(newObj)
 
-          val newGroupObj = new GroupTmpObject("default")
-          curGroupObj = Some(newGroupObj)
+          val newGroupObj = new OBJObjectGroup("default")
+          curObjGroup = Some(newGroupObj)
         }
 
         // Display/render attributes
@@ -573,12 +575,12 @@ object SimpleOBJParser {
         case "usemap" => macrogl.Utils.err.println("Use mapping not supported")
 
         case "usemtl" if (tokens.size >= 2) => {
-          flushCurPartGroupObj()
+          flushCurObjGroupPart()
 
           val selectedMatName = tokens(1)
           val selectedMat = availableMats(selectedMatName)
-          val newSubObj = new PartGroupTmpObject(selectedMat)
-          curPartGroupObj = Some(newSubObj)
+          val newSubObj = new OBJObjectGroupPart(selectedMat)
+          curObjGroupPart = Some(newSubObj)
         }
 
         case "mtllib" if (tokens.size >= 2) => {
@@ -610,7 +612,7 @@ object SimpleOBJParser {
         // Misc
 
         case "" => // Empty line (probably a comment), ignore
-        case arg => macrogl.Utils.err.println("Unknown OBJ command \"" + arg + "\", ignoring the line")
+        case arg => macrogl.Utils.err.println("Unknown or invalid OBJ command \"" + arg + "\", ignoring the line")
       }
     }
 
@@ -628,9 +630,16 @@ object SimpleOBJParser {
     override def toString(): String = "TriMesh(name=" + name + ")"
   }
 
-  def load(objFile: TextFileContent, extraFiles: Map[String, TextFileContent]): Map[String, TriMesh] = {
-    val objs = parseOBJ(objFile, extraFiles)
+  def convOBJToTriMesh(objs: Map[String, OBJObject]): scala.collection.Map[String, TriMesh] = {
 
-    ???
+    def conv(obj: OBJObject): TriMesh = {
+      ???
+    }
+
+    val meshes = objs.mapValues { obj =>
+      conv(obj)
+    }
+
+    meshes
   }
 }
