@@ -403,11 +403,13 @@ class Macrogl(implicit gl: dom.WebGLRenderingContext) {
   }
 
   final def getProgramParameteri(program: Token.Program, pname: Int): Int = {
-    gl.getProgramParameter(program, pname).asInstanceOf[js.Number].toInt
+    val ret = gl.getProgramParameter(program, pname)
+    JSTypeHelper.toInt(ret)
   }
 
   final def getProgramParameterb(program: Token.Program, pname: Int): Boolean = {
-    gl.getProgramParameter(program, pname).asInstanceOf[js.Boolean]
+    val ret = gl.getProgramParameter(program, pname)
+    JSTypeHelper.toBoolean(ret)
   }
 
   final def getProgramInfoLog(program: Token.Program): String = {
@@ -419,11 +421,13 @@ class Macrogl(implicit gl: dom.WebGLRenderingContext) {
   }
 
   final def getShaderParameteri(shader: Token.Shader, pname: Int): Int = {
-    gl.getShaderParameter(shader, pname).asInstanceOf[js.Number].toInt
+    val ret = gl.getShaderParameter(shader, pname)
+    JSTypeHelper.toInt(ret)
   }
 
   final def getShaderParameterb(shader: Token.Shader, pname: Int): Boolean = {
-    gl.getShaderParameter(shader, pname).asInstanceOf[js.Boolean]
+    val ret = gl.getShaderParameter(shader, pname)
+    JSTypeHelper.toBoolean(ret)
   }
 
   final def getShaderPrecisionFormat(shadertype: Int, precisiontype: Int): PrecisionFormat = {

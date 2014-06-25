@@ -145,7 +145,8 @@ class BasicTexture(width: Int, height: Int, print: String => Unit, systemUpdate:
           vertexBuffer.enableAttributeArrays()
           texCoordBuffer.enableAttributeArrays()
 
-          pp.uniform.texSampler = textureUnit
+          //pp.uniform.texSampler = textureUnit // Deprecated for now due to numerical type erasure in JavaScript (Scala.js)
+          mgl.uniform1i(mgl.getUniformLocation(pp.token, "texSampler"), textureUnit)
 
           mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indicesBuffer)
           mgl.drawElements(GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
