@@ -46,7 +46,7 @@ object Utils {
    */
   def loadTexture2DFromResources(resourceName: String, texture: Token.Texture, preload: => Boolean = true)(implicit gl: Macrogl): Unit = {
     val image = dom.document.createElement("img").asInstanceOf[js.Dynamic]
-    image.onload = ({ (e: dom.Event) =>
+    val onLoadCallback = ({ (e: dom.Event) =>
       if (preload) {
         val previousTexture = gl.getParameterTexture(Macrogl.TEXTURE_BINDING_2D)
         gl.bindTexture(Macrogl.TEXTURE_2D, texture)
@@ -56,6 +56,13 @@ object Utils {
         gl.bindTexture(Macrogl.TEXTURE_2D, previousTexture)
       }
     })
+    
+    val onErrorCallback = { (event: js.Any) =>
+      Utils.err.println("Error during the loading of texture resource \"" + resourceName + "\"")
+    }
+    
+    image.onload = onLoadCallback
+    image.onerror = onErrorCallback
     image.src = WebGLSpecifics.getResourcePath + resourceName
   }
 
@@ -78,6 +85,7 @@ object Utils {
     val resource = WebGLSpecifics.getResourcePath + resourceName
 
     xmlRequest.open("GET", resource, true)
+    xmlRequest.asInstanceOf[js.Dynamic].overrideMimeType("text/plain")
 
     val onLoadCallback = { (event: js.Any) =>
       val text: String = xmlRequest.responseText
@@ -85,8 +93,13 @@ object Utils {
 
       callback(lines)
     }
+    
+    val onErrorCallback = { (event: js.Any) =>
+      Utils.err.println("Error during the loading of text resource \"" + resourceName + "\": " + xmlRequest.statusText)
+    }
 
     xmlRequest.onload = onLoadCallback
+    xmlRequest.onerror = onErrorCallback
     xmlRequest.send(null)
   }
 
@@ -103,6 +116,7 @@ object Utils {
 
     xmlRequest.open("GET", resource, true)
     xmlRequest.responseType = "arraybuffer"
+    xmlRequest.asInstanceOf[js.Dynamic].overrideMimeType("application/octet-stream")
 
     val onLoadCallback = { (event: js.Any) =>
       val arrayBuffer = xmlRequest.response.asInstanceOf[dom.ArrayBuffer]
@@ -114,8 +128,13 @@ object Utils {
 
       callback(byteBuffer)
     }
+    
+    val onErrorCallback = { (event: js.Any) =>
+      Utils.err.println("Error during the loading of binary resource \"" + resourceName + "\": " + xmlRequest.statusText)
+    }
 
     xmlRequest.onload = onLoadCallback
+    xmlRequest.onerror = onErrorCallback
     xmlRequest.send(null)
   }
 

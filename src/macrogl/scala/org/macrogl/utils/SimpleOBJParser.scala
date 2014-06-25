@@ -366,7 +366,7 @@ object SimpleOBJParser {
     override def toString(): String = "Object(name=" + name + ")"
   }
 
-  def parseOBJ(objFile: TextFileContent, extraFiles: Map[String, TextFileContent]): scala.collection.Map[String, OBJObject] = {
+  def parseOBJ(objFile: TextFileContent, extraFiles: scala.collection.Map[String, TextFileContent]): scala.collection.Map[String, OBJObject] = {
     val objs: Map[String, OBJObject] = Map()
 
     var curObjGroupPart: Option[OBJObjectGroupPart] = None
@@ -633,7 +633,7 @@ object SimpleOBJParser {
     override def toString(): String = "TriMesh(name=" + name + ")"
   }
 
-  def convOBJObjectToTriMesh(objs: Map[String, OBJObject]): scala.collection.Map[String, TriMesh] = {
+  def convOBJObjectToTriMesh(objs: scala.collection.Map[String, OBJObject]): scala.collection.Map[String, TriMesh] = {
 
     def conv(obj: OBJObject): TriMesh = {
       val subs = new ArrayBuffer[SubTriMesh]()
