@@ -177,7 +177,7 @@ class BasicMesh(width: Int, height: Int, print: String => Unit, systemUpdate: ()
     def continue(): Boolean = {
       funcs match {
         case Some((continueFunc, _, _)) => continueFunc()
-        case None => throw new RuntimeException(errMsg)
+        case None => true
       }
     }
     def render(fe: org.macrogl.FrameEvent): Unit = {
