@@ -41,7 +41,7 @@ object SimpleOBJParser {
     var displacementMapTexture: Option[TexInfo] = None
     var decalTexture: Option[TexInfo] = None
 
-    override def toString(): String = "Material(name=" + name + ")"
+    override def toString(): String = "Material(name=\"" + name + "\")"
   }
 
   private def onOff(value: String): Boolean = value match {
@@ -341,10 +341,13 @@ object SimpleOBJParser {
   type TmpVertex = (Int, Option[Int], Option[Int]) // position index, texture index, normal index
   type TmpFace = Array[TmpVertex]
 
-  case class OBJObjectGroupPart(material: Material) {
+  case class OBJObjectGroupPart(material: Option[Material]) {
     val faces: ArrayBuffer[TmpFace] = new ArrayBuffer[TmpFace]()
 
-    override def toString(): String = "ObjectPart(mat=" + material.name + ")"
+    override def toString(): String = material match {
+      case Some(mat) => "ObjectGroupPart(material=\"" + mat.name + "\")"
+      case None => "ObjectGroupPart(no material)"
+    }
   }
 
   case class OBJObjectGroup(name: String) {
@@ -352,7 +355,7 @@ object SimpleOBJParser {
 
     val parts: ArrayBuffer[OBJObjectGroupPart] = new ArrayBuffer[OBJObjectGroupPart]()
 
-    override def toString(): String = "ObjectGroup(name=" + name + ")"
+    override def toString(): String = "ObjectGroup(name=\"" + name + "\")"
   }
 
   case class OBJObject(name: String) {
@@ -363,7 +366,7 @@ object SimpleOBJParser {
 
     val groups: ArrayBuffer[OBJObjectGroup] = ArrayBuffer[OBJObjectGroup]()
 
-    override def toString(): String = "Object(name=" + name + ")"
+    override def toString(): String = "Object(name=\"" + name + "\")"
   }
 
   def parseOBJ(objFile: TextFileContent, extraFiles: scala.collection.Map[String, TextFileContent]): scala.collection.Map[String, OBJObject] = {
@@ -392,7 +395,7 @@ object SimpleOBJParser {
 
     def flushCurObjGroupPart(): Unit = curObjGroupPart match {
       case Some(cur) => {
-        objGroup().parts += cur
+        if(!objGroup().parts.contains(cur)) objGroup().parts += cur
         curObjGroupPart = None
       }
       case None =>
@@ -402,7 +405,7 @@ object SimpleOBJParser {
       case Some(cur) => {
         flushCurObjGroupPart()
 
-        obj().groups += cur
+        if(!obj().groups.contains(cur)) obj().groups += cur
         curObjGroup = None
       }
       case None =>
@@ -412,10 +415,37 @@ object SimpleOBJParser {
       case Some(cur) => {
         flushCurObjGroup()
 
-        objs += (cur.name -> cur)
+        if(!objs.contains(cur.name)) objs += (cur.name -> cur)
         curObj = None
       }
       case None =>
+    }
+    
+    def getObjGroupPart(material: Option[Material]): OBJObjectGroupPart = {
+      val existingPart = objGroup().parts.find{ _.material == material }
+      
+      existingPart match {
+        case Some(part) => part
+        case None => new OBJObjectGroupPart(material)
+      }
+    }
+    
+    def getObjGroup(name: String): OBJObjectGroup = {
+      val existingGroup = obj().groups.find{ _.name == name }
+      
+      existingGroup match {
+        case Some(group) => group
+        case None => new OBJObjectGroup(name)
+      }
+    }
+    
+    def getObj(name: String): OBJObject = {
+      val existingObj = objs.get(name)
+      
+      existingObj match {
+        case Some(obj) => obj
+        case None => new OBJObject(name)
+      }
     }
 
     for (currentLine <- objFile) {
@@ -538,8 +568,11 @@ object SimpleOBJParser {
           flushCurObjGroup()
 
           val groupName = tokens(1)
-          val newGroupObj = new OBJObjectGroup(groupName)
-          curObjGroup = Some(newGroupObj)
+          val newObjGroup = getObjGroup(groupName)
+          curObjGroup = Some(newObjGroup)
+          
+          val newObjGroupPart = getObjGroupPart(None)
+          curObjGroupPart = Some(newObjGroupPart)
         }
 
         case "s" if (tokens.size >= 2) => {
@@ -553,11 +586,14 @@ object SimpleOBJParser {
           flushCurObj()
 
           val objName = tokens(1)
-          val newObj = new OBJObject(objName)
+          val newObj = getObj(objName)
           curObj = Some(newObj)
 
-          val newGroupObj = new OBJObjectGroup("default")
-          curObjGroup = Some(newGroupObj)
+          val newObjGroup = getObjGroup("default")
+          curObjGroup = Some(newObjGroup)
+          
+          val newObjGroupPart = getObjGroupPart(None)
+          curObjGroupPart = Some(newObjGroupPart)
         }
 
         // Display/render attributes
@@ -579,7 +615,7 @@ object SimpleOBJParser {
 
           val selectedMatName = tokens(1)
           val selectedMat = availableMats(selectedMatName)
-          val newSubObj = new OBJObjectGroupPart(selectedMat)
+          val newSubObj = getObjGroupPart(Some(selectedMat))
           curObjGroupPart = Some(newSubObj)
         }
 
@@ -624,13 +660,16 @@ object SimpleOBJParser {
   type Tri = (Int, Int, Int) // The three indices of the vertices of the triangle
   type VertexData = (Vector3f, Option[Vector2f], Option[Vector3f])
 
-  case class SubTriMesh(material: Material, tris: Array[Tri]) {
-    override def toString(): String = "SubTriMesh(material=" + material.name + ")"
+  case class SubTriMesh(material: Option[Material], tris: Array[Tri]) {
+    override def toString(): String = material match {
+      case Some(mat) => "SubTriMesh(material=\"" + mat.name + "\")"
+      case None => "SubTriMesh(no material)"
+    }
   }
 
   case class TriMesh(name: String, vertices: Array[Vector3f], texCoordinates: Option[Array[Vector2f]],
     normals: Option[Array[Vector3f]], submeshes: Array[SubTriMesh]) {
-    override def toString(): String = "TriMesh(name=" + name + ")"
+    override def toString(): String = "TriMesh(name=\"" + name + "\")"
   }
 
   def convOBJObjectToTriMesh(objs: scala.collection.Map[String, OBJObject]): scala.collection.Map[String, TriMesh] = {

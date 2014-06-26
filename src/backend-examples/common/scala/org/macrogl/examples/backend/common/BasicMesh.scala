@@ -65,11 +65,11 @@ class BasicMesh(width: Int, height: Int, print: String => Unit, systemUpdate: ()
           macrogl.Utils.out.println("OBJ file contains " + objs.size + " object(s)")
           objs.foreach {
             case (name, obj) =>
-              macrogl.Utils.out.println("  Object \"" + obj.name + "\" composed of " + obj.groups.size + " group(s)")
+              macrogl.Utils.out.println("  " + obj + " composed of " + obj.groups.size + " group(s)")
               obj.groups.foreach { group =>
-                macrogl.Utils.out.println("    Group \"" + group.name + "\" composed of " + group.parts.size + " part(s)")
+                macrogl.Utils.out.println("    " + group + " composed of " + group.parts.size + " part(s)")
                 group.parts.foreach { part =>
-                  macrogl.Utils.out.println("      Part using material \"" + part.material.name + "\" composed of " + part.faces.size + " face(s)")
+                  macrogl.Utils.out.println("      " + part + " composed of " + part.faces.size + " face(s)")
                 }
               }
           }
