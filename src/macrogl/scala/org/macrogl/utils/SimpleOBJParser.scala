@@ -395,7 +395,7 @@ object SimpleOBJParser {
 
     def flushCurObjGroupPart(): Unit = curObjGroupPart match {
       case Some(cur) => {
-        if(!objGroup().parts.contains(cur)) objGroup().parts += cur
+        if (!objGroup().parts.contains(cur)) objGroup().parts += cur
         curObjGroupPart = None
       }
       case None =>
@@ -405,7 +405,7 @@ object SimpleOBJParser {
       case Some(cur) => {
         flushCurObjGroupPart()
 
-        if(!obj().groups.contains(cur)) obj().groups += cur
+        if (!obj().groups.contains(cur)) obj().groups += cur
         curObjGroup = None
       }
       case None =>
@@ -415,33 +415,33 @@ object SimpleOBJParser {
       case Some(cur) => {
         flushCurObjGroup()
 
-        if(!objs.contains(cur.name)) objs += (cur.name -> cur)
+        if (!objs.contains(cur.name)) objs += (cur.name -> cur)
         curObj = None
       }
       case None =>
     }
-    
+
     def getObjGroupPart(material: Option[Material]): OBJObjectGroupPart = {
-      val existingPart = objGroup().parts.find{ _.material == material }
-      
+      val existingPart = objGroup().parts.find { _.material == material }
+
       existingPart match {
         case Some(part) => part
         case None => new OBJObjectGroupPart(material)
       }
     }
-    
+
     def getObjGroup(name: String): OBJObjectGroup = {
-      val existingGroup = obj().groups.find{ _.name == name }
-      
+      val existingGroup = obj().groups.find { _.name == name }
+
       existingGroup match {
         case Some(group) => group
         case None => new OBJObjectGroup(name)
       }
     }
-    
+
     def getObj(name: String): OBJObject = {
       val existingObj = objs.get(name)
-      
+
       existingObj match {
         case Some(obj) => obj
         case None => new OBJObject(name)
@@ -570,7 +570,7 @@ object SimpleOBJParser {
           val groupName = tokens(1)
           val newObjGroup = getObjGroup(groupName)
           curObjGroup = Some(newObjGroup)
-          
+
           val newObjGroupPart = getObjGroupPart(None)
           curObjGroupPart = Some(newObjGroupPart)
         }
@@ -591,7 +591,7 @@ object SimpleOBJParser {
 
           val newObjGroup = getObjGroup("default")
           curObjGroup = Some(newObjGroup)
-          
+
           val newObjGroupPart = getObjGroupPart(None)
           curObjGroupPart = Some(newObjGroupPart)
         }
@@ -742,18 +742,23 @@ object SimpleOBJParser {
       }
 
       obj.groups.foreach { group =>
-        group.parts.foreach { part =>
+        group.parts.filter { _.faces.size > 0 }.foreach { part =>
           val trisIndices = new ArrayBuffer[Tri]()
 
           def addTri(v0: TmpVertex, v1: TmpVertex, v2: TmpVertex): Unit = {
             def dataFromFileIndices(v: TmpVertex): VertexData = {
               val (indexV, optIndexT, optIndexN) = v
 
+              val ova = obj.vertices(indexV - 1)
+              val ov = new Vector3f(ova.x, ova.y, ova.z)
+              val ot = optIndexT.map { t => val ota = obj.texCoordinates(t - 1); new Vector2f(ota.x, ota.y) }
+              val on = optIndexN.map { n => obj.normals(n - 1) }
+
               // Data in OBJ files are indexed from 1 (instead of 0)
               (
-                vertices(indexV - 1),
-                optIndexT.map { t => texCoordinates(t - 1) },
-                optIndexN.map { n => normals(n - 1) })
+                ov,
+                ot,
+                on)
             }
 
             val v0Data = dataFromFileIndices(v0)
@@ -798,7 +803,8 @@ object SimpleOBJParser {
       new TriMesh(obj.name, vertices.toArray, if (texCoordinates.size > 0) Some(texCoordinates.toArray) else None, if (normals.size > 0) Some(normals.toArray) else None, subs.toArray)
     }
 
-    val meshes = objs.mapValues(conv)
+    //val meshes = objs.mapValues(conv)
+    val meshes = objs.map { case (name, obj) => (name, conv(obj)) }
 
     meshes
   }

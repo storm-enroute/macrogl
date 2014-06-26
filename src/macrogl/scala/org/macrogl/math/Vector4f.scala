@@ -8,7 +8,7 @@ class Vector4f extends Vector {
     x = v1
     y = v2
     z = v3
-    z = v4
+    w = v4
   }
 
   def this(v: Vector4f) = {

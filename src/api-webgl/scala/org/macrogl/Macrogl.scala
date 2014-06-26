@@ -32,7 +32,7 @@ class Macrogl(implicit gl: dom.WebGLRenderingContext) {
   }
 
   final def bindBuffer(target: Int, buffer: Token.Buffer) = {
-    gl.bindBuffer(target, buffer)
+    gl.bindBuffer(target, buffer.js)
   }
 
   final def bindFramebuffer(target: Int, framebuffer: Token.FrameBuffer) = {
@@ -159,7 +159,8 @@ class Macrogl(implicit gl: dom.WebGLRenderingContext) {
   }
 
   final def createBuffer(): Token.Buffer = {
-    gl.createBuffer()
+    val ret = gl.createBuffer()
+    Token.Buffer(ret)
   }
 
   final def createFramebuffer(): Token.FrameBuffer = {
@@ -188,7 +189,7 @@ class Macrogl(implicit gl: dom.WebGLRenderingContext) {
   }
 
   final def deleteBuffer(buffer: Token.Buffer) = {
-    gl.deleteBuffer(buffer)
+    gl.deleteBuffer(buffer.js)
   }
 
   final def deleteFramebuffer(framebuffer: Token.FrameBuffer) = {
@@ -297,9 +298,10 @@ class Macrogl(implicit gl: dom.WebGLRenderingContext) {
 
   final def getAttachedShaders(program: Token.Program): Array[Token.Shader] = {
     val jsArray = gl.getAttachedShaders(program)
-    val retArray = new Array[Token.Shader](jsArray.length.toInt)
-    jsArray.copyToArray(retArray)
-    retArray
+    //val retArray = new Array[Token.Shader](jsArray.length.toInt)
+    //jsArray.copyToArray(retArray)
+    //retArray
+    jsArray
   }
 
   final def getAttribLocation(program: Token.Program, name: String): Int = {
@@ -507,7 +509,7 @@ class Macrogl(implicit gl: dom.WebGLRenderingContext) {
 
   final def isBuffer(buffer: Token.Buffer): Boolean = {
     if(buffer == null) false
-    else gl.isBuffer(buffer)
+    else gl.isBuffer(buffer.js)
   }
 
   final def isEnabled(cap: Int): Boolean = {
