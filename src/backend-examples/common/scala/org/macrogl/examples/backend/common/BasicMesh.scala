@@ -61,10 +61,10 @@ class BasicMesh(width: Int, height: Int, print: String => Unit, systemUpdate: ()
 
           val objs = macrogl.utils.SimpleOBJParser.parseOBJ(objFileContent, Map(mtlFileName -> mtlFileContent))
           
-          macrogl.Utils.out.println("OBJ contains "+objs.size+" object(s)")
+          macrogl.Utils.out.println("OBJ file contains "+objs.size+" object(s)")
           
           objs.foreach { case (name, obj) =>
-            
+             macrogl.Utils.out.println("Object composed of " + obj.groups(0).parts(0).faces.size + " faces")
           }
 
           val indicesBuffer = mgl.createBuffer

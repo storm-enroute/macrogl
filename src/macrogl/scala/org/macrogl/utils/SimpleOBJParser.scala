@@ -211,7 +211,7 @@ object SimpleOBJParser {
 
       val tokens = line.split(" ")
 
-      (tokens(0).toLowerCase(), if (tokens.size >= 2) Some(tokens(1).toLowerCase()) else None) match {
+      if (tokens.size > 0) (tokens(0).toLowerCase(), if (tokens.size >= 2) Some(tokens(1).toLowerCase()) else None) match {
         case ("newmtl", _) if (tokens.size >= 2) => {
           flushCurMat()
 
@@ -424,7 +424,9 @@ object SimpleOBJParser {
 
       val tokens = line.split(" ")
 
-      tokens(0).toLowerCase() match {
+      // JVM: "".split(",") => an array containing the empty string ""
+      // Scala.js "".split(",") => an empty array
+      if (tokens.size > 0) tokens(0).toLowerCase() match {
 
         // Vertex data
 
@@ -623,7 +625,7 @@ object SimpleOBJParser {
 
   type Tri = (Int, Int, Int) // The three indices of the vertices of the triangle
   type VertexData = (Vector3f, Option[Vector2f], Option[Vector3f])
-  
+
   case class SubTriMesh(material: Material, tris: Array[Tri]) {
     override def toString(): String = "SubTriMesh(material=" + material.name + ")"
   }
@@ -644,7 +646,7 @@ object SimpleOBJParser {
 
       def bufferIndexOfVertex(vertexData: VertexData): Int = {
         val (vertex, texCoordinate, normal) = vertexData
-        
+
         val index = (texCoordinate, normal) match {
           case (Some(tex), Some(norm)) => {
             var i = 0
@@ -709,34 +711,33 @@ object SimpleOBJParser {
           def addTri(v0: TmpVertex, v1: TmpVertex, v2: TmpVertex): Unit = {
             def dataFromFileIndices(v: TmpVertex): VertexData = {
               val (indexV, optIndexT, optIndexN) = v
-              
+
               // Data in OBJ files are indexed from 1 (instead of 0)
               (
-                  vertices(indexV - 1),
-                  optIndexT.map{ t => texCoordinates(t - 1) },
-                  optIndexN.map{ n => normals(n - 1) }
-              )
+                vertices(indexV - 1),
+                optIndexT.map { t => texCoordinates(t - 1) },
+                optIndexN.map { n => normals(n - 1) })
             }
-            
+
             val v0Data = dataFromFileIndices(v0)
             val v1Data = dataFromFileIndices(v1)
             val v2Data = dataFromFileIndices(v2)
-            
+
             val v0Index = bufferIndexOfVertex(v0Data)
             val v1Index = bufferIndexOfVertex(v1Data)
             val v2Index = bufferIndexOfVertex(v2Data)
-            
-            val newTri: Tri = (v0Index, v1Index, v2Index) 
+
+            val newTri: Tri = (v0Index, v1Index, v2Index)
             trisIndices += newTri
           }
-          
+
           part.faces.foreach { face =>
             face.size match {
               case 3 => {
                 val v0 = face(0)
                 val v1 = face(1)
                 val v2 = face(2)
-                
+
                 addTri(v0, v1, v2)
               }
               case 4 => {
@@ -744,7 +745,7 @@ object SimpleOBJParser {
                 val v1 = face(1)
                 val v2 = face(2)
                 val v3 = face(3)
-                
+
                 addTri(v0, v1, v3)
                 addTri(v1, v2, v3)
               }

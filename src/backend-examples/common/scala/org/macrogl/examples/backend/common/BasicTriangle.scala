@@ -81,7 +81,7 @@ class BasicTriangle(width: Int, height: Int, print: String => Unit, systemUpdate
 
       for (_ <- using attributebuffer (vertexBuffer)) {
         vertexBuffer.locations = attrsLocs
-        
+
         vertexBuffer.setAttributePointers(attrsCfg)
       }
 
