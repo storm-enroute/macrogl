@@ -2,9 +2,7 @@ package org.macrogl.examples.backend.common
 
 import org.macrogl
 import org.macrogl.{ Macrogl => GL }
-
 import org.macrogl.using
-
 import scala.collection.mutable.ArrayBuffer
 
 /**
@@ -23,6 +21,15 @@ class BasicTriangle(width: Int, height: Int, print: String => Unit, systemUpdate
       print("Basic Triangle: init")
 
       implicit val mgl = systemInit()
+
+      /*val test = ",,"
+      //val res = test.split(",")
+      val res = macrogl.utils.SimpleOBJParser.fullSplit(test, ",")
+
+      macrogl.Utils.out.println("Contains " + res.size + " tokens:")
+      res.foreach { t =>
+        macrogl.Utils.out.println("Token (size=" + t.length() + "): \"" + t + "\"")
+      }*/
 
       // Prepare Data
 

@@ -60,6 +60,7 @@ class BasicMesh(width: Int, height: Int, print: String => Unit, systemUpdate: ()
           macrogl.Utils.out.println("Mtl: " + mtlFileContent(0))*/
 
           val objs = macrogl.utils.SimpleOBJParser.parseOBJ(objFileContent, Map(mtlFileName -> mtlFileContent))
+          val meshes = macrogl.utils.SimpleOBJParser.convOBJObjectToTriMesh(objs)
           
           macrogl.Utils.out.println("OBJ file contains "+objs.size+" object(s)")
           
