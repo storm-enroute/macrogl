@@ -8,25 +8,6 @@ import org.macrogl.math._
 import org.macrogl.MacroglException
 
 object SimpleOBJParser {
-  def fullSplit(text: String, delim: String): Array[String] = {
-    val delimLength = delim.length()
-
-    val buffer = new scala.collection.mutable.ArrayBuffer[String]()
-
-    var cur: String = text
-    var pos: Int = -1
-    while ({ pos = cur.indexOf(delim); pos } >= 0) {
-      val sub = cur.substring(0, pos)
-      cur = cur.substring(pos + delimLength, cur.length())
-
-      buffer += sub
-    }
-
-    buffer += cur
-
-    buffer.toArray
-  }
-
   case class TexInfo(var path: String) {
     var blendu: Boolean = true
     var blendv: Boolean = true
@@ -228,8 +209,7 @@ object SimpleOBJParser {
       val index = currentLine.indexOf("#")
       val line = if (index < 0) currentLine else currentLine.substring(0, index).trim()
 
-      //val tokens = line.split(" ")
-      val tokens = fullSplit(line, " ")
+      val tokens = line.split(" ", -1)
 
       (tokens(0).toLowerCase(), if (tokens.size >= 2) Some(tokens(1).toLowerCase()) else None) match {
         case ("newmtl", _) if (tokens.size >= 2) => {
@@ -442,8 +422,7 @@ object SimpleOBJParser {
       val index = currentLine.indexOf("#")
       val line = if (index < 0) currentLine else currentLine.substring(0, index).trim()
 
-      //val tokens = line.split(" ")
-      val tokens = fullSplit(line, " ")
+      val tokens = line.split(" ", -1)
 
       tokens(0).toLowerCase() match {
 

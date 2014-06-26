@@ -50,8 +50,8 @@ class BasicMesh(width: Int, height: Int, print: String => Unit, systemUpdate: ()
         """
 
       val resourcesDir = "/org/macrogl/examples/backend/common/"
-      val objFileName = "sphere.obj"
-      val mtlFileName = "sphere.mtl"
+      val objFileName = "cube.obj"
+      val mtlFileName = "cube.mtl"
 
       macrogl.utils.TextResources.get(resourcesDir + objFileName, resourcesDir + mtlFileName) {
         case Array(objFileContent, mtlFileContent) =>

@@ -22,15 +22,6 @@ class BasicTriangle(width: Int, height: Int, print: String => Unit, systemUpdate
 
       implicit val mgl = systemInit()
 
-      /*val test = ",,"
-      //val res = test.split(",")
-      val res = macrogl.utils.SimpleOBJParser.fullSplit(test, ",")
-
-      macrogl.Utils.out.println("Contains " + res.size + " tokens:")
-      res.foreach { t =>
-        macrogl.Utils.out.println("Token (size=" + t.length() + "): \"" + t + "\"")
-      }*/
-
       // Prepare Data
 
       val vertexSource = """
