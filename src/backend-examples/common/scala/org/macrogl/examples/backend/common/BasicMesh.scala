@@ -200,7 +200,7 @@ class BasicMesh(width: Int, height: Int, print: String => Unit, systemUpdate: ()
               val submesh = mesh.submeshes(i)
               val indicesBuffer = indicesBuffers(i)
               val indicesBufferData = indicesBuffersData(i)
-              
+
               mgl.uniform3f(colorUniLoc, submesh.material.get.diffuseColor.get)
               mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indicesBuffer)
               mgl.drawElements(GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
