@@ -112,7 +112,7 @@ object MacroGLBuild extends Build {
     },
     libraryDependencies ++= Seq(
       "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" % scalaJSVersion % "test",
-      "org.scala-lang.modules.scalajs" %% "scalajs-dom" % "0.4"
+      "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6"
     )
   )
   
@@ -138,7 +138,7 @@ object MacroGLBuild extends Build {
     scalaSource in Compile := baseDirectory.value / ".." / "src" / "buffer" / "scala",
     libraryDependencies ++= Seq(
       "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" % scalaJSVersion % "test",
-      "org.scala-lang.modules.scalajs" %% "scalajs-dom" % "0.4"
+      "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6"
     )
   )
   
@@ -190,7 +190,7 @@ object MacroGLBuild extends Build {
     resourceDirectory in Compile := baseDirectory.value / ".." / "src" / "backend-examples" / "common" / "resources",
     libraryDependencies ++= Seq(
       "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" % scalaJSVersion % "test",
-      "org.scala-lang.modules.scalajs" %% "scalajs-dom" % "0.4"
+      "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6"
     )
   )
 

@@ -6,11 +6,11 @@ import org.scalajs.dom
 
 object Token {
 
-  case class Buffer(js: org.scalajs.dom.WebGLBuffer)
+  type Buffer = org.scalajs.dom.WebGLBuffer
 
   object Buffer {
-    val invalid: Buffer = Buffer(null)
-    val none: Buffer = Buffer(null)
+    val invalid: Buffer = null
+    val none: Buffer = null
   }
 
   type Program = org.scalajs.dom.WebGLProgram

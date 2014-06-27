@@ -59,7 +59,7 @@ class BasicMesh(width: Int, height: Int, print: String => Unit, systemUpdate: ()
           macrogl.Utils.out.println("OBJ file contains " + objs.size + " object(s)")
           objs.foreach {
             case (name, obj) =>
-              macrogl.Utils.out.println("  " + obj + " of " + obj.vertices.size + " vertices, " + obj.texCoordinates.size + " tex and " + obj.normals.size + " normals in " + obj.groups.size + " group(s),")
+              macrogl.Utils.out.println("  " + obj + " of " + obj.vertices.size + " vertices, " + obj.texCoordinates.size + " tex and " + obj.normals.size + " normals in " + obj.groups.size + " group(s)")
               obj.groups.foreach { group =>
                 macrogl.Utils.out.println("    " + group + " of " + group.parts.size + " part(s)")
                 group.parts.foreach { part =>
@@ -113,19 +113,19 @@ class BasicMesh(width: Int, height: Int, print: String => Unit, systemUpdate: ()
           val mesh = meshes("Cube")
 
           val vertexBuffer = mgl.createBuffer
-          //val indicesBuffers = mesh.submeshes.map { submesh => mgl.createBuffer }
+          val indicesBuffers = mesh.submeshes.map { submesh => mgl.createBuffer }
           
           //val indicesBuffers = new scala.Array[scala.scalajs.js.Object](2)
-          val retArray = new Array[org.scalajs.dom.WebGLBuffer](2)
+          //val retArray = new Array[org.scalajs.dom.WebGLBuffer](2)
           //val indicesBuffers = new scala.Array[org.scalajs.nio.Buffer](2)
 
-          /*val vertexBufferData = macrogl.Macrogl.createFloatData(mesh.vertices.size * 3) // 3 components per vertex
+          val vertexBufferData = macrogl.Macrogl.createFloatData(mesh.vertices.size * 3) // 3 components per vertex
           mesh.vertices.foreach { v =>
             v.store(vertexBufferData)
           }
-          vertexBufferData.rewind()*/
+          vertexBufferData.rewind()
 
-          /*val indicesBuffersData = mesh.submeshes.map { submesh =>
+          val indicesBuffersData = mesh.submeshes.map { submesh =>
             val data = macrogl.Macrogl.createShortData(submesh.tris.size * 3) // 3 vertices per triangle
             
             submesh.tris.foreach { case (v0, v1, v2) =>
@@ -136,7 +136,7 @@ class BasicMesh(width: Int, height: Int, print: String => Unit, systemUpdate: ()
             
             data.rewind()
             data
-          }*/
+          }
 
           // position: 1 face (4 vertices)
           /*val vertexBufferData = macrogl.Macrogl.createFloatData(4 * 3)
