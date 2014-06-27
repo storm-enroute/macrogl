@@ -237,7 +237,7 @@ object SimpleOBJParser {
           val g = tokens(2).toFloat
           val b = tokens(3).toFloat
 
-          val rgb = new Vector3f(r, b, g)
+          val rgb = new Vector3f(r, g, b)
           mat().ambientColor = Some(rgb)
         }
 
@@ -257,7 +257,7 @@ object SimpleOBJParser {
           val g = tokens(2).toFloat
           val b = tokens(3).toFloat
 
-          val rgb = new Vector3f(r, b, g)
+          val rgb = new Vector3f(r, g, b)
           mat().diffuseColor = Some(rgb)
         }
 
@@ -277,7 +277,7 @@ object SimpleOBJParser {
           val g = tokens(2).toFloat
           val b = tokens(3).toFloat
 
-          val rgb = new Vector3f(r, b, g)
+          val rgb = new Vector3f(r, g, b)
           mat().specularColor = Some(rgb)
         }
 

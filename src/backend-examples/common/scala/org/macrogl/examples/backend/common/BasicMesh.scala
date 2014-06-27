@@ -27,7 +27,6 @@ class BasicMesh(width: Int, height: Int, print: String => Unit, systemUpdate: ()
         uniform mat4 transform;
         
         attribute vec3 position;
-        attribute vec3 color;
         
         void main(void) {
           gl_Position = projection * transform * vec4(position, 1.0);
@@ -47,11 +46,18 @@ class BasicMesh(width: Int, height: Int, print: String => Unit, systemUpdate: ()
         """
 
       val resourcesDir = "/org/macrogl/examples/backend/common/"
-      val objFileName = "cube.obj"
-      val mtlFileName = "cube.mtl"
+      val objFileName = "test.obj"
+      val mtlFileName = "test.mtl"
 
       macrogl.utils.TextResources.get(resourcesDir + objFileName, resourcesDir + mtlFileName) {
         case Array(objFileContent, mtlFileContent) =>
+
+          val pp = new macrogl.Program("BasicProjection3D")(
+            macrogl.Program.Shader.Vertex(vertexSource),
+            macrogl.Program.Shader.Fragment(fragmentSource))
+          pp.acquire()
+
+          mgl.useProgram(pp.token)
 
           val objs = macrogl.utils.SimpleOBJParser.parseOBJ(objFileContent, Map(mtlFileName -> mtlFileContent))
           val meshes = macrogl.utils.SimpleOBJParser.convOBJObjectToTriMesh(objs)
@@ -110,14 +116,7 @@ class BasicMesh(width: Int, height: Int, print: String => Unit, systemUpdate: ()
           }
 
           // Inject TriMesh into Buffers
-          val mesh = meshes("Cube")
-
-          val vertexBuffer = mgl.createBuffer
-          val indicesBuffers = mesh.submeshes.map { submesh => mgl.createBuffer }
-          
-          //val indicesBuffers = new scala.Array[scala.scalajs.js.Object](2)
-          //val retArray = new Array[org.scalajs.dom.WebGLBuffer](2)
-          //val indicesBuffers = new scala.Array[org.scalajs.nio.Buffer](2)
+          val mesh = meshes("Test")
 
           val vertexBufferData = macrogl.Macrogl.createFloatData(mesh.vertices.size * 3) // 3 components per vertex
           mesh.vertices.foreach { v =>
@@ -127,71 +126,48 @@ class BasicMesh(width: Int, height: Int, print: String => Unit, systemUpdate: ()
 
           val indicesBuffersData = mesh.submeshes.map { submesh =>
             val data = macrogl.Macrogl.createShortData(submesh.tris.size * 3) // 3 vertices per triangle
-            
-            submesh.tris.foreach { case (v0, v1, v2) =>
-              data.put(v0.toShort)
-              data.put(v1.toShort)
-              data.put(v2.toShort)
+
+            submesh.tris.foreach {
+              case (v0, v1, v2) =>
+                data.put(v0.toShort)
+                data.put(v1.toShort)
+                data.put(v2.toShort)
             }
-            
+
             data.rewind()
             data
           }
 
-          // position: 1 face (4 vertices)
-          /*val vertexBufferData = macrogl.Macrogl.createFloatData(4 * 3)
-          vertexBufferData.put(-1f).put(-0.5f).put(0f)
-          vertexBufferData.put(1f).put(-0.5f).put(0f)
-          vertexBufferData.put(1f).put(0.5f).put(0f)
-          vertexBufferData.put(-1f).put(0.5f).put(0f)
-          vertexBufferData.rewind
+          val positionAttribLoc = mgl.getAttribLocation(pp.token, "position")
+          val colorUniLoc = mgl.getUniformLocation(pp.token, "color")
+          val projectionUniLoc = mgl.getUniformLocation(pp.token, "projection")
+          val transformUniLoc = mgl.getUniformLocation(pp.token, "transform")
 
-          // 1 faces = 2 triangles
-          val indicesBufferData = macrogl.Macrogl.createShortData(2 * 3)
-          indicesBufferData.put(0.toShort).put(1.toShort).put(3.toShort)
-          indicesBufferData.put(1.toShort).put(2.toShort).put(3.toShort)
-          indicesBufferData.rewind
+          val vertexBuffer = mgl.createBuffer
+          mgl.bindBuffer(GL.ARRAY_BUFFER, vertexBuffer)
+          mgl.bufferData(GL.ARRAY_BUFFER, vertexBufferData, GL.STATIC_DRAW)
+          mgl.vertexAttribPointer(positionAttribLoc, 3, GL.FLOAT, false, 0, 0)
 
-          mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indicesBuffer)
-          mgl.bufferData(GL.ELEMENT_ARRAY_BUFFER, indicesBufferData, GL.STATIC_DRAW)*/
-
-          /*mgl.viewport(0, 0, width, height)
-          mgl.clearColor(0.5f, 0.5f, 0.5f, 1)*/
+          val indicesBuffers = indicesBuffersData.map { indicesBufferData =>
+            val indicesBuffer = mgl.createBuffer
+            mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indicesBuffer)
+            mgl.bufferData(GL.ELEMENT_ARRAY_BUFFER, indicesBufferData, GL.STATIC_DRAW)
+            indicesBuffer
+          }
 
           // Setup matrices
           val projection = Matrix4f.perspective3D(70f, width.toFloat / height.toFloat, 0.01f, 10f)
           val transformStack = new MatrixStack(new Matrix4f)
 
-          /*val pp = new macrogl.Program("BasicProjection3D")(
-            macrogl.Program.Shader.Vertex(vertexSource),
-            macrogl.Program.Shader.Fragment(fragmentSource))
-          pp.acquire()*/
+          // Viewport and gray background
+          mgl.viewport(0, 0, width, height)
+          mgl.clearColor(0.5f, 0.5f, 0.5f, 1)
 
-          /*val vertexBuffer = new macrogl.AttributeBuffer(GL.STATIC_DRAW, vertexBufferData.remaining() / 3, 3)
-          vertexBuffer.acquire()
-          vertexBuffer.send(0, vertexBufferData)
-          for (_ <- using attributebuffer (vertexBuffer)) {
-            val vertexAttrsLocs = Array(mgl.getAttribLocation(pp.token, "position"))
-            val vertexAttrsCfg = Array((0, 3))
+          // Enable depth test
+          mgl.enable(GL.DEPTH_TEST)
+          mgl.depthFunc(GL.LESS)
 
-            vertexBuffer.locations = vertexAttrsLocs
-            vertexBuffer.attribs = vertexAttrsCfg
-
-            vertexBuffer.setAttributePointers()
-          }
-
-          val colorBuffer = new macrogl.AttributeBuffer(GL.STATIC_DRAW, colorBufferData.remaining() / 3, 3)
-          colorBuffer.acquire()
-          colorBuffer.send(0, colorBufferData)
-          for (_ <- using attributebuffer (colorBuffer)) {
-            val colorAttrsLocs = Array(mgl.getAttribLocation(pp.token, "color"))
-            val colorAttrsCfg = Array((0, 3))
-
-            colorBuffer.locations = colorAttrsLocs
-            colorBuffer.attribs = colorAttrsCfg
-
-            colorBuffer.setAttributePointers()
-          }*/
+          mgl.enableVertexAttribArray(positionAttribLoc)
 
           print("Basic Mesh: ready")
 
@@ -207,29 +183,30 @@ class BasicMesh(width: Int, height: Int, print: String => Unit, systemUpdate: ()
           def render(fe: org.macrogl.FrameEvent): Unit = {
             transformStack.push // Save the current transformation matrix
 
+            mgl.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT)
+
             // Anime the rotation using the data from the FrameEvent
             currentRotation += rotationVelocity * fe.elapsedTime
 
             transformStack.current = Matrix4f.translate3D(new Vector3f(0, 0, -3)) *
+              Matrix4f.rotation3D(30, new Vector3f(1, 0, 0)) *
               Matrix4f.rotation3D(currentRotation, new Vector3f(0, 1, 0))
 
-            /*for {
-              _ <- using program (pp)
-            } {*/
-              //mgl.clear(GL.COLOR_BUFFER_BIT)
+            mgl.uniformMatrix4f(projectionUniLoc, projection)
+            mgl.uniformMatrix4f(transformUniLoc, transformStack.current)
 
-              /*vertexBuffer.enableAttributeArrays()
-              colorBuffer.enableAttributeArrays()*/
+            var i = 0
+            while (i < mesh.submeshes.size) {
+              val submesh = mesh.submeshes(i)
+              val indicesBuffer = indicesBuffers(i)
+              val indicesBufferData = indicesBuffersData(i)
+              
+              mgl.uniform3f(colorUniLoc, submesh.material.get.diffuseColor.get)
+              mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indicesBuffer)
+              mgl.drawElements(GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
 
-              /*pp.uniform.projection = projection
-              pp.uniform.transform = transformStack.current*/
-
-              //mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indicesBuffer)
-              //mgl.drawElements(GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
-
-              /*colorBuffer.disableAttributeArrays()
-              vertexBuffer.disableAttributeArrays()*/
-            //}
+              i += 1
+            }
 
             transformStack.pop // Restore the transformation matrix 
             continueCondition = systemUpdate()
@@ -238,13 +215,15 @@ class BasicMesh(width: Int, height: Int, print: String => Unit, systemUpdate: ()
           def close(): Unit = {
             print("Basic Mesh: closing")
 
-            /*mgl.deleteBuffer(indicesBuffer)
+            mgl.disableVertexAttribArray(positionAttribLoc)
 
-            colorBuffer.release()
-            vertexBuffer.release()*/
-            
-            
-            //pp.release()
+            indicesBuffers.foreach { b =>
+              mgl.deleteBuffer(b)
+            }
+
+            mgl.deleteBuffer(vertexBuffer)
+
+            pp.release()
 
             systemClose()
 
