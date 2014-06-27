@@ -509,7 +509,7 @@ class Macrogl(implicit gl: dom.WebGLRenderingContext) {
   }
 
   final def isBuffer(buffer: Token.Buffer): Boolean = {
-    if(buffer == null) false
+    if (buffer == null) false
     else gl.isBuffer(buffer)
   }
 
@@ -518,27 +518,27 @@ class Macrogl(implicit gl: dom.WebGLRenderingContext) {
   }
 
   final def isFramebuffer(framebuffer: Token.FrameBuffer): Boolean = {
-    if(framebuffer == null) false
+    if (framebuffer == null) false
     else gl.isFramebuffer(framebuffer)
   }
 
   final def isProgram(program: Token.Program): Boolean = {
-    if(program == null) false
+    if (program == null) false
     else gl.isProgram(program)
   }
 
   final def isRenderbuffer(renderbuffer: Token.RenderBuffer): Boolean = {
-    if(renderbuffer == null) false
+    if (renderbuffer == null) false
     else gl.isRenderbuffer(renderbuffer)
   }
 
   final def isShader(shader: Token.Shader): Boolean = {
-    if(shader == null) false
+    if (shader == null) false
     else gl.isShader(shader)
   }
 
   final def isTexture(texture: Token.Texture): Boolean = {
-    if(texture == null) false
+    if (texture == null) false
     else gl.isTexture(texture)
   }
 

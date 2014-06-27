@@ -110,7 +110,7 @@ class BasicMesh(width: Int, height: Int, print: String => Unit, systemUpdate: ()
                 macrogl.Utils.out.println("      " + submesh + " of " + submesh.tris.size + " triangle(s)")
                 submesh.tris.foreach {
                   case (v0, v1, v2) =>
-                    macrogl.Utils.out.println("          (" + v0 + ", " + v1 + ", " + v2 + ")")
+                    macrogl.Utils.out.println("        (" + v0 + ", " + v1 + ", " + v2 + ")")
                 }
               }
           }
