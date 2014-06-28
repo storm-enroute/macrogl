@@ -37,6 +37,7 @@ object LwjglExamples {
         val contextAttributes = new ContextAttribs(glMajor, glMinor)
         Display.setDisplayMode(new DisplayMode(width, height))
         Display.create(new PixelFormat, contextAttributes)
+        Display.setTitle("MacroGL example")
 
         Macrogl.default
       }
