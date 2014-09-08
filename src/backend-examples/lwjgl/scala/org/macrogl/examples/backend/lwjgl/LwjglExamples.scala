@@ -19,6 +19,7 @@ object LwjglExamples {
       println("\t[3] For basic 3D projection and animation")
       println("\t[4] For basic 3D fractale")
       println("\t[5] For basic render-to-texture")
+      println("\t[6] For basic mesh")
     }
   }
 
@@ -36,6 +37,7 @@ object LwjglExamples {
         val contextAttributes = new ContextAttribs(glMajor, glMinor)
         Display.setDisplayMode(new DisplayMode(width, height))
         Display.create(new PixelFormat, contextAttributes)
+        Display.setTitle("MacroGL example")
 
         Macrogl.default
       }
@@ -51,6 +53,7 @@ object LwjglExamples {
       case "3" => new BasicProjection3D(width, height, myPrint, myUpdate, customInit(2, 1), myClose)
       case "4" => new BasicFractale3D(width, height, myPrint, myUpdate, customInit(2, 1), myClose)
       case "5" => new BasicRenderToTexture(width, height, myPrint, myUpdate, customInit(3, 0), myClose)
+      case "6" => new BasicMesh(width, height, myPrint, myUpdate, customInit(2, 1), myClose)
       case _ => {
         println("\"" + exampleName + "\" is not a valid example")
         return

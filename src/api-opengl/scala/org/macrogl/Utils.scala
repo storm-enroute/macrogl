@@ -48,6 +48,8 @@ object Utils {
   private def inputStreamForResource(resourceName: String): InputStream = {
     this.getClass().getResourceAsStream(resourceName)
   }
+  
+  private val notFoundMsg = "Resource not found"
 
   /**
    * Load a image from the resources into an OpenGL 2D texture.
@@ -61,54 +63,58 @@ object Utils {
    * A returned value false means aborting the texture loading
    */
   def loadTexture2DFromResources(resourceName: String, texture: Token.Texture, preload: => Boolean = true)(implicit gl: Macrogl): Unit = {
-    val stream = inputStreamForResource(resourceName)
-
     // TODO should we have our own ExecutionContext?
-
     Future {
-      // Should support JPEG, PNG, BMP, WBMP and GIF
-      val image = ImageIO.read(stream)
+      try {
+        val stream = inputStreamForResource(resourceName)
+        if(stream == null) throw new RuntimeException(notFoundMsg)
+        
+        // Should support JPEG, PNG, BMP, WBMP and GIF
+        val image = ImageIO.read(stream)
 
-      val height = image.getHeight()
-      val width = image.getWidth()
+        val height = image.getHeight()
+        val width = image.getWidth()
 
-      val byteBuffer = Macrogl.createByteData(4 * width * height) // Stored as RGBA value: 4 bytes per pixel
+        val byteBuffer = Macrogl.createByteData(4 * width * height) // Stored as RGBA value: 4 bytes per pixel
 
-      val tmp = new Array[Byte](4)
+        val tmp = new Array[Byte](4)
 
-      var y = height - 1
-      while (y >= 0) {
+        var y = height - 1
+        while (y >= 0) {
 
-        var x = 0
-        while (x < width) {
+          var x = 0
+          while (x < width) {
 
-          val argb = image.getRGB(x, y)
+            val argb = image.getRGB(x, y)
 
-          tmp(2) = argb.toByte // blue
-          tmp(1) = (argb >> 8).toByte // green
-          tmp(0) = (argb >> 16).toByte // red
-          tmp(3) = (argb >> 24).toByte // alpha
+            tmp(2) = argb.toByte // blue
+            tmp(1) = (argb >> 8).toByte // green
+            tmp(0) = (argb >> 16).toByte // red
+            tmp(3) = (argb >> 24).toByte // alpha
 
-          byteBuffer.put(tmp)
+            byteBuffer.put(tmp)
 
-          x += 1
+            x += 1
+          }
+
+          y -= 1
         }
 
-        y -= 1
+        stream.close()
+        byteBuffer.rewind
+
+        // Don't load it now, we want it done synchronously in the main loop to avoid concurrency issue
+        LWJGLSpecifics.addPendingTask({ () =>
+          if (preload) {
+            val previousTexture = gl.getParameterTexture(Macrogl.TEXTURE_BINDING_2D)
+            gl.bindTexture(Macrogl.TEXTURE_2D, texture)
+            gl.texImage2D(Macrogl.TEXTURE_2D, 0, Macrogl.RGBA, width, height, 0, Macrogl.RGBA, Macrogl.UNSIGNED_BYTE, byteBuffer)
+            gl.bindTexture(Macrogl.TEXTURE_2D, previousTexture)
+          }
+        })
+      } catch {
+        case e: Throwable => org.macrogl.Utils.err.println("Error during the loading of texture resource \"" + resourceName + "\": " + e.getMessage())
       }
-
-      stream.close()
-      byteBuffer.rewind
-
-      // Don't load it now, we want it done synchronously in the main loop to avoid concurrency issue
-      LWJGLSpecifics.addPendingTask({ () =>
-        if (preload) {
-          val previousTexture = gl.getParameterTexture(Macrogl.TEXTURE_BINDING_2D)
-          gl.bindTexture(Macrogl.TEXTURE_2D, texture)
-          gl.texImage2D(Macrogl.TEXTURE_2D, 0, Macrogl.RGBA, width, height, 0, Macrogl.RGBA, Macrogl.UNSIGNED_BYTE, byteBuffer)
-          gl.bindTexture(Macrogl.TEXTURE_2D, previousTexture)
-        }
-      })
     }
   }
 
@@ -119,28 +125,33 @@ object Utils {
    * @param callback The function to call once the data are in memory
    */
   def getTextFileFromResources(resourceName: String)(callback: Array[String] => Unit): Unit = {
-    val stream = inputStreamForResource(resourceName)
-
     Future {
-      val streamReader = new InputStreamReader(stream)
-      val reader = new BufferedReader(streamReader)
+      try {
+        val stream = inputStreamForResource(resourceName)
+        if(stream == null) throw new RuntimeException(notFoundMsg)
+        
+        val streamReader = new InputStreamReader(stream)
+        val reader = new BufferedReader(streamReader)
 
-      var list: List[String] = Nil
-      var line: String = null
+        val buffer = new scala.collection.mutable.ArrayBuffer[String]()
+        var line: String = null
 
-      while ({ line = reader.readLine(); line } != null) {
-        list = line :: list
+        while ({ line = reader.readLine(); line } != null) {
+          buffer += line
+        }
+
+        reader.close()
+        streamReader.close()
+        stream.close()
+
+        val lines = buffer.toArray
+
+        LWJGLSpecifics.addPendingTask({ () =>
+          callback(lines)
+        })
+      } catch {
+        case e: Throwable => org.macrogl.Utils.err.println("Error during the loading of text resource \"" + resourceName + "\": " + e.getMessage())
       }
-
-      reader.close()
-      streamReader.close()
-      stream.close()
-
-      val lines = list.toArray
-
-      LWJGLSpecifics.addPendingTask({ () =>
-        callback(lines)
-      })
     }
   }
 
@@ -151,29 +162,34 @@ object Utils {
    * @param callback The function to call once the data are in memory
    */
   def getBinaryFileFromResources(resourceName: String)(callback: org.macrogl.Data.Byte => Unit): Unit = {
-    val stream = inputStreamForResource(resourceName)
-
     Future {
-      val byteStream = new ByteArrayOutputStream()
+      try {
+        val stream = inputStreamForResource(resourceName)
+        if(stream == null) throw new RuntimeException(notFoundMsg)
+        
+        val byteStream = new ByteArrayOutputStream()
 
-      val tmpData: Array[Byte] = new Array[Byte](1024) // 1KB of temp data
-      var tmpDataContentSize: Int = 0
+        val tmpData: Array[Byte] = new Array[Byte](1024) // 1KB of temp data
+        var tmpDataContentSize: Int = 0
 
-      while ({ tmpDataContentSize = stream.read(tmpData); tmpDataContentSize } >= 0) {
-        byteStream.write(tmpData, 0, tmpDataContentSize)
+        while ({ tmpDataContentSize = stream.read(tmpData); tmpDataContentSize } >= 0) {
+          byteStream.write(tmpData, 0, tmpDataContentSize)
+        }
+
+        stream.close()
+
+        val byteArray = byteStream.toByteArray()
+        val byteBuffer = org.macrogl.Macrogl.createByteData(byteArray.length)
+
+        byteBuffer.put(byteArray)
+        byteBuffer.rewind()
+
+        LWJGLSpecifics.addPendingTask({ () =>
+          callback(byteBuffer)
+        })
+      } catch {
+        case e: Throwable => org.macrogl.Utils.err.println("Error during the loading of text resource \"" + resourceName + "\": " + e.getMessage())
       }
-
-      stream.close()
-
-      val byteArray = byteStream.toByteArray()
-      val byteBuffer = org.macrogl.Macrogl.createByteData(byteArray.length)
-
-      byteBuffer.put(byteArray)
-      byteBuffer.rewind()
-
-      LWJGLSpecifics.addPendingTask({ () =>
-        callback(byteBuffer)
-      })
     }
   }
 
@@ -214,5 +230,17 @@ object Utils {
 
     // Start listener
     frameListenerThread.start()
+  }
+  
+  object out {
+    def println(msg: Any): Unit = {
+      System.out.println(if(msg != null) msg.toString() else "<null>")
+    }
+  }
+  
+  object err {
+    def println(msg: Any): Unit = {
+      System.err.println(if(msg != null) msg.toString() else "<null>")
+    }
   }
 }

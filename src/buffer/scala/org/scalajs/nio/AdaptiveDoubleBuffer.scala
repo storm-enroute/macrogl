@@ -12,7 +12,8 @@ class AdaptiveDoubleBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: dom.
     this.dataView.getFloat64(index * this.bytes_per_element, this.littleEndian).toDouble
   }
   override protected def iSet(index: Int, value: Double): Unit = {
-    this.dataView.setFloat64(index * this.bytes_per_element, value, this.littleEndian)
+    this.dataView.asInstanceOf[js.Dynamic].setFloat64(index * this.bytes_per_element, value, this.littleEndian)
+    //this.dataView.setFloat64(index * this.bytes_per_element, value, this.littleEndian) // Incorrect in the new version of scala-dom, correct once it's ok
   }
 
   override def duplicate(): DoubleBuffer = {

@@ -6,10 +6,10 @@
 </head>
 <body>
 
-<h1>Examples: WebGL back-end for MacroGL - pre-optimized version</h1>
+<h1>Examples: WebGL back-end for MacroGL - fast optimized version</h1>
 
 <p>After having compiled and optimized properly the code for the application
-(using `sbt backendExamplesWebgl/preoptimizeJS` in the root folder), you should see the MacroGL example.</p>
+(using `sbt backendExamplesWebgl/fastOptJS` in the root folder), you should see the MacroGL example.</p>
 
 <div id="output">
 </div>
@@ -44,7 +44,13 @@
   Your browser doesn't appear to support the HTML5 canvas element.
 </canvas>
 
-<script type="text/javascript" src="./target/scala-2.11/backend-examples-webgl-preopt.js"></script>
+<h2>[6] Basic mesh demo (with animation)</h2>
+
+<canvas id="canvas-mesh">
+  Your browser doesn't appear to support the HTML5 canvas element.
+</canvas>
+
+<script type="text/javascript" src="./target/scala-2.11/backend-examples-webgl-fastopt.js"></script>
 
 <script type="text/javascript">
 WebglExamples().main();

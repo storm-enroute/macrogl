@@ -171,13 +171,15 @@ class NativeByteBuffer(protected var mCapacity: Int, protected var mLimit: Int, 
   def putFloat(value: Float): ByteBuffer = this.putFloat(this.nextIndex(false, NativeFloatBuffer.BYTES_PER_ELEMENT), value)
   def putFloat(index: Int, value: Float): ByteBuffer = {
     this.checkIndex(index, NativeFloatBuffer.BYTES_PER_ELEMENT)
-    this.dataView.setFloat32(index, value, this.littleEndian)
+    this.dataView.asInstanceOf[js.Dynamic].setFloat32(index, value, this.littleEndian)
+    //this.dataView.setFloat32(index, value, this.littleEndian) // Incorrect in the new version of scala-dom, correct once it's ok
     this
   }
   def putDouble(value: Double): ByteBuffer = this.putDouble(this.nextIndex(false, NativeDoubleBuffer.BYTES_PER_ELEMENT), value)
   def putDouble(index: Int, value: Double): ByteBuffer = {
     this.checkIndex(index, NativeDoubleBuffer.BYTES_PER_ELEMENT)
-    this.dataView.setFloat64(index, value, this.littleEndian)
+    this.dataView.asInstanceOf[js.Dynamic].setFloat64(index, value, this.littleEndian)
+    //this.dataView.setFloat64(index, value, this.littleEndian) // Incorrect in the new version of scala-dom, correct once it's ok
     this
   }
 

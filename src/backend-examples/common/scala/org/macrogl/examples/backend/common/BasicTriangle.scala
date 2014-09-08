@@ -2,8 +2,8 @@ package org.macrogl.examples.backend.common
 
 import org.macrogl
 import org.macrogl.{ Macrogl => GL }
-
 import org.macrogl.using
+import scala.collection.mutable.ArrayBuffer
 
 /**
  * Basic example with a static triangle
@@ -79,7 +79,7 @@ class BasicTriangle(width: Int, height: Int, print: String => Unit, systemUpdate
 
       for (_ <- using attributebuffer (vertexBuffer)) {
         vertexBuffer.locations = attrsLocs
-        
+
         vertexBuffer.setAttributePointers(attrsCfg)
       }
 

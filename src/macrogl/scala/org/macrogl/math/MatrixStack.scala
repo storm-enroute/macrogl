@@ -1,20 +1,19 @@
 package org.macrogl.math
 
+import scala.collection.mutable.ArrayBuffer
+
 class MatrixStack[T <: Matrix](var current: T) {
-  private var stack: List[T] = Nil
+  private val stack: ArrayBuffer[T] = new ArrayBuffer[T]()
 
   def push: Unit = {
-    stack = current.copy.asInstanceOf[T] :: stack
+    stack += current.copy.asInstanceOf[T]
   }
 
-  def pop: T = stack match {
-    case x :: xs =>
-      current = x
-      stack = xs
-      x
-    case Nil =>
-      throw new RuntimeException("Stack empty")
+  def pop: T = if(empty) {
+    throw new RuntimeException("Stack empty")
+  } else {
+    stack.remove(stack.size - 1)
   }
 
-  def empty: Boolean = stack != Nil
+  def empty: Boolean = stack.size == 0
 }

@@ -68,7 +68,7 @@ class Macrogl(implicit gl: dom.WebGLRenderingContext) {
   }
 
   final def bufferData(target: Int, totalBytes: Long, usage: Int) {
-    gl.bufferData(target, totalBytes, usage)
+    gl.bufferData(target, totalBytes.toInt, usage)
   }
 
   private final def _bufferData(target: Int, data: Data, usage: Int) = {
@@ -114,7 +114,8 @@ class Macrogl(implicit gl: dom.WebGLRenderingContext) {
   }
 
   final def clearDepth(depth: Double) = {
-    gl.clearDepth(depth)
+    gl.asInstanceOf[js.Dynamic].clearDepth(depth)
+    //gl.clearDepth(depth) // not correct in Scala dom
   }
 
   final def clearStencil(s: Int) = {
@@ -159,7 +160,8 @@ class Macrogl(implicit gl: dom.WebGLRenderingContext) {
   }
 
   final def createBuffer(): Token.Buffer = {
-    gl.createBuffer()
+    val ret = gl.createBuffer()
+    ret
   }
 
   final def createFramebuffer(): Token.FrameBuffer = {
@@ -248,7 +250,7 @@ class Macrogl(implicit gl: dom.WebGLRenderingContext) {
 
   final def drawElements(mode: Int, count: Int, `type`: Int, offset: Long) = {
     // may be a good idea to check that an element array buffer is currently bound
-    gl.drawElements(mode, count, `type`, offset)
+    gl.drawElements(mode, count, `type`, offset.toInt)
   }
 
   final def enable(cap: Int) = {
@@ -297,9 +299,10 @@ class Macrogl(implicit gl: dom.WebGLRenderingContext) {
 
   final def getAttachedShaders(program: Token.Program): Array[Token.Shader] = {
     val jsArray = gl.getAttachedShaders(program)
-    val retArray = new Array[Token.Shader](jsArray.length.toInt)
-    jsArray.copyToArray(retArray)
-    retArray
+    //val retArray = new Array[Token.Shader](jsArray.length.toInt)
+    //jsArray.copyToArray(retArray)
+    //retArray
+    jsArray
   }
 
   final def getAttribLocation(program: Token.Program, name: String): Int = {
@@ -403,11 +406,13 @@ class Macrogl(implicit gl: dom.WebGLRenderingContext) {
   }
 
   final def getProgramParameteri(program: Token.Program, pname: Int): Int = {
-    gl.getProgramParameter(program, pname).asInstanceOf[js.Number].toInt
+    val ret = gl.getProgramParameter(program, pname)
+    JSTypeHelper.toInt(ret)
   }
 
   final def getProgramParameterb(program: Token.Program, pname: Int): Boolean = {
-    gl.getProgramParameter(program, pname).asInstanceOf[js.Boolean]
+    val ret = gl.getProgramParameter(program, pname)
+    JSTypeHelper.toBoolean(ret)
   }
 
   final def getProgramInfoLog(program: Token.Program): String = {
@@ -419,11 +424,13 @@ class Macrogl(implicit gl: dom.WebGLRenderingContext) {
   }
 
   final def getShaderParameteri(shader: Token.Shader, pname: Int): Int = {
-    gl.getShaderParameter(shader, pname).asInstanceOf[js.Number].toInt
+    val ret = gl.getShaderParameter(shader, pname)
+    JSTypeHelper.toInt(ret)
   }
 
   final def getShaderParameterb(shader: Token.Shader, pname: Int): Boolean = {
-    gl.getShaderParameter(shader, pname).asInstanceOf[js.Boolean]
+    val ret = gl.getShaderParameter(shader, pname)
+    JSTypeHelper.toBoolean(ret)
   }
 
   final def getShaderPrecisionFormat(shadertype: Int, precisiontype: Int): PrecisionFormat = {
@@ -502,7 +509,7 @@ class Macrogl(implicit gl: dom.WebGLRenderingContext) {
   }
 
   final def isBuffer(buffer: Token.Buffer): Boolean = {
-    if(buffer == null) false
+    if (buffer == null) false
     else gl.isBuffer(buffer)
   }
 
@@ -511,32 +518,33 @@ class Macrogl(implicit gl: dom.WebGLRenderingContext) {
   }
 
   final def isFramebuffer(framebuffer: Token.FrameBuffer): Boolean = {
-    if(framebuffer == null) false
+    if (framebuffer == null) false
     else gl.isFramebuffer(framebuffer)
   }
 
   final def isProgram(program: Token.Program): Boolean = {
-    if(program == null) false
+    if (program == null) false
     else gl.isProgram(program)
   }
 
   final def isRenderbuffer(renderbuffer: Token.RenderBuffer): Boolean = {
-    if(renderbuffer == null) false
+    if (renderbuffer == null) false
     else gl.isRenderbuffer(renderbuffer)
   }
 
   final def isShader(shader: Token.Shader): Boolean = {
-    if(shader == null) false
+    if (shader == null) false
     else gl.isShader(shader)
   }
 
   final def isTexture(texture: Token.Texture): Boolean = {
-    if(texture == null) false
+    if (texture == null) false
     else gl.isTexture(texture)
   }
 
   final def lineWidth(width: Float) = {
-    gl.lineWidth(width)
+    gl.asInstanceOf[js.Dynamic].lineWidth(width)
+    //gl.lineWidth(width)
   }
 
   final def linkProgram(program: Token.Program) = {
@@ -548,7 +556,8 @@ class Macrogl(implicit gl: dom.WebGLRenderingContext) {
   }
 
   final def polygonOffset(factor: Float, units: Float) = {
-    gl.polygonOffset(factor, units)
+    gl.asInstanceOf[js.Dynamic].polygonOffset(factor, units)
+    //gl.polygonOffset(factor, units)
   }
 
   private final def _readPixels(x: Int, y: Int, width: Int, height: Int, format: Int, `type`: Int, pixels: Data) = {
@@ -573,7 +582,8 @@ class Macrogl(implicit gl: dom.WebGLRenderingContext) {
   }
 
   final def sampleCoverage(value: Float, invert: Boolean) = {
-    gl.sampleCoverage(value, invert)
+    gl.asInstanceOf[js.Dynamic].sampleCoverage(value, invert)
+    //gl.sampleCoverage(value, invert)
   }
 
   final def scissor(x: Int, y: Int, width: Int, height: Int) = {
@@ -641,7 +651,8 @@ class Macrogl(implicit gl: dom.WebGLRenderingContext) {
   }
 
   final def texParameterf(target: Int, pname: Int, param: Float) = {
-    gl.texParameterf(target, pname, param)
+    gl.asInstanceOf[js.Dynamic].texParameterf(target, pname, param)
+    //gl.texParameterf(target, pname, param)
   }
 
   final def texParameteri(target: Int, pname: Int, param: Int) = {
@@ -827,7 +838,7 @@ class Macrogl(implicit gl: dom.WebGLRenderingContext) {
    */
 
   final def vertexAttribPointer(index: Int, size: Int, `type`: Int, normalized: Boolean, stride: Int, offset: Long) = {
-    gl.vertexAttribPointer(index, size, `type`, normalized, stride, offset)
+    gl.vertexAttribPointer(index, size, `type`, normalized, stride, offset.toInt)
   }
 
   final def viewport(x: Int, y: Int, width: Int, height: Int) = {

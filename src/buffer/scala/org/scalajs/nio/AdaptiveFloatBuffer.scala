@@ -12,7 +12,8 @@ class AdaptiveFloatBuffer(cap: Int, lim: Int, pos: Int, mar: Int, mBuffer: dom.A
     this.dataView.getFloat32(index * this.bytes_per_element, this.littleEndian).toFloat
   }
   override protected def iSet(index: Int, value: Float): Unit = {
-    this.dataView.setFloat32(index * this.bytes_per_element, value, this.littleEndian)
+    this.dataView.asInstanceOf[js.Dynamic].setFloat32(index * this.bytes_per_element, value, this.littleEndian)
+    //this.dataView.setFloat32(index * this.bytes_per_element, value, this.littleEndian) // Incorrect in the new version of scala-dom, correct once it's ok
   }
 
   override def duplicate(): FloatBuffer = {
