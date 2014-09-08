@@ -1,7 +1,7 @@
 import sbt._
 import Keys._
 import Process._
-import java.io.File
+import java.io._
 
 import scala.scalajs.sbtplugin.ScalaJSPlugin._
 import ScalaJSKeys._
