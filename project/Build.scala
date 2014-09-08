@@ -11,30 +11,25 @@ object MacroGLBuild extends Build {
 
   /* macro-gl */
 
-  val publishUser = "SONATYPE_USER"
-  
-  val publishPass = "SONATYPE_PASS"
-  
-  val macroglVersion = "0.4-SNAPSHOT"
+  def versionFromFile(filename: String): String = {
+    val fis = new FileInputStream(filename)
+    val props = new java.util.Properties()
+    try props.load(fis)
+    finally fis.close()
+
+    val major = props.getProperty("macrogl_major")
+    val minor = props.getProperty("macrogl_minor")
+    s"$major.$minor"
+  }
+
+  val frameworkVersion = versionFromFile("version.conf")
+
   val macroglScalaVersion = "2.11.0"
-  
-  val userPass = for {
-    user <- sys.env.get(publishUser)
-    pass <- sys.env.get(publishPass)
-  } yield (user, pass)
 
-  val publishCreds: Seq[Setting[_]] = Seq(userPass match {
-    case Some((user, pass)) =>
-      credentials += Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, pass)
-    case None =>
-      // prevent publishing
-      publish <<= streams.map(_.log.info("Publishing to Sonatype is disabled since the \"" + publishUser + "\" and/or \"" + publishPass + "\" environment variables are not set."))
-  })
-
-  val macroglSettings = Defaults.defaultSettings ++ publishCreds ++ LWJGLPlugin.lwjglSettings ++ Seq(
+  val macroglSettings = Defaults.defaultSettings ++ LWJGLPlugin.lwjglSettings ++ Seq(
     name := "macrogl",
     organization := "com.storm-enroute",
-    version := macroglVersion,
+    version := frameworkVersion,
     scalaVersion := macroglScalaVersion,
 
     scalacOptions ++= Seq(
@@ -96,7 +91,7 @@ object MacroGLBuild extends Build {
   
   val macroglWebglSettings = Defaults.defaultSettings ++ scalaJSSettings ++ Seq(
     name := "macrogl-webgl",
-    version := macroglVersion,
+    version := frameworkVersion,
     scalaVersion := macroglScalaVersion,
     scalacOptions ++= Seq(
       "-deprecation",
@@ -126,7 +121,7 @@ object MacroGLBuild extends Build {
 
   val macroglBufferSettings = Defaults.defaultSettings ++ scalaJSSettings ++ Seq(
     name := "macrogl-buffer",
-    version := macroglVersion,
+    version := frameworkVersion,
     scalaVersion := macroglScalaVersion,
     scalacOptions ++= Seq(
       "-deprecation",
@@ -152,7 +147,7 @@ object MacroGLBuild extends Build {
   
   val macroglExamplesSettings = Defaults.defaultSettings ++ LWJGLPlugin.lwjglSettings ++ Seq(
     name := "macrogl-examples",
-    version := macroglVersion,
+    version := frameworkVersion,
     scalaVersion := macroglScalaVersion,
     scalacOptions ++= Seq(
       "-deprecation",
@@ -176,7 +171,7 @@ object MacroGLBuild extends Build {
 
   val backendExamplesWebglSettings = Defaults.defaultSettings ++ scalaJSSettings ++ Seq(
     name := "backend-examples-webgl",
-    version := macroglVersion,
+    version := frameworkVersion,
     scalaVersion := macroglScalaVersion,
     scalacOptions ++= Seq(
       "-deprecation",
@@ -204,7 +199,7 @@ object MacroGLBuild extends Build {
 
   val backendExamplesLwjglSettings = Defaults.defaultSettings ++ LWJGLPlugin.lwjglSettings ++ Seq(
     name := "backend-examples-lwjgl",
-    version := macroglVersion,
+    version := frameworkVersion,
     scalaVersion := macroglScalaVersion,
     scalacOptions ++= Seq(
       "-deprecation",
