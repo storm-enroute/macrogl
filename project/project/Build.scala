@@ -6,7 +6,7 @@ object Plugins extends Build {
   val mechadir = new File(s"mecha")
   val mechaPlugin = {
     if (mechadir.exists) ProjectRef(uri("../../mecha"), "mecha-repo-plugin")
-    else ProjectRef(uri("git://github.com/storm-enroute/mecha.git"), "mecha-super-plugin")
+    else ProjectRef(uri("git://github.com/storm-enroute/mecha.git"), "mecha-repo-plugin")
   }
   
   lazy val build = Project(
