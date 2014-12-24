@@ -2,34 +2,27 @@ import sbt._
 import Keys._
 import Process._
 import java.io._
-
 import scala.scalajs.sbtplugin.ScalaJSPlugin._
 import ScalaJSKeys._
+import org.stormenroute.mecha._
 
 
-object MacroGLBuild extends Build {
+object MacroGLBuild extends MechaRepoBuild {
 
   /* macro-gl */
 
-  def versionFromFile(filename: String): String = {
-    val fis = new FileInputStream(filename)
-    val props = new java.util.Properties()
-    try props.load(fis)
-    finally fis.close()
-
-    val major = props.getProperty("macrogl_major")
-    val minor = props.getProperty("macrogl_minor")
-    s"$major.$minor"
+  val frameworkVersion = Def.setting {
+    ConfigParsers.versionFromFile(
+        (baseDirectory in macrogl).value / "version.conf",
+        List("macrogl_major", "macrogl_minor"))
   }
-
-  val frameworkVersion = versionFromFile("version.conf")
 
   val macroglScalaVersion = "2.11.0"
 
   val macroglSettings = Defaults.defaultSettings ++ LWJGLPlugin.lwjglSettings ++ Seq(
     name := "macrogl",
     organization := "com.storm-enroute",
-    version := frameworkVersion,
+    version <<= frameworkVersion,
     scalaVersion := macroglScalaVersion,
 
     scalacOptions ++= Seq(
@@ -81,7 +74,7 @@ object MacroGLBuild extends Build {
       </developers>
   )
   
-  lazy val macrogl = Project(
+  lazy val macrogl: Project = Project(
     "macrogl",
     file("."),
     settings = macroglSettings
@@ -91,7 +84,7 @@ object MacroGLBuild extends Build {
   
   val macroglWebglSettings = Defaults.defaultSettings ++ scalaJSSettings ++ Seq(
     name := "macrogl-webgl",
-    version := frameworkVersion,
+    version <<= frameworkVersion,
     scalaVersion := macroglScalaVersion,
     scalacOptions ++= Seq(
       "-deprecation",
@@ -121,7 +114,7 @@ object MacroGLBuild extends Build {
 
   val macroglBufferSettings = Defaults.defaultSettings ++ scalaJSSettings ++ Seq(
     name := "macrogl-buffer",
-    version := frameworkVersion,
+    version <<= frameworkVersion,
     scalaVersion := macroglScalaVersion,
     scalacOptions ++= Seq(
       "-deprecation",
@@ -147,7 +140,7 @@ object MacroGLBuild extends Build {
   
   val macroglExamplesSettings = Defaults.defaultSettings ++ LWJGLPlugin.lwjglSettings ++ Seq(
     name := "macrogl-examples",
-    version := frameworkVersion,
+    version <<= frameworkVersion,
     scalaVersion := macroglScalaVersion,
     scalacOptions ++= Seq(
       "-deprecation",
@@ -171,7 +164,7 @@ object MacroGLBuild extends Build {
 
   val backendExamplesWebglSettings = Defaults.defaultSettings ++ scalaJSSettings ++ Seq(
     name := "backend-examples-webgl",
-    version := frameworkVersion,
+    version <<= frameworkVersion,
     scalaVersion := macroglScalaVersion,
     scalacOptions ++= Seq(
       "-deprecation",
@@ -199,7 +192,7 @@ object MacroGLBuild extends Build {
 
   val backendExamplesLwjglSettings = Defaults.defaultSettings ++ LWJGLPlugin.lwjglSettings ++ Seq(
     name := "backend-examples-lwjgl",
-    version := frameworkVersion,
+    version <<= frameworkVersion,
     scalaVersion := macroglScalaVersion,
     scalacOptions ++= Seq(
       "-deprecation",
