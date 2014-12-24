@@ -1,7 +1,7 @@
 package org.macrogl
 
 import language.experimental.macros
-import scala.reflect.macros.Context
+import scala.reflect.macros.blackbox.Context
 
 package ex {
 
@@ -51,6 +51,8 @@ package ex {
   }
 
   object MacrosEx {
+
+    import scala.language.implicitConversions
 
     implicit def c2utils(c: Context) = new org.macrogl.Macros.Util[c.type](c)
 

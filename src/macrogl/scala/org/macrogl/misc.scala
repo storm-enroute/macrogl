@@ -1,7 +1,7 @@
 package org
 
 import language.experimental.macros
-import scala.reflect.macros.whitebox.Context
+import scala.reflect.macros.blackbox.Context
 
 package macrogl {
 
