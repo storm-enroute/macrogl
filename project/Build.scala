@@ -9,6 +9,8 @@ import org.stormenroute.mecha._
 
 object MacroGLBuild extends MechaRepoBuild {
 
+  def repoName = "macrogl"
+
   /* macro-gl */
 
   val frameworkVersion = Def.setting {
@@ -17,7 +19,7 @@ object MacroGLBuild extends MechaRepoBuild {
         List("macrogl_major", "macrogl_minor"))
   }
 
-  val macroglScalaVersion = "2.11.0"
+  val macroglScalaVersion = "2.11.4"
 
   val macroglSettings = Defaults.defaultSettings ++ LWJGLPlugin.lwjglSettings ++ Seq(
     name := "macrogl",
