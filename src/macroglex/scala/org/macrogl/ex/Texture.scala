@@ -1,7 +1,16 @@
 package org.macrogl
 package ex
 
-class Texture(target: Int)(init: org.macrogl.Texture => Unit)(implicit glex: Macroglex) extends org.macrogl.Texture(target)(init)(glex) {
+
+
+
+
+
+class Texture
+  (target: Int)(init: org.macrogl.ex.Texture => Unit)(implicit glex: Macroglex)
+extends org.macrogl.Texture(target)(
+  (t: org.macrogl.Texture) => init(t.asInstanceOf[ex.Texture])
+)(glex) {
   override def binding = target match {
     case Macroglex.TEXTURE_1D => Macroglex.TEXTURE_BINDING_1D
     case _ => super.binding
@@ -19,14 +28,30 @@ class Texture(target: Int)(init: org.macrogl.Texture => Unit)(implicit glex: Mac
 
   def depthTextureMode_=(v: Int) = param(Macroglex.DEPTH_TEXTURE_MODE) = v
 
-  def allocateImage1D(level: Int, internalFormat: Int, wdt: Int, border: Int, format: Int, dataType: Int, data: Data = null) {
+  def allocateImage1D(level: Int, internalFormat: Int, wdt: Int, border: Int,
+    format: Int, dataType: Int, data: Data = null) {
     target match {
       case Macroglex.TEXTURE_1D => data match {
-        case null => glex.texImage1D(target, level, internalFormat, wdt, border, format, dataType, null: Data.Int)
-        case data: Data.Int => glex.texImage1D(target, level, internalFormat, wdt, border, format, dataType, data)
-        case _ => throw new UnsupportedOperationException(s"Unknown data format: ${data.getClass}")
+        case null =>
+          glex.texImage1D(target, level, internalFormat, wdt, border, format,
+            dataType, null: Data.Int)
+        case data: Data.Int =>
+          glex.texImage1D(target, level, internalFormat, wdt, border, format,
+            dataType, data)
+        case _ =>
+          throw new UnsupportedOperationException(
+            s"Unknown data format: ${data.getClass}")
       }
-      case _ => throw new UnsupportedOperationException("Texture is not 1D.")
+      case _ =>
+        throw new UnsupportedOperationException("Texture is not 1D.")
     }
   }
+}
+
+
+object Texture {
+
+  def apply(target: Int)(init: ex.Texture => Unit)(implicit gl: Macroglex) =
+    new ex.Texture(target)(init)(gl)
+
 }

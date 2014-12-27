@@ -1,6 +1,11 @@
 package org.macrogl
 
-package object utils {
+
+
+
+
+
+package object util {
   type TextFileContent = Array[String]
   type BinaryFileContent = org.macrogl.Data.Byte
 }

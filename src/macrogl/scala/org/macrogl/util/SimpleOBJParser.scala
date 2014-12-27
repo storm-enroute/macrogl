@@ -1,11 +1,15 @@
-package org.macrogl.utils
+package org.macrogl.util
+
+
 
 import scala.collection.mutable.Map
 import scala.collection.mutable.ArrayBuffer
 
 import org.macrogl
-import org.macrogl.math._
+import org.macrogl.algebra._
 import org.macrogl.MacroglException
+
+
 
 object SimpleOBJParser {
   case class TexInfo(var path: String) {

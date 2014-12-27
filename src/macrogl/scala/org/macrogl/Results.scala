@@ -1,5 +1,10 @@
 package org.macrogl
 
+
+
+
+
+
 object Results {
   private val intResultT = new ThreadLocal[Data.Int] {
     override def initialValue = Macrogl.createIntData(16)
@@ -19,4 +24,3 @@ object Results {
 
   def doubleResult = doubleResultT.get
 }
-

@@ -1,12 +1,17 @@
 package org.macrogl
 
+
+
 import org.lwjgl.opengl._
 import org.lwjgl.util.glu._
+
+
 
 class Macrogl() {
 
   /* public API */
-  final def getWebGLRenderingContext(): Nothing = throw new UnsupportedOperationException("Available only when using Scala.js")
+  final def getWebGLRenderingContext(): Nothing =
+    throw new UnsupportedOperationException("Available only in Scala.js")
 
   final def bytesPerShort = 2
   final def bytesPerInt = 4
@@ -21,8 +26,8 @@ class Macrogl() {
     GL20.glAttachShader(program, shader)
   }
 
-  final def bindAttribLocation(program: Token.Program, index: Int, name: String) = {
-    GL20.glBindAttribLocation(program, index, name)
+  final def bindAttribLocation(p: Token.Program, index: Int, name: String) = {
+    GL20.glBindAttribLocation(p, index, name)
   }
 
   final def bindBuffer(target: Int, buffer: Token.Buffer) = {
@@ -276,14 +281,14 @@ class Macrogl() {
     val nameMaxSize = this.getProgramParameteri(program, GL20.GL_ACTIVE_ATTRIBUTE_MAX_LENGTH)
     this.tmpInt.clear()
     val name = GL20.glGetActiveAttrib(program, index, nameMaxSize, this.tmpInt)
-    org.macrogl.ActiveInfo(this.tmpInt.get(0), this.tmpInt.get(1), name)
+    ActiveInfo(this.tmpInt.get(0), this.tmpInt.get(1), name)
   }
 
   final def getActiveUniform(program: Token.Program, index: Int): ActiveInfo = {
     val nameMaxSize = this.getProgramParameteri(program, GL20.GL_ACTIVE_UNIFORM_MAX_LENGTH)
     this.tmpInt.clear()
     val name = GL20.glGetActiveUniform(program, index, nameMaxSize, this.tmpInt)
-    org.macrogl.ActiveInfo(this.tmpInt.get(0), this.tmpInt.get(1), name)
+    ActiveInfo(this.tmpInt.get(0), this.tmpInt.get(1), name)
   }
 
   final def getAttachedShaders(program: Token.Program): Array[Token.Shader] = {
@@ -420,7 +425,7 @@ class Macrogl() {
     this.tmpInt.limit(8)
 
     ARBES2Compatibility.glGetShaderPrecisionFormat(shadertype, precisiontype, tmpInt, tmpInt2)
-    org.macrogl.PrecisionFormat(tmpInt.get(0), tmpInt.get(1), tmpInt2.get(0))
+    PrecisionFormat(tmpInt.get(0), tmpInt.get(1), tmpInt2.get(0))
   }
 
   final def getShaderInfoLog(shader: Token.Shader): String = {
@@ -850,35 +855,35 @@ class Macrogl() {
     p1 != p2
   }
 
-  final def uniform2f(location: Token.UniformLocation, vec: org.macrogl.math.Vector2f): Unit = {
+  final def uniform2f(location: Token.UniformLocation, vec: org.macrogl.algebra.Vector2f): Unit = {
     this.uniform2f(location, vec.x, vec.y)
   }
 
-  final def uniform3f(location: Token.UniformLocation, vec: org.macrogl.math.Vector3f): Unit = {
+  final def uniform3f(location: Token.UniformLocation, vec: org.macrogl.algebra.Vector3f): Unit = {
     this.uniform3f(location, vec.x, vec.y, vec.z)
   }
 
-  final def uniform4f(location: Token.UniformLocation, vec: org.macrogl.math.Vector4f): Unit = {
+  final def uniform4f(location: Token.UniformLocation, vec: org.macrogl.algebra.Vector4f): Unit = {
     this.uniform4f(location, vec.x, vec.y, vec.z, vec.w)
   }
 
-  final def uniformMatrix2f(location: Token.UniformLocation, mat: org.macrogl.math.Matrix2f): Unit = {
+  final def uniformMatrix2f(location: Token.UniformLocation, mat: org.macrogl.algebra.Matrix2f): Unit = {
     this.tmpFloat.clear()
-    mat.store(this.tmpFloat, org.macrogl.math.ColumnMajor)
+    mat.store(this.tmpFloat, org.macrogl.algebra.ColumnMajor)
     this.tmpFloat.flip()
     this.uniformMatrix2fv(location, false, this.tmpFloat.slice)
   }
 
-  final def uniformMatrix3f(location: Token.UniformLocation, mat: org.macrogl.math.Matrix3f): Unit = {
+  final def uniformMatrix3f(location: Token.UniformLocation, mat: org.macrogl.algebra.Matrix3f): Unit = {
     this.tmpFloat.clear()
-    mat.store(this.tmpFloat, org.macrogl.math.ColumnMajor)
+    mat.store(this.tmpFloat, org.macrogl.algebra.ColumnMajor)
     this.tmpFloat.flip()
     this.uniformMatrix3fv(location, false, this.tmpFloat.slice)
   }
 
-  final def uniformMatrix4f(location: Token.UniformLocation, mat: org.macrogl.math.Matrix4f): Unit = {
+  final def uniformMatrix4f(location: Token.UniformLocation, mat: org.macrogl.algebra.Matrix4f): Unit = {
     this.tmpFloat.clear()
-    mat.store(this.tmpFloat, org.macrogl.math.ColumnMajor)
+    mat.store(this.tmpFloat, org.macrogl.algebra.ColumnMajor)
     this.tmpFloat.flip()
     this.uniformMatrix4fv(location, false, this.tmpFloat.slice)
   }
@@ -1213,4 +1218,3 @@ object Macrogl {
   /* implementation-specific methods */
 
 }
-

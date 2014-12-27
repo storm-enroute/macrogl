@@ -1,5 +1,11 @@
-package org.macrogl.math
+package org.macrogl.algebra
 
+
+
+
+
+
+/** A mutable matrix class. */
 abstract class Matrix {
   def apply(row: Int, col: Int): Float
   def update(row: Int, col: Int, v: Float): Unit

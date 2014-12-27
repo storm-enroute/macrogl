@@ -1,6 +1,10 @@
-package org.macrogl.math
+package org.macrogl.algebra
+
+
 
 import scala.collection.mutable.ArrayBuffer
+
+
 
 class MatrixStack[T <: Matrix](var current: T) {
   private val stack: ArrayBuffer[T] = new ArrayBuffer[T]()

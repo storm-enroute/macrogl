@@ -1,11 +1,16 @@
 package org.macrogl
 
-import language.experimental.macros
+
+
+import scala.language.experimental.macros
 import scala.reflect.macros.whitebox.Context
 import scala.collection._
 
-class AttributeBuffer(val usage: Int, val capacity: Int, val attributes: Int)(implicit gl: Macrogl)
-  extends Handle {
+
+
+class AttributeBuffer
+  (val usage: Int, val capacity: Int, val attributes: Int)(implicit gl: Macrogl)
+extends Handle {
   private var vtoken = Token.Buffer.invalid
   private var result = new Array[Int](1)
   private var totalelems = 0
@@ -169,6 +174,3 @@ object AttributeBuffer {
   }
 
 }
-
-
-

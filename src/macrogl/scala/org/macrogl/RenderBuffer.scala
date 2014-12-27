@@ -1,6 +1,10 @@
 package org.macrogl
 
+
+
 import scala.collection._
+
+
 
 final class RenderBuffer(val format: Int, val width: Int, val height: Int)(implicit gl: Macrogl)
   extends Handle {

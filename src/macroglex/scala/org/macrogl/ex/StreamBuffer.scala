@@ -1,9 +1,13 @@
 package org.macrogl
 package ex
 
-import language.experimental.macros
+
+
+import scala.language.experimental.macros
 import scala.reflect.macros.Context
 import scala.collection._
+
+
 
 class StreamBuffer(val copies: Int, val attributes: Int, val size: Int)(implicit gl: Macrogl)
   extends Handle {

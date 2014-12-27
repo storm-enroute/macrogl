@@ -1,6 +1,10 @@
 package org.macrogl
 
+
+
 import scala.collection._
+
+
 
 abstract class Matrix(val array: Array[Double]) {
 
@@ -18,6 +22,7 @@ abstract class Matrix(val array: Array[Double]) {
   final def apply(y: Int, x: Int) = array(x * 4 + y)
 
 }
+
 
 object Matrix {
 

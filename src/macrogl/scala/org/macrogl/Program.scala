@@ -1,9 +1,15 @@
 package org.macrogl
 
+
+
 import scala.language.dynamics
 import scala.collection._
 
-class Program(val name: String)(val shaders: Program.Shader*)(implicit val gl: Macrogl) extends Handle {
+
+
+class Program
+  (val name: String)(val shaders: Program.Shader*)(implicit val gl: Macrogl)
+extends Handle {
   private var ptoken = Token.Program.invalid
   private val result = new Array[Int](1)
   private val floatData = Macrogl.createFloatData(16)
@@ -11,7 +17,9 @@ class Program(val name: String)(val shaders: Program.Shader*)(implicit val gl: M
   object uniform extends Dynamic {
     def location(varname: String) = {
       val loc = gl.getUniformLocation(token, varname)
-      if (!gl.validUniformLocation(loc)) throw new Program.Exception(Program.this, s"Could not send uniform: $varname, location: $loc")
+      if (!gl.validUniformLocation(loc))
+        throw new Program.Exception(
+          Program.this, s"Could not send uniform: $varname, location: $loc")
       loc
     }
     def updateDynamic(varname: String)(v: Any) = {
@@ -30,12 +38,12 @@ class Program(val name: String)(val shaders: Program.Shader*)(implicit val gl: M
         case (x: Int, y: Int) => gl.uniform2i(l, x, y)
         case (x: Int, y: Int, z: Int) => gl.uniform3i(l, x, y, z)
         case (x: Int, y: Int, z: Int, w: Int) => gl.uniform4i(l, x, y, z, w)
-        case v2: math.Vector2f => gl.uniform2f(l, v2)
-        case v3: math.Vector3f => gl.uniform3f(l, v3)
-        case v4: math.Vector4f => gl.uniform4f(l, v4)
-        case m2: math.Matrix2f => gl.uniformMatrix2f(l, m2)
-        case m3: math.Matrix3f => gl.uniformMatrix3f(l, m3)
-        case m4: math.Matrix4f => gl.uniformMatrix4f(l, m4)
+        case v2: algebra.Vector2f => gl.uniform2f(l, v2)
+        case v3: algebra.Vector3f => gl.uniform3f(l, v3)
+        case v4: algebra.Vector4f => gl.uniform4f(l, v4)
+        case m2: algebra.Matrix2f => gl.uniformMatrix2f(l, m2)
+        case m3: algebra.Matrix3f => gl.uniformMatrix3f(l, m3)
+        case m4: algebra.Matrix4f => gl.uniformMatrix4f(l, m4)
         case m: Matrix =>
           var i = 0
           while (i < 16) {

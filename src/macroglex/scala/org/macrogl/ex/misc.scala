@@ -1,11 +1,15 @@
 package org.macrogl
 
-import language.experimental.macros
+
+
+import scala.language.experimental.macros
 import scala.reflect.macros.blackbox.Context
+
+
 
 package ex {
 
-  object rasterEx {
+  object raster {
     def drawbuffers(b0: Int, b1: Int, b2: Int)(implicit gl: Macroglex) {
       val ib = Results.intResult
       ib.clear()
@@ -34,23 +38,25 @@ package ex {
     }
   }
 
-  object settingEx {
+  object setting {
     object Color {
-      def foreach[U](f: Unit => U)(implicit gl: Macroglex): Unit = macro MacrosEx.setColor[U]
+      def foreach[U](f: Unit => U)(implicit gl: Macroglex): Unit =
+        macro Macros.setColor[U]
     }
 
     def color(r: Float, g: Float, b: Float, a: Float) = Color
   }
 
-  object usingEx {
+  object using {
     object TransformationMatrix {
-      def foreach[U](f: Unit => U)(implicit gl: Macroglex): Unit = macro MacrosEx.useMatrix[U]
+      def foreach[U](f: Unit => U)(implicit gl: Macroglex): Unit =
+        macro Macros.useMatrix[U]
     }
 
     def matrix(m: Matrix) = TransformationMatrix
   }
 
-  object MacrosEx {
+  object Macros {
 
     import scala.language.implicitConversions
 

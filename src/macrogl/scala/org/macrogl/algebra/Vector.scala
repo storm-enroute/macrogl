@@ -1,4 +1,9 @@
-package org.macrogl.math
+package org.macrogl.algebra
+
+
+
+
+
 
 abstract class Vector {
   def apply(pos: Int): Float

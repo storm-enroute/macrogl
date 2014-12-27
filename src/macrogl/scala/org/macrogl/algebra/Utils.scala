@@ -1,4 +1,9 @@
-package org.macrogl.math
+package org.macrogl.algebra
+
+
+
+
+
 
 object Utils {
   val degToRadFactor: Float = (Math.PI / 180.0).toFloat

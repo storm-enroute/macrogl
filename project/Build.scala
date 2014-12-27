@@ -26,7 +26,6 @@ object MacroGLBuild extends MechaRepoBuild {
     organization := "com.storm-enroute",
     version <<= frameworkVersion,
     scalaVersion := macroglScalaVersion,
-
     scalacOptions ++= Seq(
       "-deprecation",
       "-unchecked",

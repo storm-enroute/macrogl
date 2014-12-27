@@ -1,8 +1,10 @@
-package org.macrogl.math
+package org.macrogl.algebra
 
-/**
- * Ported from LWJGL source code
- */
+
+
+
+
+
 class Matrix4f extends Matrix {
   private var m00, m11, m22, m33: Float = 1
   private var m01, m02, m03, m10, m12, m13, m20, m21, m23, m30, m31, m32: Float = 0

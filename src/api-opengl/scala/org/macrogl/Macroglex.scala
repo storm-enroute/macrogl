@@ -1,7 +1,11 @@
 package org.macrogl
 
+
+
 import org.lwjgl.opengl._
 import org.lwjgl.util.glu._
+
+
 
 class Macroglex private[macrogl] () extends Macrogl() {
 
@@ -114,6 +118,7 @@ class Macroglex private[macrogl] () extends Macrogl() {
   }
 }
 
+
 object Macroglex {
 
   /* public API - constants */
@@ -149,5 +154,3 @@ object Macroglex {
   implicit def default = new Macroglex()
 
 }
-
-

@@ -1,4 +1,9 @@
-package org.macrogl.math
+package org.macrogl.algebra
+
+
+
+
+
 
 class Vector2f extends Vector {
   var x, y: Float = _

@@ -1,7 +1,11 @@
 package org.macrogl
 package ex
 
+
+
 import org.macrogl.Matrix._
+
+
 
 object Matrix {
   lazy val defaultModelview = {

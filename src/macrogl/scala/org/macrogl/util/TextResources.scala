@@ -1,4 +1,6 @@
-package org.macrogl.utils
+package org.macrogl.util
+
+
 
 object TextResources {
   def get(resourcesName: String*) (callback: Array[TextFileContent] => Unit): Unit = {

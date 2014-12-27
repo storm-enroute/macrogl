@@ -1,14 +1,17 @@
 package org.macrogl
 
+
+
 import org.scalajs.dom
 import org.scalajs.nio
 
 import scala.scalajs.js
 import js.Dynamic.{ global => g }
 
+
+
 // See https://github.com/scala-js/scala-js-dom/blob/master/src/main/scala/org/scalajs/dom/WebGL.scala for documentation
 // about the WebGL DOM for ScalaJS
-
 class Macrogl(implicit gl: dom.WebGLRenderingContext) {
 
   /* public API */
@@ -1587,6 +1590,7 @@ private object JSTypeHelper {
   }
 }
 
+
 object Macrogl {
 
   /* public API - constants */
@@ -1914,4 +1918,3 @@ object Macrogl {
   /* implementation-specific methods */
 
 }
-
