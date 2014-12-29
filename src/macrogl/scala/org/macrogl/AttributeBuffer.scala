@@ -49,19 +49,22 @@ extends Handle {
 
   def locations = optLocations match {
     case Some(locs) => locs
-    case None => throw new RuntimeException("Locations undefined")
+    case None => throw new RuntimeException("Locations undefined.")
   }
+  
   def locations_=(locs: Array[Int]) {
     optLocations = Some(locs)
   }
+  
   def clearLocations(): Unit = {
     optLocations = None
   }
 
   def attribs = optAttribsCfg match {
     case Some(attribs) => attribs
-    case None => throw new RuntimeException("Attribs undefined")
+    case None => throw new RuntimeException("Attribs undefined.")
   }
+  
   def attribs_=(attribs: Array[(Int, Int)]) {
     optAttribsCfg = Some(attribs)
   }
@@ -126,8 +129,12 @@ extends Handle {
       val byteOffset = attribs(i)._1 * gl.bytesPerFloat
       val num = attribs(i)._2
       optLocations match {
-        case Some(locs) => gl.vertexAttribPointer(locs(i), num, Macrogl.FLOAT, false, stride, byteOffset)
-        case None => gl.vertexAttribPointer(i, num, Macrogl.FLOAT, false, stride, byteOffset)
+        case Some(locs) =>
+          gl.vertexAttribPointer(
+            locs(i), num, Macrogl.FLOAT, false, stride, byteOffset)
+        case None =>
+          gl.vertexAttribPointer(
+            i, num, Macrogl.FLOAT, false, stride, byteOffset)
       }
       i += 1
     }
@@ -147,6 +154,7 @@ extends Handle {
 
 }
 
+
 object AttributeBuffer {
 
   trait Access {
@@ -155,10 +163,12 @@ object AttributeBuffer {
 
   import Macros._
 
-  def using[U: c.WeakTypeTag](c: Context)(f: c.Expr[Access => U])(gl: c.Expr[Macrogl]): c.Expr[Unit] = {
+  def using[U: c.WeakTypeTag](c: Context)
+    (f: c.Expr[Access => U])(gl: c.Expr[Macrogl]): c.Expr[Unit] = {
     import c.universe._
 
-    val Apply(Apply(TypeApply(Select(Apply(_, List(mesh)), _), _), _), _) = c.macroApplication
+    val Apply(Apply(TypeApply(Select(Apply(_, List(mesh)), _), _), _), _) =
+      c.macroApplication
 
     val r = reify {
       val m = (c.Expr[AttributeBuffer](mesh)).splice

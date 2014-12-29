@@ -18,8 +18,8 @@ package object ex {
       def foreach[U](f: Unit => U)(implicit glex: Macroglex): Unit = macro ex.AttributeBuffer.computing[U]
     }
 
-    def meshbuffer(mesh: MeshBuffer)(layoutIndex: Int) = MeshBufferObject
-    def attributebuffer(mesh: AttributeBuffer)(layoutIndex: Int) = AttributeBufferObject
+    def meshbuffer(layoutIndex: Int, mesh: MeshBuffer) = MeshBufferObject
+    def attributebuffer(layoutIndex: Int, mesh: AttributeBuffer) = AttributeBufferObject
   }
 
 }

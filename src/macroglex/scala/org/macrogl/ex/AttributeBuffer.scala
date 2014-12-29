@@ -16,7 +16,7 @@ object AttributeBuffer {
   def computing[U: c.WeakTypeTag](c: Context)(f: c.Expr[Unit => U])(glex: c.Expr[Macroglex]): c.Expr[Unit] = {
     import c.universe._
 
-    val Apply(Apply(TypeApply(Select(Apply(Apply(_, List(mesh)), List(layoutIndex)), _), _), _), _) = c.macroApplication
+    val Apply(Apply(TypeApply(Select(Apply(_, List(layoutIndex, mesh)), _), _), _), _) = c.macroApplication
 
     val r = reify {
       glex.splice.bindShaderStorageBuffer(Macroglex.SHADER_STORAGE_BUFFER, (c.Expr[Int](layoutIndex)).splice, (c.Expr[AttributeBuffer](mesh)).splice.token)
