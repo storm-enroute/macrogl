@@ -21,11 +21,14 @@ object MacroGLBuild extends MechaRepoBuild {
 
   val macroglScalaVersion = "2.11.4"
 
+  val lwjglVersion = "2.9.0"
+
   val macroglSettings = Defaults.defaultSettings ++ LWJGLPlugin.lwjglSettings ++ Seq(
     name := "macrogl",
     organization := "com.storm-enroute",
     version <<= frameworkVersion,
     scalaVersion := macroglScalaVersion,
+    LWJGLPlugin.lwjgl.version := lwjglVersion,
     scalacOptions ++= Seq(
       "-deprecation",
       "-unchecked",
@@ -87,6 +90,7 @@ object MacroGLBuild extends MechaRepoBuild {
     name := "macrogl-webgl",
     version <<= frameworkVersion,
     scalaVersion := macroglScalaVersion,
+    LWJGLPlugin.lwjgl.version := lwjglVersion,
     scalacOptions ++= Seq(
       "-deprecation",
       "-unchecked",
@@ -117,6 +121,7 @@ object MacroGLBuild extends MechaRepoBuild {
     name := "macrogl-buffer",
     version <<= frameworkVersion,
     scalaVersion := macroglScalaVersion,
+    LWJGLPlugin.lwjgl.version := lwjglVersion,
     scalacOptions ++= Seq(
       "-deprecation",
       "-unchecked",
@@ -143,6 +148,7 @@ object MacroGLBuild extends MechaRepoBuild {
     name := "macrogl-examples",
     version <<= frameworkVersion,
     scalaVersion := macroglScalaVersion,
+    LWJGLPlugin.lwjgl.version := lwjglVersion,
     scalacOptions ++= Seq(
       "-deprecation",
       "-unchecked",
@@ -167,6 +173,7 @@ object MacroGLBuild extends MechaRepoBuild {
     name := "backend-examples-webgl",
     version <<= frameworkVersion,
     scalaVersion := macroglScalaVersion,
+    LWJGLPlugin.lwjgl.version := lwjglVersion,
     scalacOptions ++= Seq(
       "-deprecation",
       "-unchecked",
@@ -195,6 +202,7 @@ object MacroGLBuild extends MechaRepoBuild {
     name := "backend-examples-lwjgl",
     version <<= frameworkVersion,
     scalaVersion := macroglScalaVersion,
+    LWJGLPlugin.lwjgl.version := lwjglVersion,
     scalacOptions ++= Seq(
       "-deprecation",
       "-unchecked",
