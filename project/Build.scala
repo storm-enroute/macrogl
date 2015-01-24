@@ -15,15 +15,16 @@ object MacroGLBuild extends MechaRepoBuild {
 
   val frameworkVersion = Def.setting {
     ConfigParsers.versionFromFile(
-        (baseDirectory in macrogl).value / "version.conf",
-        List("macrogl_major", "macrogl_minor"))
+      (baseDirectory in macrogl).value / "version.conf",
+      List("macrogl_major", "macrogl_minor"))
   }
 
   val macroglScalaVersion = "2.11.4"
 
   val lwjglVersion = "2.9.0"
 
-  val macroglSettings = Defaults.defaultSettings ++ LWJGLPlugin.lwjglSettings ++ Seq(
+  val macroglSettings = Defaults.defaultSettings ++
+    LWJGLPlugin.lwjglSettings ++ Seq(
     name := "macrogl",
     organization := "com.storm-enroute",
     version <<= frameworkVersion,
