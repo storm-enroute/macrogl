@@ -24,7 +24,7 @@ object MacroGLBuild extends MechaRepoBuild {
   val lwjglVersion = "2.9.0"
 
   val macroglSettings = Defaults.defaultSettings ++
-    LWJGLPlugin.lwjglSettings ++ Seq(
+    MechaRepoPlugin.defaultSettings ++ LWJGLPlugin.lwjglSettings ++ Seq(
     name := "macrogl",
     organization := "com.storm-enroute",
     version <<= frameworkVersion,
@@ -76,7 +76,8 @@ object MacroGLBuild extends MechaRepoBuild {
           <name>Aleksandar Prokopec</name>
           <url>http://axel22.github.com/</url>
         </developer>
-      </developers>
+      </developers>,
+    mechaPublishKey := { publish.value }
   )
   
   lazy val macrogl: Project = Project(

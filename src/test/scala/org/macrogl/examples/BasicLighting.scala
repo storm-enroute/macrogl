@@ -5,7 +5,6 @@ import org.lwjgl.input.{ Keyboard, Mouse }
 import org.lwjgl.BufferUtils
 import org.macrogl
 import org.macrogl._
-import org.macrogl.ex._
 
 object BasicLighting {
 

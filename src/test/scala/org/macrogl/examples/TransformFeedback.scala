@@ -6,7 +6,6 @@ import org.lwjgl.BufferUtils
 import org.{ macrogl => gl }
 import org.macrogl._
 import org.macrogl.{ ex => glex }
-import org.macrogl.ex._
 
 object TransformFeedback {
   def main(args: Array[String]) {
@@ -218,7 +217,7 @@ object TransformFeedback {
     val components = vertices.length / count
 
     def genParticle() = {
-      import util.Random.{ nextFloat => nf }
+      import scala.util.Random.{ nextFloat => nf }
       Array[Float](
         0, 0.75f, 0,
         nf, nf, nf,
