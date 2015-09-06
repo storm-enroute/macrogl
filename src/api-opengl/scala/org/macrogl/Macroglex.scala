@@ -151,6 +151,6 @@ object Macroglex {
 
   /* public API - implicits */
 
-  implicit def default = new Macroglex()
+  implicit val default = new Macroglex()
 
 }
