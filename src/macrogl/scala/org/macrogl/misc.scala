@@ -120,10 +120,8 @@ package macrogl {
 
       val r = reify {
         val rb = (c.Expr[RenderBuffer](rbt)).splice
-        val oldbinding = gl.splice.getParameterRenderbuffer(Macrogl.RENDERBUFFER_BINDING)
         gl.splice.bindRenderbuffer(Macrogl.RENDERBUFFER, rb.token)
-        try f.splice(())
-        finally gl.splice.bindRenderbuffer(Macrogl.RENDERBUFFER, oldbinding)
+        f.splice(())
         ()
       }
 
@@ -138,10 +136,8 @@ package macrogl {
       val r = reify {
         val t = (c.Expr[Texture](tt)).splice
         gl.splice.activeTexture((c.Expr[Int](texnum)).splice)
-        val oldbinding = gl.splice.getParameterTexture(t.binding)
         gl.splice.bindTexture(t.target, t.token)
-        try f.splice(())
-        finally gl.splice.bindTexture(t.target, oldbinding)
+        f.splice(())
         ()
       }
 
@@ -155,14 +151,8 @@ package macrogl {
 
       val r = reify {
         val p = (c.Expr[Program](pt)).splice
-        val opidx = gl.splice.getCurrentProgram()
-        if (gl.splice.differentPrograms(opidx, p.token)) {
-          gl.splice.useProgram(p.token)
-        }
-        try f.splice(())
-        finally if (gl.splice.differentPrograms(opidx, p.token)) {
-          gl.splice.useProgram(opidx)
-        }
+        gl.splice.useProgram(p.token)
+        f.splice(())
         ()
       }
 
