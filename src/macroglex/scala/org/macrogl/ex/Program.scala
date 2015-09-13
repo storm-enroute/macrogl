@@ -17,10 +17,8 @@ extends org.macrogl.Program(n)(ss: _*)(glex) {
     assert(shaders.length == 1, "Only a single compute shader allowed.")
     shaders.head match {
       case Program.Shader.Compute(_, _) =>
-        val opidx = gl.getCurrentProgram()
-        if (gl.differentPrograms(opidx, token)) gl.useProgram(token)
-        try glex.dispatchCompute(numGroupsX, numGroupsY, numGroupsZ)
-        finally if (gl.differentPrograms(opidx, token)) gl.useProgram(opidx)
+        gl.useProgram(token)
+        glex.dispatchCompute(numGroupsX, numGroupsY, numGroupsZ)
       case _ =>
         throw new org.macrogl.Program.Exception(this,
           "Can only dispatch a compute shader.")
