@@ -103,10 +103,9 @@ package macrogl {
 
       val r = reify {
         val fb = (c.Expr[FrameBuffer](fbt)).splice
-        val oldbinding = gl.splice.getParameterFramebuffer(Macrogl.FRAMEBUFFER_BINDING)
         gl.splice.bindFramebuffer(Macrogl.FRAMEBUFFER, fb.token)
-        try f.splice(fb.binding)
-        finally gl.splice.bindFramebuffer(Macrogl.FRAMEBUFFER, oldbinding)
+        f.splice(fb.binding)
+        gl.splice.bindFramebuffer(Macrogl.FRAMEBUFFER, Token.FrameBuffer.none)
         ()
       }
 
@@ -166,10 +165,8 @@ package macrogl {
 
       val r = reify {
         val v = (c.Expr[Int](vt)).splice
-        val ov = gl.splice.getParameteri(Macrogl.CULL_FACE_MODE)
         gl.splice.cullFace(v)
-        try f.splice(())
-        finally gl.splice.cullFace(ov)
+        f.splice(())
         ()
       }
 
@@ -186,15 +183,8 @@ package macrogl {
         val y = (c.Expr[Int](gt)).splice
         val w = (c.Expr[Int](bt)).splice
         val h = (c.Expr[Int](at)).splice
-        Results.intResult.clear()
-        gl.splice.getParameteriv(Macrogl.VIEWPORT, Results.intResult)
-        val ox = Results.intResult.get(0)
-        val oy = Results.intResult.get(1)
-        val ow = Results.intResult.get(2)
-        val oh = Results.intResult.get(3)
         gl.splice.viewport(x, y, w, h)
-        try f.splice(())
-        finally gl.splice.viewport(ox, oy, ow, oh)
+        f.splice(())
         ()
       }
 
@@ -209,16 +199,8 @@ package macrogl {
       val r = reify {
         //val osrc = gl.splice.getParameteri(Macroglex.BLEND_SRC)
         //val odst = gl.splice.getParameteri(Macroglex.BLEND_DST)
-        val osrca = gl.splice.getParameteri(Macrogl.BLEND_SRC_ALPHA)
-        val osrcrgb = gl.splice.getParameteri(Macrogl.BLEND_SRC_RGB)
-        val odsta = gl.splice.getParameteri(Macrogl.BLEND_DST_ALPHA)
-        val odstrgb = gl.splice.getParameteri(Macrogl.BLEND_DST_RGB)
         gl.splice.blendFunc((c.Expr[Int](sfactor)).splice, c.Expr[Int](dfactor).splice)
-        try f.splice(())
-        finally {
-          //gl.splice.blendFunc(osrc, odst)
-          gl.splice.blendFuncSeparate(osrcrgb, odstrgb, osrca, odsta)
-        }
+        f.splice(())
         ()
       }
 

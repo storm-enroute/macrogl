@@ -3,11 +3,11 @@ package org.macrogl
 
 
 import org.scalajs.dom
+
+
+
 // See scalajs-dom for the package org.scalajs.dom
 // https://github.com/scala-js/scala-js-dom
-
-
-
 object Token {
 
   type Buffer = org.scalajs.dom.WebGLBuffer
