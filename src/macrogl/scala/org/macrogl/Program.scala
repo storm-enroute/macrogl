@@ -7,15 +7,25 @@ import scala.collection._
 
 
 
-class Program
-  (val name: String)(val shaders: Program.Shader*)(implicit val gl: Macrogl)
+class Program(val name: String)(val shaders: Program.Shader*)(implicit val gl: Macrogl)
 extends Handle {
   private var ptoken = Token.Program.invalid
   private val result = new Array[Int](1)
   private val floatData = Macrogl.createFloatData(16)
+  private val locationCache = mutable.HashMap[String, Int]()
+    .withDefaultValue(gl.invalidUniformLocation)
 
   object uniform extends Dynamic {
     def location(varname: String) = {
+      val loc = locationCache(varname)
+      if (loc != gl.invalidUniformLocation) loc
+      else {
+        val loc = getLocationFromGpu(varname)
+        locationCache(varname) = loc
+        loc
+      }
+    }
+    private def getLocationFromGpu(varname: String) = {
       val loc = gl.getUniformLocation(token, varname)
       if (!gl.validUniformLocation(loc))
         throw new Program.Exception(

@@ -13,6 +13,14 @@ import js.Dynamic.{ global => g }
 // See https://github.com/scala-js/scala-js-dom/blob/master/src/main/scala/org/scalajs/dom/WebGL.scala for documentation
 // about the WebGL DOM for ScalaJS
 class Macrogl(implicit gl: dom.WebGLRenderingContext) {
+  val invalidUniformLocation = null
+  // Conversions algorithm taken from the official OpenGL ES 2.0 specifications (2.1.2)
+  val maxUint32: Long = 0xFFFFFFFFL
+  val maxUint32d: Double = maxUint32.toDouble // seems faster than Long for math operations in JavaScript
+  val maxUint16: Int = 0xFFFF
+  val maxUint16d: Double = maxUint16.toDouble
+  val maxUint8: Int = 0xFF
+  val maxUint8d: Double = maxUint8.toDouble
 
   /* public API */
   final def getWebGLRenderingContext(): dom.WebGLRenderingContext = gl
@@ -900,7 +908,7 @@ class Macrogl(implicit gl: dom.WebGLRenderingContext) {
   }
 
   final def validUniformLocation(uloc: Token.UniformLocation): Boolean = {
-    (uloc != null)
+    (uloc != invalidUniformLocation)
   }
 
   final def validFramebuffer(fb: Token.FrameBuffer): Boolean = {
@@ -1466,17 +1474,6 @@ private object JSTypeHelper {
     if (b) 1.0f
     else 0.0f
   }
-
-  // Conversions algorithm taken from the official OpenGL ES 2.0 specifications (2.1.2)
-
-  val maxUint32: Long = 0xFFFFFFFFL
-  val maxUint32d: Double = maxUint32.toDouble // seems faster than Long for math operations in JavaScript
-
-  val maxUint16: Int = 0xFFFF
-  val maxUint16d: Double = maxUint16.toDouble
-
-  val maxUint8: Int = 0xFF
-  val maxUint8d: Double = maxUint8.toDouble
 
   // From/To 32 bits values
 

@@ -8,6 +8,13 @@ import org.lwjgl.util.glu._
 
 
 class Macrogl() {
+  private val maxResultSize = 16
+  private val tmpByte = Macrogl.createByteData(maxResultSize)
+  private val tmpShort = Macrogl.createShortData(maxResultSize)
+  private val tmpInt = Macrogl.createIntData(maxResultSize)
+  private val tmpFloat = Macrogl.createFloatData(maxResultSize)
+  private val tmpDouble = Macrogl.createDoubleData(maxResultSize)
+  val invalidUniformLocation = -1
 
   /* public API */
   final def getWebGLRenderingContext(): Nothing =
@@ -788,13 +795,6 @@ class Macrogl() {
     GL11.glViewport(x, y, width, height)
   }
 
-  private val maxResultSize = 16
-  private val tmpByte = Macrogl.createByteData(maxResultSize)
-  private val tmpShort = Macrogl.createShortData(maxResultSize)
-  private val tmpInt = Macrogl.createIntData(maxResultSize)
-  private val tmpFloat = Macrogl.createFloatData(maxResultSize)
-  private val tmpDouble = Macrogl.createDoubleData(maxResultSize)
-
   // Helper methods
 
   final def checkError() {
@@ -840,7 +840,7 @@ class Macrogl() {
   }
 
   final def validUniformLocation(uloc: Token.UniformLocation): Boolean = {
-    (uloc != -1)
+    (uloc != invalidUniformLocation)
   }
 
   final def validFramebuffer(fb: Token.FrameBuffer): Boolean = {
