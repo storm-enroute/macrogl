@@ -63,30 +63,31 @@ package macrogl {
 
   object using {
     object ShaderProgram {
-      def foreach[U](f: Unit => U)(implicit gl: Macrogl): Unit = macro Macros.useProgram[U]
+      def foreach[U](f: Unit => U)(implicit gl: Macrogl): Unit =
+        macro Macros.useProgram[U]
     }
     object TextureObject {
-      def foreach[U](f: Unit => U)(implicit gl: Macrogl): Unit = macro Macros.useTexture[U]
+      def foreach[U](f: Unit => U)(implicit gl: Macrogl): Unit =
+        macro Macros.useTexture[U]
     }
     object RenderBufferObject {
-      def foreach[U](f: Unit => U)(implicit gl: Macrogl): Unit = macro Macros.useRenderBuffer[U]
+      def foreach[U](f: Unit => U)(implicit gl: Macrogl): Unit =
+        macro Macros.useRenderBuffer[U]
     }
     object FrameBufferObject {
-      def foreach[U](f: FrameBuffer.Binding => U)(implicit gl: Macrogl): Unit = macro Macros.useFrameBuffer[U]
+      def foreach[U](f: FrameBuffer.Binding => U)(implicit gl: Macrogl): Unit =
+        macro Macros.useFrameBuffer[U]
     }
-    object AttributeBufferObject {
-      def foreach[U](f: AttributeBuffer.Access => U)(implicit gl: Macrogl): Unit = macro AttributeBuffer.using[U]
-    }
-    object MeshBufferObject {
-      def foreach[U](f: MeshBuffer.Access => U)(implicit gl: Macrogl): Unit = macro MeshBuffer.using[U]
+    object VertexBufferObject {
+      def foreach[U](f: VertexBuffer.Access => U)(implicit gl: Macrogl): Unit =
+        macro VertexBuffer.using[U]
     }
 
     def program(p: Program) = ShaderProgram
     def texture(texnum: Int, t: Texture) = TextureObject
     def renderbuffer(rb: RenderBuffer) = RenderBufferObject
     def framebuffer(fb: FrameBuffer) = FrameBufferObject
-    def attributebuffer(mesh: AttributeBuffer) = AttributeBufferObject
-    def meshbuffer(mesh: MeshBuffer) = MeshBufferObject
+    def vertexbuffer(mesh: VertexBuffer) = VertexBufferObject
   }
 
   /* macros */

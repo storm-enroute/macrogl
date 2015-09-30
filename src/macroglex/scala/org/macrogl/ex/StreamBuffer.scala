@@ -9,12 +9,15 @@ import scala.collection._
 
 
 
-class StreamBuffer
-  (val copies: Int, val size: Int, val attributes: Int)(implicit gl: Macrogl)
-extends Handle {
+class StreamBuffer(
+  val copies: Int,
+  val size: Int,
+  val totalAttribs: Int,
+  val attribs: Array[(Int, Int)]
+)(implicit gl: Macrogl) extends Handle {
   private val buffers = new Array[AttributeBuffer](copies)
   for (i <- 0 until buffers.length) {
-    buffers(i) = new AttributeBuffer(Macroglex.STREAM_COPY, size, attributes)
+    buffers(i) = new AttributeBuffer(Macroglex.STREAM_COPY, size, totalAttribs, attribs)
   }
   private var last = 0
 
