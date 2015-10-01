@@ -9,7 +9,8 @@ import org.macrogl._
 object BasicLighting {
 
   def main(args: Array[String]) {
-    val contextAttributes = new ContextAttribs(3, 2).withForwardCompatible(true).withProfileCore(true)
+    val contextAttributes = new ContextAttribs(3, 2)
+      .withForwardCompatible(true).withProfileCore(true)
 
     Display.setDisplayMode(new DisplayMode(800, 600))
     Display.create(new PixelFormat, contextAttributes)
@@ -30,21 +31,27 @@ object BasicLighting {
     cfb.put(Cube.vertices)
     cfb.flip()
 
-    val vertexBuffer = new AttributeBuffer(GL15.GL_STATIC_DRAW, Cube.vertices.length / Cube.components, Cube.components)
+    val vertexBuffer = new AttributeBuffer(
+      GL15.GL_STATIC_DRAW, Cube.vertices.length / Cube.num_components,
+      Cube.num_components, Cube.components)
     vertexBuffer.acquire()
     vertexBuffer.send(0, cfb)
     val attrsCfg = Array((0, 3), (3, 3), (6, 3))
-    for (_ <- using.attributebuffer(vertexBuffer)) vertexBuffer.setAttributePointers(attrsCfg)
+    for (_ <- using.vertexbuffer(vertexBuffer))
+      vertexBuffer.setAttributePointers(attrsCfg)
 
     GL30.glBindVertexArray(0)
 
     val pp = new macrogl.Program("test")(
-      macrogl.Program.Shader.Vertex(Utils.readResource("/org/macrogl/examples/BasicLighting.vert")),
-      macrogl.Program.Shader.Fragment(Utils.readResource("/org/macrogl/examples/BasicLighting.frag")))
+      macrogl.Program.Shader.Vertex(
+        Utils.readResource("/org/macrogl/examples/BasicLighting.vert")),
+      macrogl.Program.Shader.Fragment(
+        Utils.readResource("/org/macrogl/examples/BasicLighting.frag")))
 
     pp.acquire()
 
-    val projectionTransform = Utils.perspectiveProjection(50, 800.0 / 600.0, 0.1, 100.0)
+    val projectionTransform =
+      Utils.perspectiveProjection(50, 800.0 / 600.0, 0.1, 100.0)
 
     val camera = new Utils.Camera(0, 0, 4)
     val cameraSpeed = 5.0
@@ -144,10 +151,12 @@ object BasicLighting {
         vertexBuffer.enableAttributeArrays(attrsCfg)
 
         pp.uniform.worldTransform = leftTransform
-        GL11.glDrawElements(GL11.GL_TRIANGLES, Cube.indices.length, GL11.GL_UNSIGNED_BYTE, 0)
+        GL11.glDrawElements(
+          GL11.GL_TRIANGLES, Cube.indices.length, GL11.GL_UNSIGNED_BYTE, 0)
 
         pp.uniform.worldTransform = rightTransform
-        GL11.glDrawElements(GL11.GL_TRIANGLES, Cube.indices.length, GL11.GL_UNSIGNED_BYTE, 0)
+        GL11.glDrawElements(
+          GL11.GL_TRIANGLES, Cube.indices.length, GL11.GL_UNSIGNED_BYTE, 0)
 
         vertexBuffer.disableAttributeArrays(attrsCfg)
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0)
@@ -202,8 +211,9 @@ object BasicLighting {
 
   // data
   object Cube {
-    val components = 9
-    val attributes = 3
+    val num_components = 9
+
+    val components = Array((0, 3), (3, 3), (6, 3))
 
     // position, normal, color
     val vertices = Array[Float](
