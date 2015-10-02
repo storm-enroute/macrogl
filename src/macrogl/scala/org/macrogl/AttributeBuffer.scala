@@ -94,10 +94,7 @@ class AttributeBuffer(
     while (i < attribs.length) {
       val byteOffset = attribs(i)._1 * gl.bytesPerFloat
       val num = attribs(i)._2
-      gl.checkError()
-      println(i, num, stride, byteOffset)
       gl.vertexAttribPointer(i, num, Macrogl.FLOAT, false, stride, byteOffset)
-      gl.checkError()
       i += 1
     }
   }

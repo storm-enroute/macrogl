@@ -14,13 +14,6 @@ import js.Dynamic.{ global => g }
 // about the WebGL DOM for ScalaJS
 class Macrogl(implicit gl: dom.WebGLRenderingContext) {
   val invalidUniformLocation = null
-  // Conversions algorithm taken from the official OpenGL ES 2.0 specifications (2.1.2)
-  val maxUint32: Long = 0xFFFFFFFFL
-  val maxUint32d: Double = maxUint32.toDouble // seems faster than Long for math operations in JavaScript
-  val maxUint16: Int = 0xFFFF
-  val maxUint16d: Double = maxUint16.toDouble
-  val maxUint8: Int = 0xFF
-  val maxUint8d: Double = maxUint8.toDouble
 
   /* public API */
   final def getWebGLRenderingContext(): dom.WebGLRenderingContext = gl
@@ -313,7 +306,7 @@ class Macrogl(implicit gl: dom.WebGLRenderingContext) {
     //val retArray = new Array[Token.Shader](jsArray.length.toInt)
     //jsArray.copyToArray(retArray)
     //retArray
-    jsArray
+    jsArray.toArray
   }
 
   final def getAttribLocation(program: Token.Program, name: String): Int = {
@@ -923,41 +916,43 @@ class Macrogl(implicit gl: dom.WebGLRenderingContext) {
     p1 != p2
   }
 
-  final def uniform2f(location: Token.UniformLocation, vec: org.macrogl.math.Vector2f): Unit = {
+  final def uniform2f(location: Token.UniformLocation, vec: org.macrogl.algebra.Vector2f): Unit = {
     this.uniform2f(location, vec.x, vec.y)
   }
 
-  final def uniform3f(location: Token.UniformLocation, vec: org.macrogl.math.Vector3f): Unit = {
+  final def uniform3f(location: Token.UniformLocation, vec: org.macrogl.algebra.Vector3f): Unit = {
     this.uniform3f(location, vec.x, vec.y, vec.z)
   }
 
-  final def uniform4f(location: Token.UniformLocation, vec: org.macrogl.math.Vector4f): Unit = {
+  final def uniform4f(location: Token.UniformLocation, vec: org.macrogl.algebra.Vector4f): Unit = {
     this.uniform4f(location, vec.x, vec.y, vec.z, vec.w)
   }
 
-  final def uniformMatrix2f(location: Token.UniformLocation, mat: org.macrogl.math.Matrix2f): Unit = {
+  final def uniformMatrix2f(location: Token.UniformLocation, mat: org.macrogl.algebra.Matrix2f): Unit = {
     this.tmpFloat.clear()
-    mat.store(this.tmpFloat, org.macrogl.math.ColumnMajor)
+    mat.store(this.tmpFloat, org.macrogl.algebra.ColumnMajor)
     this.tmpFloat.flip()
     this.uniformMatrix2fv(location, false, this.tmpFloat.slice)
   }
 
-  final def uniformMatrix3f(location: Token.UniformLocation, mat: org.macrogl.math.Matrix3f): Unit = {
+  final def uniformMatrix3f(location: Token.UniformLocation, mat: org.macrogl.algebra.Matrix3f): Unit = {
     this.tmpFloat.clear()
-    mat.store(this.tmpFloat, org.macrogl.math.ColumnMajor)
+    mat.store(this.tmpFloat, org.macrogl.algebra.ColumnMajor)
     this.tmpFloat.flip()
     this.uniformMatrix3fv(location, false, this.tmpFloat.slice)
   }
 
-  final def uniformMatrix4f(location: Token.UniformLocation, mat: org.macrogl.math.Matrix4f): Unit = {
+  final def uniformMatrix4f(location: Token.UniformLocation, mat: org.macrogl.algebra.Matrix4f): Unit = {
     this.tmpFloat.clear()
-    mat.store(this.tmpFloat, org.macrogl.math.ColumnMajor)
+    mat.store(this.tmpFloat, org.macrogl.algebra.ColumnMajor)
     this.tmpFloat.flip()
     this.uniformMatrix4fv(location, false, this.tmpFloat.slice)
   }
 }
 
 private object JSTypeHelper {
+  import Macrogl._
+
   def toBoolean(value: js.Any): Boolean = {
     val typeName = org.scalajs.nio.JsUtils.typeName(value)
     typeName match {
@@ -1589,6 +1584,14 @@ private object JSTypeHelper {
 
 
 object Macrogl {
+
+  // Conversions algorithm taken from the official OpenGL ES 2.0 specifications (2.1.2)
+  val maxUint32: Long = 0xFFFFFFFFL
+  val maxUint32d: Double = maxUint32.toDouble // seems faster than Long for math operations in JavaScript
+  val maxUint16: Int = 0xFFFF
+  val maxUint16d: Double = maxUint16.toDouble
+  val maxUint8: Int = 0xFF
+  val maxUint8d: Double = maxUint8.toDouble
 
   /* public API - constants */
 

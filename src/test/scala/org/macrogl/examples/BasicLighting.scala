@@ -34,7 +34,6 @@ object BasicLighting {
     indexBuffer.send(0, ibb)
 
     val vao = GL30.glGenVertexArrays()
-    GL30.glBindVertexArray(vao)
 
     val pp = new macrogl.Program("test")(
       macrogl.Program.Shader.Vertex(

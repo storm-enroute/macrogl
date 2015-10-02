@@ -12,7 +12,7 @@ extends Handle {
   private var ptoken = Token.Program.invalid
   private val result = new Array[Int](1)
   private val floatData = Macrogl.createFloatData(16)
-  private val locationCache = mutable.HashMap[String, Int]()
+  private val locationCache = mutable.HashMap[String, Token.UniformLocation]()
     .withDefaultValue(gl.invalidUniformLocation)
 
   object uniform extends Dynamic {

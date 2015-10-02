@@ -44,9 +44,7 @@ extends Handle {
   object access extends IndexBuffer.Access {
     def render(mode: Int, vertexBuffer: VertexBuffer) {
       try {
-        println("render!")
         vertexBuffer.enableForRender()
-        gl.checkError()
         gl.drawElements(mode, totalIndices, Macrogl.UNSIGNED_INT, 0)
       } finally {
         vertexBuffer.disableForRender()
