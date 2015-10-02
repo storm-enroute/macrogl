@@ -37,8 +37,8 @@ object BasicLighting {
     vertexBuffer.acquire()
     vertexBuffer.send(0, cfb)
     val attrsCfg = Array((0, 3), (3, 3), (6, 3))
-    for (_ <- using.vertexbuffer(vertexBuffer))
-      vertexBuffer.setAttributePointers(attrsCfg)
+    // for (_ <- using.vertexbuffer(vertexBuffer))
+    //   vertexBuffer.setAttributePointers(attrsCfg)
 
     GL30.glBindVertexArray(0)
 
@@ -148,7 +148,7 @@ object BasicLighting {
         GL30.glBindVertexArray(vao)
 
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, indexBuffer)
-        vertexBuffer.enableAttributeArrays(attrsCfg)
+        // vertexBuffer.enableAttributeArrays(attrsCfg)
 
         pp.uniform.worldTransform = leftTransform
         GL11.glDrawElements(
@@ -158,7 +158,7 @@ object BasicLighting {
         GL11.glDrawElements(
           GL11.GL_TRIANGLES, Cube.indices.length, GL11.GL_UNSIGNED_BYTE, 0)
 
-        vertexBuffer.disableAttributeArrays(attrsCfg)
+        // vertexBuffer.disableAttributeArrays(attrsCfg)
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0)
 
         GL30.glBindVertexArray(0)

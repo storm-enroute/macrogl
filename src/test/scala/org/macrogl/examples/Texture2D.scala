@@ -13,98 +13,98 @@ object Texture2D {
   var minFilter = GL11.GL_NEAREST
 
   def main(args: Array[String]) {
-    val contextAttributes = new ContextAttribs(3, 2).withForwardCompatible(true).withProfileCore(true)
+    // val contextAttributes = new ContextAttribs(3, 2).withForwardCompatible(true).withProfileCore(true)
 
-    Display.setDisplayMode(new DisplayMode(800, 600))
-    Display.create(new PixelFormat, contextAttributes)
+    // Display.setDisplayMode(new DisplayMode(800, 600))
+    // Display.create(new PixelFormat, contextAttributes)
 
-    val vao = GL30.glGenVertexArrays()
-    GL30.glBindVertexArray(vao)
+    // val vao = GL30.glGenVertexArrays()
+    // GL30.glBindVertexArray(vao)
 
-    val vertices = Array(
-      -0.5f, 0.5f, 0.0f, 0.0f, 0.0f,
-      -0.5f, -0.5f, 0.0f, 0.0f, texCoord,
-      0.5f, 0.5f, 0.0f, texCoord, 0.0f)
+    // val vertices = Array(
+    //   -0.5f, 0.5f, 0.0f, 0.0f, 0.0f,
+    //   -0.5f, -0.5f, 0.0f, 0.0f, texCoord,
+    //   0.5f, 0.5f, 0.0f, texCoord, 0.0f)
 
-    val fb = BufferUtils.createFloatBuffer(vertices.length)
-    fb.put(vertices)
-    fb.flip()
+    // val fb = BufferUtils.createFloatBuffer(vertices.length)
+    // fb.put(vertices)
+    // fb.flip()
 
-    val mb = new AttributeBuffer(GL15.GL_DYNAMIC_DRAW, 3, 5)
-    mb.acquire()
-    mb.send(0, fb)
+    // val mb = new AttributeBuffer(GL15.GL_DYNAMIC_DRAW, 3, 5)
+    // mb.acquire()
+    // mb.send(0, fb)
 
-    val textureSize = 16
+    // val textureSize = 16
 
-    val ab = new scala.collection.mutable.ArrayBuilder.ofByte
-    for {
-      i <- 0 until textureSize
-      j <- 0 until textureSize
-    } {
-      val half = textureSize / 2
-      val black = (i < half && j < half) || (i >= half && j >= half)
-      ab ++= { if (black) Seq(0, 0, 0) else Seq(0xFF.toByte, 0xFF.toByte, 0xFF.toByte) }
-    }
-    val textureData = ab.result
+    // val ab = new scala.collection.mutable.ArrayBuilder.ofByte
+    // for {
+    //   i <- 0 until textureSize
+    //   j <- 0 until textureSize
+    // } {
+    //   val half = textureSize / 2
+    //   val black = (i < half && j < half) || (i >= half && j >= half)
+    //   ab ++= { if (black) Seq(0, 0, 0) else Seq(0xFF.toByte, 0xFF.toByte, 0xFF.toByte) }
+    // }
+    // val textureData = ab.result
 
-    val textureBuffer = BufferUtils.createByteBuffer(textureData.length)
-    textureBuffer.put(textureData)
-    textureBuffer.flip()
+    // val textureBuffer = BufferUtils.createByteBuffer(textureData.length)
+    // textureBuffer.put(textureData)
+    // textureBuffer.flip()
 
-    val texture = Texture(GL11.GL_TEXTURE_2D) { tex =>
-      tex.allocateImage2D(0, GL11.GL_RGB, textureSize, textureSize, 0, GL11.GL_RGB, GL11.GL_UNSIGNED_BYTE, textureBuffer)
+    // val texture = Texture(GL11.GL_TEXTURE_2D) { tex =>
+    //   tex.allocateImage2D(0, GL11.GL_RGB, textureSize, textureSize, 0, GL11.GL_RGB, GL11.GL_UNSIGNED_BYTE, textureBuffer)
 
-      tex.wrapS = wrapS
-      tex.magFilter = magFilter
-      tex.minFilter = minFilter
-    }
+    //   tex.wrapS = wrapS
+    //   tex.magFilter = magFilter
+    //   tex.minFilter = minFilter
+    // }
 
-    texture.acquire()
+    // texture.acquire()
 
-    def readResource(path: String) = io.Source.fromURL(getClass.getResource(path)).mkString
+    // def readResource(path: String) = io.Source.fromURL(getClass.getResource(path)).mkString
 
-    val pp = new Program("test")(
-      Program.Shader.Vertex(readResource("/org/macrogl/examples/Texture2D.vert")),
-      Program.Shader.Fragment(readResource("/org/macrogl/examples/Texture2D.frag")))
+    // val pp = new Program("test")(
+    //   Program.Shader.Vertex(readResource("/org/macrogl/examples/Texture2D.vert")),
+    //   Program.Shader.Fragment(readResource("/org/macrogl/examples/Texture2D.frag")))
 
-    pp.acquire()
+    // pp.acquire()
 
-    val attr = Array((0, 3), (3, 2))
+    // val attr = Array((0, 3), (3, 2))
 
-    while (!Display.isCloseRequested) {
-      val stateChanged = processInput()
-      if (stateChanged) {
-        vertices(9) = texCoord
-        vertices(13) = texCoord
-        fb.put(vertices)
-        fb.flip()
-        mb.send(0, fb)
+    // while (!Display.isCloseRequested) {
+    //   val stateChanged = processInput()
+    //   if (stateChanged) {
+    //     vertices(9) = texCoord
+    //     vertices(13) = texCoord
+    //     fb.put(vertices)
+    //     fb.flip()
+    //     mb.send(0, fb)
 
-        texture.wrapS = wrapS
-        texture.minFilter = minFilter
-        texture.magFilter = magFilter
-      }
+    //     texture.wrapS = wrapS
+    //     texture.minFilter = minFilter
+    //     texture.magFilter = magFilter
+    //   }
 
-      for {
-        _ <- using.program(pp)
-        _ <- using.texture(GL13.GL_TEXTURE0, texture)
-        acc <- using.attributebuffer(mb)
-      } {
-        GL11.glClearColor(0.0f, 0.64f, 0.91f, 1.0f)
-        raster.clear(GL11.GL_COLOR_BUFFER_BIT)
+    //   for {
+    //     _ <- using.program(pp)
+    //     _ <- using.texture(GL13.GL_TEXTURE0, texture)
+    //     acc <- using.attributebuffer(mb)
+    //   } {
+    //     GL11.glClearColor(0.0f, 0.64f, 0.91f, 1.0f)
+    //     raster.clear(GL11.GL_COLOR_BUFFER_BIT)
 
-        pp.uniform.testTexture = 0
+    //     pp.uniform.testTexture = 0
 
-        acc.render(GL11.GL_TRIANGLES, attr)
-      }
+    //     acc.render(GL11.GL_TRIANGLES, attr)
+    //   }
 
-      Display.update()
-    }
+    //   Display.update()
+    // }
 
-    pp.release()
-    texture.release()
-    mb.release()
-    Display.destroy()
+    // pp.release()
+    // texture.release()
+    // mb.release()
+    // Display.destroy()
   }
   def processInput(): Boolean = {
     var stateChanged = false
