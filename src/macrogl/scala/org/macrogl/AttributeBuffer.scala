@@ -60,11 +60,11 @@ class AttributeBuffer(
     gl.bindBuffer(Macrogl.ARRAY_BUFFER, Token.Buffer.none)
   }
 
-  private def enableAttributeArrays(): Unit = {
+  def enableAttributeArrays(): Unit = {
     enableAttributeArrays(attributes)
   }
 
-  private def disableAttributeArrays(): Unit = {
+  def disableAttributeArrays(): Unit = {
     disableAttributeArrays(attributes)
   }
 
@@ -84,25 +84,29 @@ class AttributeBuffer(
     }
   }
 
-  private def setAttributePointers(): Unit = {
+  def setAttributePointers(): Unit = {
     setAttributePointers(attributes)
   }
 
-  private def setAttributePointers(attribs: Array[(Int, Int)]): Unit = {
+  def setAttributePointers(attribs: Array[(Int, Int)]): Unit = {
     val stride = totalAttributes * gl.bytesPerFloat
     var i = 0
     while (i < attribs.length) {
       val byteOffset = attribs(i)._1 * gl.bytesPerFloat
       val num = attribs(i)._2
-      gl.vertexAttribPointer(
-        i, num, Macrogl.FLOAT, false, stride, byteOffset)
+      gl.checkError()
+      println(i, num, stride, byteOffset)
+      gl.vertexAttribPointer(i, num, Macrogl.FLOAT, false, stride, byteOffset)
+      gl.checkError()
       i += 1
     }
   }
 
   def enableForRender(): Unit = {
     enableAttributeArrays()
+    gl.checkError()
     setAttributePointers()
+    gl.checkError()
   }
 
   def disableForRender(): Unit = {

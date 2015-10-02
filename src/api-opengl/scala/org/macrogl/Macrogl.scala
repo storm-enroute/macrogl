@@ -780,14 +780,19 @@ class Macrogl() {
   }
 
   /*
-   * Method vertexAttribPointer with signature glVertexAttribPointer(int index, int size, boolean normalized,
-   * int stride, *Buffer buffer) discarded
+   * Method vertexAttribPointer with signature:
+   * 
+   *     glVertexAttribPointer(int index, int size, boolean normalized,
+   *     int stride, *Buffer buffer) discarded
+   * 
    * Reason: not available in the API WebGL
    * Note: available in the API GLES20 of Android
-   * Note: the following available method requires the use of an array buffer currently bound to ARRAY_BUFFER
+   * Note: the following available method requires the use of an array buffer currently
+   * bound to ARRAY_BUFFER.
    */
 
-  final def vertexAttribPointer(index: Int, size: Int, `type`: Int, normalized: Boolean, stride: Int, offset: Long) = {
+  final def vertexAttribPointer(index: Int, size: Int, `type`: Int, normalized: Boolean,
+    stride: Int, offset: Long) = {
     GL20.glVertexAttribPointer(index, size, `type`, normalized, stride, offset)
   }
 

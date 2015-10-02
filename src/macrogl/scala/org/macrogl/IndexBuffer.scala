@@ -44,8 +44,10 @@ extends Handle {
   object access extends IndexBuffer.Access {
     def render(mode: Int, vertexBuffer: VertexBuffer) {
       try {
+        println("render!")
         vertexBuffer.enableForRender()
-        gl.drawElements(mode, 0, totalIndices, Macrogl.UNSIGNED_INT)
+        gl.checkError()
+        gl.drawElements(mode, totalIndices, Macrogl.UNSIGNED_INT, 0)
       } finally {
         vertexBuffer.disableForRender()
       }
@@ -72,10 +74,10 @@ object IndexBuffer {
 
     val r = reify {
       val m = (c.Expr[IndexBuffer](mesh)).splice
-      gl.splice.bindBuffer(Macrogl.ARRAY_BUFFER, m.token)
+      gl.splice.bindBuffer(Macrogl.ELEMENT_ARRAY_BUFFER, m.token)
       try f.splice(m.access)
       finally {
-        gl.splice.bindBuffer(Macrogl.ARRAY_BUFFER, Token.Buffer.none)
+        gl.splice.bindBuffer(Macrogl.ELEMENT_ARRAY_BUFFER, Token.Buffer.none)
       }
       ()
     }

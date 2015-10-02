@@ -15,17 +15,9 @@ object BasicLighting {
     Display.setDisplayMode(new DisplayMode(800, 600))
     Display.create(new PixelFormat, contextAttributes)
 
-    val ibb = BufferUtils.createByteBuffer(Cube.indices.length)
+    val ibb = BufferUtils.createIntBuffer(Cube.indices.length)
     ibb.put(Cube.indices)
     ibb.flip()
-
-    val indexBuffer = GL15.glGenBuffers()
-    GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, indexBuffer)
-    GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, ibb, GL15.GL_STATIC_DRAW)
-    GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0)
-
-    val vao = GL30.glGenVertexArrays()
-    GL30.glBindVertexArray(vao)
 
     val cfb = BufferUtils.createFloatBuffer(Cube.vertices.length)
     cfb.put(Cube.vertices)
@@ -36,11 +28,13 @@ object BasicLighting {
       Cube.num_components, Cube.components)
     vertexBuffer.acquire()
     vertexBuffer.send(0, cfb)
-    val attrsCfg = Array((0, 3), (3, 3), (6, 3))
-    // for (_ <- using.vertexbuffer(vertexBuffer))
-    //   vertexBuffer.setAttributePointers(attrsCfg)
 
-    GL30.glBindVertexArray(0)
+    val indexBuffer = new IndexBuffer(GL15.GL_STATIC_DRAW, Cube.indices.length)
+    indexBuffer.acquire()
+    indexBuffer.send(0, ibb)
+
+    val vao = GL30.glGenVertexArrays()
+    GL30.glBindVertexArray(vao)
 
     val pp = new macrogl.Program("test")(
       macrogl.Program.Shader.Vertex(
@@ -58,8 +52,6 @@ object BasicLighting {
 
     var dtSeconds = 0.0
     var prevTime = System.currentTimeMillis
-
-    Mouse.setGrabbed(true)
 
     val leftTransform = new macrogl.ex.Matrix.Plain(
       Array[Double](
@@ -139,38 +131,32 @@ object BasicLighting {
       rightTransform.array(10) = c
 
       // draw
-      for (_ <- using.program(pp)) {
-        GL11.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
-        raster.clear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT)
+      GL30.glBindVertexArray(vao)
+      val gl = implicitly[Macrogl]
+      for {
+        _ <- using.program(pp)
+        _ <- using.vertexbuffer(vertexBuffer)
+        b <- using.indexbuffer(indexBuffer)
+      } {
+        gl.checkError()
+        gl.clearColor(0.0f, 0.0f, 0.0f, 1.0f)
+        raster.clear(Macrogl.COLOR_BUFFER_BIT | Macrogl.DEPTH_BUFFER_BIT)
 
         pp.uniform.viewTransform = camera.transform
-
-        GL30.glBindVertexArray(vao)
-
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, indexBuffer)
-        // vertexBuffer.enableAttributeArrays(attrsCfg)
-
         pp.uniform.worldTransform = leftTransform
-        GL11.glDrawElements(
-          GL11.GL_TRIANGLES, Cube.indices.length, GL11.GL_UNSIGNED_BYTE, 0)
+        b.render(Macrogl.TRIANGLES, vertexBuffer)
 
         pp.uniform.worldTransform = rightTransform
-        GL11.glDrawElements(
-          GL11.GL_TRIANGLES, Cube.indices.length, GL11.GL_UNSIGNED_BYTE, 0)
-
-        // vertexBuffer.disableAttributeArrays(attrsCfg)
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0)
-
-        GL30.glBindVertexArray(0)
+        b.render(Macrogl.TRIANGLES, vertexBuffer)
       }
+      GL30.glBindVertexArray(0)
 
       Display.update()
     }
 
     pp.release()
     vertexBuffer.release()
-    GL30.glDeleteVertexArrays(vao)
-    GL15.glDeleteBuffers(indexBuffer)
+    indexBuffer.release()
     Display.destroy()
   }
 
@@ -248,7 +234,7 @@ object BasicLighting {
       1.0f, -1.0f, -1.0f, 1, 0, 0, 0, 1, 1,
       1.0f, -1.0f, 1.0f, 1, 0, 0, 0, 1, 1)
 
-    val indices = Array[Byte](
+    val indices = Array[Int](
       // bottom
       0, 1, 2, 1, 3, 2,
       // top

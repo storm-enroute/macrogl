@@ -12,7 +12,7 @@ uniform mat4 viewTransform;
 uniform mat4 worldTransform;
 
 void main() {
-    gl_Position = projection * viewTransform * worldTransform * vec4(position, 1.0);
-    fragColor  = color;
-    fragNormal = normal;
+  gl_Position = projection * viewTransform * worldTransform * vec4(position, 1.0);
+  fragColor  = color;
+  fragNormal = normal;
 }
