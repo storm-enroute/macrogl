@@ -10,7 +10,7 @@ import org.macrogl.examples.backend.common._
 
 /**
  * Framework for the examples using the WebGL back end
- * All 5 demos should be visible at the page backend-examples-webgl/index.html
+ * Demos should be visible at the page backend-examples-webgl/index.html
  */
 @JSExport
 object WebglExamples {
@@ -35,20 +35,18 @@ object WebglExamples {
         val canvas = g.document.getElementById(canvasName)
         canvas.width = width
         canvas.height = height
-        var gl = canvas.getContext("webgl").asInstanceOf[dom.WebGLRenderingContext]
-        if (gl == null) gl = canvas.getContext("experimental-webgl").asInstanceOf[dom.WebGLRenderingContext]
-        if (gl == null) throw new RuntimeException("WebGL not supported")
-        new Macrogl()(gl)
+        var gl = canvas.getContext("webgl")
+        if (gl == null)
+          gl = canvas.getContext("experimental-webgl")
+        if (gl == null)
+          throw new RuntimeException("WebGL not supported")
+        new Macrogl()(gl.asInstanceOf[dom.WebGLRenderingContext])
       }
 
       myInit _
     }
 
-    new BasicTriangle(width, height, myPrint, myUpdate, customInit("canvas-triangle"), myClose).start()
-    new BasicTexture(width, height, myPrint, myUpdate, customInit("canvas-texture"), myClose).start()
-    new BasicProjection3D(width, height, myPrint, myUpdate, customInit("canvas-projection"), myClose).start()
-    new BasicFractal3D(width, height, myPrint, myUpdate, customInit("canvas-fractale"), myClose).start()
-    new BasicRenderToTexture(width, height, myPrint, myUpdate, customInit("canvas-renderToTexture"), myClose).start()
-    new BasicMesh(width, height, myPrint, myUpdate, customInit("canvas-mesh"), myClose).start()
+    new BasicTriangle(width, height, myPrint, myUpdate, customInit("canvas-triangle"),
+      myClose).start()
   }
 }

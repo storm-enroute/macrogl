@@ -460,7 +460,7 @@ object Matrix3f {
   }
 
   def setRotation2D(angle: Float, dst: Matrix3f): Unit = {
-    val radAngle = Utils.degToRad(angle)
+    val radAngle = degToRad(angle)
 
     val c = Math.cos(radAngle).toFloat
     val s = Math.sin(radAngle).toFloat
@@ -534,7 +534,7 @@ object Matrix3f {
   }
 
   def setRotation3D(angle: Float, axis: Vector3f, dst: Matrix3f): Unit = {
-    val radAngle = Utils.degToRad(angle)
+    val radAngle = degToRad(angle)
 
     val c = Math.cos(radAngle).toFloat
     val s = Math.sin(radAngle).toFloat
