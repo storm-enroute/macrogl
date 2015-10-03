@@ -20,6 +20,18 @@ class Macroglex private[macrogl] () extends Macrogl() {
 
   // Moved from Macrogl
 
+  final def createVertexArray(): Token.VertexArray = {
+    GL30.glGenVertexArrays()
+  }
+
+  final def bindVertexArray(vao: Token.VertexArray) = {
+    GL30.glBindVertexArray(vao)
+  }
+
+  final def deleteVertexArray(vao: Token.VertexArray) = {
+    GL30.glDeleteVertexArrays(vao)
+  }
+
   final def getBufferSubData(target: Int, offset: Long, data: Data.Byte) {
     GL15.glGetBufferSubData(target, offset, data)
   }

@@ -29,11 +29,9 @@ object BasicLighting {
     vertexBuffer.acquire()
     vertexBuffer.send(0, cfb)
 
-    val indexBuffer = new IndexBuffer(GL15.GL_STATIC_DRAW, Cube.indices.length)
+    val indexBuffer = new ex.IndexBuffer(GL15.GL_STATIC_DRAW, Cube.indices.length)
     indexBuffer.acquire()
     indexBuffer.send(0, ibb)
-
-    val vao = GL30.glGenVertexArrays()
 
     val pp = new macrogl.Program("test")(
       macrogl.Program.Shader.Vertex(
@@ -130,12 +128,11 @@ object BasicLighting {
       rightTransform.array(10) = c
 
       // draw
-      GL30.glBindVertexArray(vao)
       val gl = implicitly[Macrogl]
       for {
         _ <- using.program(pp)
         _ <- using.vertexbuffer(vertexBuffer)
-        b <- using.indexbuffer(indexBuffer)
+        b <- ex.using.indexbuffer(indexBuffer)
       } {
         gl.checkError()
         gl.clearColor(0.0f, 0.0f, 0.0f, 1.0f)
@@ -148,7 +145,6 @@ object BasicLighting {
         pp.uniform.worldTransform = rightTransform
         b.render(Macrogl.TRIANGLES, vertexBuffer)
       }
-      GL30.glBindVertexArray(0)
 
       Display.update()
     }

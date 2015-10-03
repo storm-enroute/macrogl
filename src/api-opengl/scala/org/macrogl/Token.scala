@@ -14,6 +14,12 @@ object Token {
     val none: Buffer = 0
   }
 
+  type VertexArray = Int
+
+  object VertexArray {
+    val none: VertexArray = 0
+  }
+
   type Program = Int
 
   object Program {

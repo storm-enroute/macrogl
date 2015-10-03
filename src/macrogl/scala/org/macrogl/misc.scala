@@ -82,17 +82,12 @@ package macrogl {
       def foreach[U](f: VertexBuffer.Access => U)(implicit gl: Macrogl): Unit =
         macro VertexBuffer.using[U]
     }
-    object IndexBufferObject {
-      def foreach[U](f: IndexBuffer.Access => U)(implicit gl: Macrogl): Unit =
-        macro IndexBuffer.using[U]
-    }
 
     def program(p: Program) = ShaderProgram
     def texture(texnum: Int, t: Texture) = TextureObject
     def renderbuffer(rb: RenderBuffer) = RenderBufferObject
     def framebuffer(fb: FrameBuffer) = FrameBufferObject
     def vertexbuffer(mesh: VertexBuffer) = VertexBufferObject
-    def indexbuffer(mesh: IndexBuffer) = IndexBufferObject
   }
 
   /* macros */

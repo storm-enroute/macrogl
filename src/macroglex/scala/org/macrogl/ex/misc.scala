@@ -52,8 +52,13 @@ package ex {
       def foreach[U](f: Unit => U)(implicit gl: Macroglex): Unit =
         macro Macros.useMatrix[U]
     }
+    object IndexBufferObject {
+      def foreach[U](f: IndexBuffer.Access => U)(implicit gl: Macroglex): Unit =
+        macro ex.IndexBuffer.using[U]
+    }
 
     def matrix(m: Matrix) = TransformationMatrix
+    def indexbuffer(mesh: IndexBuffer) = IndexBufferObject
   }
 
   object Macros {
