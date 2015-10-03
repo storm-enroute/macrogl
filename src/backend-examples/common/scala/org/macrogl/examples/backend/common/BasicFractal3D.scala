@@ -4,18 +4,20 @@ import org.macrogl
 import org.macrogl.{ Macrogl => GL }
 import org.macrogl.using
 
-import org.macrogl.math._
+import org.macrogl.algebra._
 
 /**
  * Basic example to try depth-testing
  */
-class BasicFractale3D(width: Int, height: Int, print: String => Unit, systemUpdate: () => Boolean,
+class BasicFractal3D(
+  width: Int, height: Int, print: String => Unit, systemUpdate: () => Boolean,
   systemInit: () => macrogl.Macrogl, systemClose: () => Unit)
   extends DemoRenderable {
 
-  class BasicFractale3DListener extends org.macrogl.FrameListener {
+  class BasicFractal3DListener extends org.macrogl.FrameListener {
     // (continue, render, close)
-    var funcs: Option[(() => Boolean, org.macrogl.FrameEvent => Unit, () => Unit)] = None
+    var funcs: Option[(() => Boolean, org.macrogl.FrameEvent => Unit, () => Unit)] =
+      None
 
     def init(): Unit = {
       print("Basic Fractale3D: init")
@@ -71,8 +73,10 @@ class BasicFractale3D(width: Int, height: Int, print: String => Unit, systemUpda
       def drawTriangle(cX: Float, cY: Float, cZ: Float, r: Float): Unit = {
         val top = cY + r
         vertexBufferData.put(cX).put(top).put(cZ)
-        vertexBufferData.put(cX * cos120 - top * sin120).put(cX * sin120 + top * cos120).put(cZ)
-        vertexBufferData.put(cX * cos240 - top * sin240).put(cX * sin240 + top * cos240).put(cZ)
+        vertexBufferData.put(cX * cos120 - top * sin120).put(cX * sin120 + top * cos120)
+          .put(cZ)
+        vertexBufferData.put(cX * cos240 - top * sin240).put(cX * sin240 + top * cos240)
+          .put(cZ)
         colorBufferData.put(0f).put(0f).put(0f)
         colorBufferData.put(0f).put(0f).put(0f)
         colorBufferData.put(0f).put(0f).put(1f / cZ)
@@ -80,7 +84,8 @@ class BasicFractale3D(width: Int, height: Int, print: String => Unit, systemUpda
 
       def recursiveTriangles(n: Integer): Unit = {
         drawTriangle(0f, 0f, 2f / n.toFloat, 3f / n.toFloat)
-        indicesBufferData.put((3 * n - 3).toShort).put((3 * n - 2).toShort).put((3 * n - 1).toShort)
+        indicesBufferData.put((3 * n - 3).toShort).put((3 * n - 2).toShort)
+          .put((3 * n - 1).toShort)
         if (n > 2)
           recursiveTriangles(n - 1)
       }
@@ -91,10 +96,11 @@ class BasicFractale3D(width: Int, height: Int, print: String => Unit, systemUpda
       colorBufferData.rewind
       indicesBufferData.rewind
 
-      val vertexBuffer = new macrogl.AttributeBuffer(GL.STATIC_DRAW, vertexBufferData.remaining() / 3, 3)
+      val vertexBuffer =
+        new macrogl.AttributeBuffer(GL.STATIC_DRAW, vertexBufferData.remaining() / 3, 3)
       vertexBuffer.acquire()
       vertexBuffer.send(0, vertexBufferData)
-      for (_ <- using attributebuffer (vertexBuffer)) {
+      for (_ <- using.vertexbuffer(vertexBuffer)) {
         val vertexAttrsLocs = Array(mgl.getAttribLocation(pp.token, "position"))
         val vertexAttrsCfg = Array((0, 3))
 
@@ -104,10 +110,11 @@ class BasicFractale3D(width: Int, height: Int, print: String => Unit, systemUpda
         vertexBuffer.setAttributePointers()
       }
 
-      val colorBuffer = new macrogl.AttributeBuffer(GL.STATIC_DRAW, colorBufferData.remaining() / 3, 3)
+      val colorBuffer =
+        new macrogl.AttributeBuffer(GL.STATIC_DRAW, colorBufferData.remaining() / 3, 3)
       colorBuffer.acquire()
       colorBuffer.send(0, colorBufferData)
-      for (_ <- using attributebuffer (colorBuffer)) {
+      for (_ <- using.vertexbuffer(colorBuffer)) {
         val colorAttrsLocs = Array(mgl.getAttribLocation(pp.token, "color"))
         val colorAttrsCfg = Array((0, 3))
 
@@ -163,7 +170,8 @@ class BasicFractale3D(width: Int, height: Int, print: String => Unit, systemUpda
           pp.uniform.transform = transformStack.current
 
           mgl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indicesBuffer)
-          mgl.drawElements(GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
+          mgl.drawElements(
+            GL.TRIANGLES, indicesBufferData.remaining, GL.UNSIGNED_SHORT, 0)
 
           colorBuffer.disableAttributeArrays()
           vertexBuffer.disableAttributeArrays()
@@ -214,6 +222,6 @@ class BasicFractale3D(width: Int, height: Int, print: String => Unit, systemUpda
   }
 
   def start(): Unit = {
-    org.macrogl.Utils.startFrameListener(new BasicFractale3DListener)
+    org.macrogl.Utils.startFrameListener(new BasicFractal3DListener)
   }
 }

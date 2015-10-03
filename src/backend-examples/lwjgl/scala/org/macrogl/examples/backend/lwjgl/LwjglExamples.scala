@@ -51,7 +51,7 @@ object LwjglExamples {
       case "1" => new BasicTriangle(width, height, myPrint, myUpdate, customInit(2, 1), myClose)
       case "2" => new BasicTexture(width, height, myPrint, myUpdate, customInit(2, 1), myClose)
       case "3" => new BasicProjection3D(width, height, myPrint, myUpdate, customInit(2, 1), myClose)
-      case "4" => new BasicFractale3D(width, height, myPrint, myUpdate, customInit(2, 1), myClose)
+      case "4" => new BasicFractal3D(width, height, myPrint, myUpdate, customInit(2, 1), myClose)
       case "5" => new BasicRenderToTexture(width, height, myPrint, myUpdate, customInit(3, 0), myClose)
       case "6" => new BasicMesh(width, height, myPrint, myUpdate, customInit(2, 1), myClose)
       case _ => {
