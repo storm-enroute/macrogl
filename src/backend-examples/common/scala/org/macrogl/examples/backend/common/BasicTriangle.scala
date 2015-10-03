@@ -52,7 +52,8 @@ class BasicTriangle(
       indicesBufferData.put(0.toShort).put(1.toShort).put(2.toShort)
       indicesBufferData.rewind
 
-      val triangleColor = new Vector3f(0, 0.25f, 0.5f)
+      var color = 0.0
+      val triangleColor = new Vector3f(0, 0, 0.5f)
 
       // General OpenGL
       mgl.viewport(0, 0, width, height)
@@ -86,9 +87,8 @@ class BasicTriangle(
           b.render(Macrogl.TRIANGLES)
         }
 
-        triangleColor(0) = ((triangleColor(0) + 0.01) % 1.00).toFloat
-        triangleColor(1) = ((triangleColor(1) + 0.01) % 1.00).toFloat
-        triangleColor(2) = ((triangleColor(2) + 0.01) % 1.00).toFloat
+        color += 0.01
+        triangleColor(2) = math.abs(color % 2.0 - 1.0).toFloat
         continueCondition = systemUpdate()
       }
 
