@@ -38,14 +38,18 @@ object MacroGLBuild extends MechaRepoBuild {
       "-feature"
     ),
     scalaSource in Compile := baseDirectory.value / "src" / "macrogl" / "scala",
-    unmanagedSourceDirectories in Compile += baseDirectory.value / "src" / "api-opengl" / "scala",
-    unmanagedSourceDirectories in Compile += baseDirectory.value / "src" / "macroglex" / "scala",
+    unmanagedSourceDirectories in Compile +=
+      baseDirectory.value / "src" / "api-opengl" / "scala",
+    unmanagedSourceDirectories in Compile +=
+      baseDirectory.value / "src" / "macroglex" / "scala",
     libraryDependencies <+= scalaVersion { sv =>
       "org.scala-lang" % "scala-compiler" % sv
     },
     resolvers ++= Seq(
-      "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
-      "Sonatype OSS Releases" at "https://oss.sonatype.org/content/repositories/releases"
+      "Sonatype OSS Snapshots" at
+        "https://oss.sonatype.org/content/repositories/snapshots",
+      "Sonatype OSS Releases" at
+        "https://oss.sonatype.org/content/repositories/releases"
     ),
     publishMavenStyle := true,
     publishTo <<= version { (v: String) =>
@@ -80,7 +84,9 @@ object MacroGLBuild extends MechaRepoBuild {
     mechaPublishKey := { publish.value },
     mechaDocsRepoKey := "git@github.com:storm-enroute/apidocs.git",
     mechaDocsBranchKey := "gh-pages",
-    mechaDocsPathKey := "macrogl"
+    mechaDocsPathKey := "macrogl",
+    mechaNightlyKey <<=
+      mechaNightlyKey.dependsOn(mechaNightlyKey in backendExamplesWebgl)
   )
   
   lazy val macrogl: Project = Project(
@@ -104,12 +110,14 @@ object MacroGLBuild extends MechaRepoBuild {
       "-feature"
     ),
     scalaSource in Compile := baseDirectory.value / ".." / "src" / "macrogl" / "scala",
-    unmanagedSourceDirectories in Compile += baseDirectory.value / ".." / "src" / "api-webgl" / "scala",
+    unmanagedSourceDirectories in Compile +=
+      baseDirectory.value / ".." / "src" / "api-webgl" / "scala",
     libraryDependencies <+= scalaVersion { sv =>
       "org.scala-lang" % "scala-compiler" % sv
     },
     libraryDependencies ++= Seq(
-      "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" % scalaJSVersion % "test",
+      "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" %
+        scalaJSVersion % "test",
       "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6"
     )
   )
@@ -136,7 +144,8 @@ object MacroGLBuild extends MechaRepoBuild {
     ),
     scalaSource in Compile := baseDirectory.value / ".." / "src" / "buffer" / "scala",
     libraryDependencies ++= Seq(
-      "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" % scalaJSVersion % "test",
+      "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" %
+        scalaJSVersion % "test",
       "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6"
     )
   )
@@ -149,7 +158,8 @@ object MacroGLBuild extends MechaRepoBuild {
 
   /* examples */
   
-  val macroglExamplesSettings = Defaults.defaultSettings ++ LWJGLPlugin.lwjglSettings ++ Seq(
+  val macroglExamplesSettings = Defaults.defaultSettings ++ LWJGLPlugin.lwjglSettings ++
+    Seq(
     name := "macrogl-examples",
     version <<= frameworkVersion,
     scalaVersion := macroglScalaVersion,
@@ -162,7 +172,8 @@ object MacroGLBuild extends MechaRepoBuild {
       "-feature"
     ),
     scalaSource in Compile := baseDirectory.value / ".." / "src" / "test" / "scala",
-    resourceDirectory in Compile := baseDirectory.value / ".." / "src" / "test" / "resources"
+    resourceDirectory in Compile :=
+      baseDirectory.value / ".." / "src" / "test" / "resources"
   )
   
   lazy val macroglExample = Project(
@@ -174,7 +185,8 @@ object MacroGLBuild extends MechaRepoBuild {
   /* back-end examples */
   /* back-end examples using WebGL */
 
-  val backendExamplesWebglSettings = Defaults.defaultSettings ++ scalaJSSettings ++ Seq(
+  val backendExamplesWebglSettings = Defaults.defaultSettings ++ scalaJSSettings ++
+    MechaRepoPlugin.defaultSettings ++ Seq(
     name := "backend-examples-webgl",
     version <<= frameworkVersion,
     scalaVersion := macroglScalaVersion,
@@ -186,13 +198,24 @@ object MacroGLBuild extends MechaRepoBuild {
       "-optimise",
       "-feature"
     ),
-    scalaSource in Compile := baseDirectory.value / ".." / "src" / "backend-examples" / "webgl" / "scala",
-    unmanagedSourceDirectories in Compile += baseDirectory.value / ".." / "src" / "backend-examples" / "common" / "scala",
-    resourceDirectory in Compile := baseDirectory.value / ".." / "src" / "backend-examples" / "common" / "resources",
+    scalaSource in Compile :=
+      baseDirectory.value / ".." / "src" / "backend-examples" / "webgl" / "scala",
+    unmanagedSourceDirectories in Compile +=
+      baseDirectory.value / ".." / "src" / "backend-examples" / "common" / "scala",
+    resourceDirectory in Compile :=
+      baseDirectory.value / ".." / "src" / "backend-examples" / "common" / "resources",
     libraryDependencies ++= Seq(
-      "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" % scalaJSVersion % "test",
+      "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" %
+        scalaJSVersion % "test",
       "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6"
-    )
+    ),
+    mechaBuildOutputRepoKey := "git@github.com:storm-enroute/builds.git",
+    mechaBuildOutputBranchKey := "gh-pages",
+    mechaBuildOutputPathKey := "macrogl",
+    mechaBuildOutputSrcPathKey :=
+      (baseDirectory.value).toString,
+    mechaPublishBuildOutputKey <<=
+      mechaPublishBuildOutputKey.dependsOn(packageBin in Compile)
   )
 
   lazy val backendExamplesWebgl = Project(
@@ -203,7 +226,8 @@ object MacroGLBuild extends MechaRepoBuild {
 
   /* back-end examples using LWJGL */
 
-  val backendExamplesLwjglSettings = Defaults.defaultSettings ++ LWJGLPlugin.lwjglSettings ++ Seq(
+  val backendExamplesLwjglSettings = Defaults.defaultSettings ++
+    LWJGLPlugin.lwjglSettings ++ Seq(
     name := "backend-examples-lwjgl",
     version <<= frameworkVersion,
     scalaVersion := macroglScalaVersion,
@@ -215,9 +239,12 @@ object MacroGLBuild extends MechaRepoBuild {
       "-optimise",
       "-feature"
     ),
-    scalaSource in Compile := baseDirectory.value / ".." / "src" / "backend-examples" / "lwjgl" / "scala",
-    unmanagedSourceDirectories in Compile += baseDirectory.value / ".." / "src" / "backend-examples" / "common" / "scala",
-    resourceDirectory in Compile := baseDirectory.value / ".." / "src" / "backend-examples" / "common" / "resources"
+    scalaSource in Compile :=
+      baseDirectory.value / ".." / "src" / "backend-examples" / "lwjgl" / "scala",
+    unmanagedSourceDirectories in Compile +=
+      baseDirectory.value / ".." / "src" / "backend-examples" / "common" / "scala",
+    resourceDirectory in Compile :=
+      baseDirectory.value / ".." / "src" / "backend-examples" / "common" / "resources"
   )
 
   lazy val backendExamplesLwjgl = Project(
