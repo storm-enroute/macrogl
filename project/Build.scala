@@ -183,6 +183,7 @@ object MacroGLBuild extends MechaRepoBuild {
   ) dependsOn(macrogl)
 
   /* back-end examples */
+
   /* back-end examples using WebGL */
 
   val backendExamplesWebglSettings = Defaults.defaultSettings ++ scalaJSSettings ++
