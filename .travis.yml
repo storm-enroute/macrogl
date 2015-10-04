@@ -11,4 +11,3 @@ env:
 branches:
   only:
     - master
-
