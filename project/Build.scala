@@ -213,7 +213,7 @@ object MacroGLBuild extends MechaRepoBuild {
     mechaBuildOutputRepoKey := "git@github.com:storm-enroute/builds.git",
     mechaBuildOutputBranchKey := "gh-pages",
     mechaBuildOutputPathKey := "macrogl",
-    mechaBuildOutputExpirationDaysKey := 5,
+    mechaBuildOutputExpirationDaysKey := 10,
     mechaBuildOutputSrcPathKey :=
       (baseDirectory.value).toString,
     mechaPublishBuildOutputKey <<=
