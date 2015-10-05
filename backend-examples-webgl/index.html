@@ -8,8 +8,11 @@
 
 <h1>Examples: WebGL back-end for MacroGL - fully optimized version</h1>
 
-<p>After having compiled and optimized properly the code for the application
-(using `sbt backendExamplesWebgl/fullOptJS` in the root folder), you should see the MacroGL example.</p>
+<p>
+  After having compiled and optimized properly the code for the application
+  (using `sbt backendExamplesWebgl/fullOptJS` in the root folder),
+  you should see the MacroGL example.
+</p>
 
 <div id="output">
 </div>
@@ -17,14 +20,16 @@
 <h2>[1] Basic triangle</h2>
 
 <p>
-  Here you should see a pulsating blue triangle on a red background.
+  You should see a pulsating blue triangle on a red background.
 </p>
 
 <canvas id="canvas-triangle">
   Your browser doesn't appear to support the HTML5 canvas element.
 </canvas>
 
-<script type="text/javascript" src="./target/scala-2.11/backend-examples-webgl-opt.js"></script>
+<script type="text/javascript" src="./target/scala-2.11/backend-examples-webgl-opt.js">
+  
+</script>
 
 <script type="text/javascript">
 WebglExamples().main();
