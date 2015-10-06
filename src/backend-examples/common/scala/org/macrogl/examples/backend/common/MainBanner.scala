@@ -56,7 +56,8 @@ class MainBanner(
 
       // General OpenGL
       mgl.viewport(0, 0, width, height)
-      mgl.clearColor(1, 1, 1, 1)
+      val whiteTone = 0xf5.toFloat / 0xff
+      mgl.clearColor(whiteTone, whiteTone, whiteTone, 1)
 
       // Setup
       val pp = new Program("MainBanner")(
