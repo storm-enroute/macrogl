@@ -213,11 +213,11 @@ object MacroGLBuild extends MechaRepoBuild {
     mechaBuildOutputRepoKey := "git@github.com:storm-enroute/builds.git",
     mechaBuildOutputBranchKey := "gh-pages",
     mechaBuildOutputPathKey := "macrogl",
-    mechaBuildOutputExpirationDaysKey := 10,
+    mechaBuildOutputExpirationDaysKey := 7,
     mechaBuildOutputSrcPathKey :=
       (baseDirectory.value).toString,
     mechaPublishBuildOutputKey <<=
-      mechaPublishBuildOutputKey.dependsOn(fastOptJS in Compile)
+      mechaPublishBuildOutputKey.dependsOn(fastOptJS in Compile, fullOptJS in Compile)
   )
 
   lazy val backendExamplesWebgl = Project(
