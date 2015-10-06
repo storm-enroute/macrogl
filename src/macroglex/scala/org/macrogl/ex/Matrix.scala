@@ -56,16 +56,6 @@ object Matrix {
     def newMatrix(a: Array[Double]) = new Texture(a)
   }
 
-  final class Plain(a: Array[Double]) extends Matrix(a) {
-    def this() = this(new Array[Double](16))
-    def mode = ???
-    def matrixMode = ???
-  }
-
-  implicit val plainCtor = new Ctor[Plain] {
-    def newMatrix(a: Array[Double]) = new Plain(a)
-  }
-
   def orthoProjection(m: Projection)(left: Double, right: Double, bottom: Double, top: Double, nearPlane: Double, farPlane: Double)(implicit glex: Macroglex) {
     val oldmode = glex.getParameteri(Macroglex.MATRIX_MODE)
     glex.matrixMode(Macroglex.PROJECTION)

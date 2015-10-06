@@ -17,13 +17,23 @@
 <div id="output">
 </div>
 
-<h2>[1] Basic triangle</h2>
+<h2>Basic triangle</h2>
 
 <p>
   You should see a pulsating blue triangle on a red background.
 </p>
 
-<canvas id="canvas-triangle">
+<canvas id="canvas-triangle" height="600px" width="1400px">
+  Your browser doesn't appear to support the HTML5 canvas element.
+</canvas>
+
+<h2>Main banner</h2>
+
+<p>
+  You should see the MacroGL homepage main banner animation.
+</p>
+
+<canvas id="canvas-main-banner" height="600px" width="1400px">
   Your browser doesn't appear to support the HTML5 canvas element.
 </canvas>
 
@@ -32,6 +42,10 @@
 
 <script type="text/javascript">
 WebglExamples().main();
+</script>
+
+<script type="text/javascript">
+WebglExamples().mainBanner("canvas-main-banner");
 </script>
 
 </body>

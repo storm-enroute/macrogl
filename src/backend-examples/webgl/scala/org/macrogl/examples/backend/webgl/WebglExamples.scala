@@ -49,7 +49,7 @@ object WebglExamples {
   @JSExport
   def mainBanner(bannerId: String): Unit = {
     val width = 1400
-    val height = 600
+    val height = 500
     val init = () => {
       val canvas = js.Dynamic.global.document.getElementById(bannerId)
       var gl = canvas.getContext("webgl")
