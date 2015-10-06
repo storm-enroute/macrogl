@@ -11,7 +11,7 @@ import org.macrogl.examples.backend.common._
  * Framework for the examples using the WebGL back end
  * Demos should be visible at the page backend-examples-webgl/index.html
  */
-@JSExport
+@JSExport("WebglExamples")
 object WebglExamples {
   @JSExport
   def main(): Unit = {
