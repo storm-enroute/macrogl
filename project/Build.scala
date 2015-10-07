@@ -217,7 +217,8 @@ object MacroGLBuild extends MechaRepoBuild {
     mechaBuildOutputSrcPathKey :=
       (baseDirectory.value).toString,
     mechaPublishBuildOutputKey <<=
-      mechaPublishBuildOutputKey.dependsOn(fastOptJS in Compile, fullOptJS in Compile)
+      // mechaPublishBuildOutputKey.dependsOn(fastOptJS in Compile, fullOptJS in Compile)
+      mechaPublishBuildOutputKey.dependsOn(fastOptJS in Compile)
   )
 
   lazy val backendExamplesWebgl = Project(
