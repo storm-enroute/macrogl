@@ -1,3 +1,6 @@
+
+
+
 import sbt._
 import Keys._
 import Process._
@@ -5,6 +8,7 @@ import java.io._
 import scala.scalajs.sbtplugin.ScalaJSPlugin._
 import ScalaJSKeys._
 import org.stormenroute.mecha._
+
 
 
 object MacroGLBuild extends MechaRepoBuild {
@@ -217,7 +221,7 @@ object MacroGLBuild extends MechaRepoBuild {
     mechaBuildOutputSrcPathKey :=
       (baseDirectory.value).toString,
     mechaPublishBuildOutputKey <<=
-      // mechaPublishBuildOutputKey.dependsOn(fastOptJS in Compile, fullOptJS in Compile)
+      //mechaPublishBuildOutputKey.dependsOn(fastOptJS in Compile, fullOptJS in Compile)
       mechaPublishBuildOutputKey.dependsOn(fastOptJS in Compile)
   )
 
