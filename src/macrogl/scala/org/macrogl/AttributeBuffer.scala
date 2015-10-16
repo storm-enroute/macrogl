@@ -101,9 +101,7 @@ class AttributeBuffer(
 
   def enableForRender(): Unit = {
     enableAttributeArrays()
-    gl.checkError()
     setAttributePointers()
-    gl.checkError()
   }
 
   def disableForRender(): Unit = {

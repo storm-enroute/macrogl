@@ -9,7 +9,8 @@ import org.lwjgl.util.glu._
 
 class Macroglex private[macrogl] () extends Macrogl() {
 
-  final def bindShaderStorageBuffer(target: Int, layoutIndex: Int, buffer: Token.Buffer) = {
+  final def bindShaderStorageBuffer(target: Int, layoutIndex: Int,
+    buffer: Token.Buffer) = {
     import org.lwjgl.opengl.GL43._
     GL30.glBindBufferBase(target, layoutIndex, buffer)
   }
@@ -56,25 +57,40 @@ class Macroglex private[macrogl] () extends Macrogl() {
     GL11.glGetDouble(pname, outputs)
   }
 
-  final def texImage1D(target: Int, level: Int, internalformat: Int, width: Int, border: Int,
-    format: Int, `type`: Int, pixels: Data.Byte) = {
-    GL11.glTexImage1D(target, level, internalformat, width, border, format, `type`, pixels)
+  final def texImage1D(target: Int, level: Int, internalformat: Int, width: Int,
+    border: Int, format: Int, `type`: Int, pixels: Data.Byte) = {
+    GL11.glTexImage1D(target, level, internalformat, width, border, format, `type`,
+      pixels)
   }
-  final def texImage1D(target: Int, level: Int, internalformat: Int, width: Int, border: Int,
-    format: Int, `type`: Int, pixels: Data.Short) = {
-    GL11.glTexImage1D(target, level, internalformat, width, border, format, `type`, pixels)
+
+  final def texImage1D(target: Int, level: Int, internalformat: Int, width: Int,
+    border: Int, format: Int, `type`: Int, pixels: Data.Short) = {
+    GL11.glTexImage1D(target, level, internalformat, width, border, format, `type`,
+      pixels)
   }
-  final def texImage1D(target: Int, level: Int, internalformat: Int, width: Int, border: Int,
-    format: Int, `type`: Int, pixels: Data.Int) = {
-    GL11.glTexImage1D(target, level, internalformat, width, border, format, `type`, pixels)
+
+  final def texImage1D(target: Int, level: Int, internalformat: Int, width: Int,
+    border: Int, format: Int, `type`: Int, pixels: Data.Int) = {
+    GL11.glTexImage1D(target, level, internalformat, width, border, format, `type`,
+      pixels)
   }
-  final def texImage1D(target: Int, level: Int, internalformat: Int, width: Int, border: Int,
-    format: Int, `type`: Int, pixels: Data.Float) = {
-    GL11.glTexImage1D(target, level, internalformat, width, border, format, `type`, pixels)
+
+  final def texImage1D(target: Int, level: Int, internalformat: Int, width: Int,
+    border: Int, format: Int, `type`: Int, pixels: Data.Float) = {
+    GL11.glTexImage1D(target, level, internalformat, width, border, format, `type`,
+      pixels)
   }
-  final def texImage1D(target: Int, level: Int, internalformat: Int, width: Int, border: Int,
-    format: Int, `type`: Int, pixels: Data.Double) = {
-    GL11.glTexImage1D(target, level, internalformat, width, border, format, `type`, pixels)
+
+  final def texImage1D(target: Int, level: Int, internalformat: Int, width: Int,
+    border: Int, format: Int, `type`: Int, pixels: Data.Double) = {
+    GL11.glTexImage1D(target, level, internalformat, width, border, format, `type`,
+      pixels)
+  }
+
+  final def texImage2DMultisample(target: Int, samples: Int, internalformat: Int,
+    width: Int, height: Int, fixedSampleLocations: Boolean) = {
+    ARBTextureMultisample.glTexImage2DMultisample(target, samples, internalformat,
+      width, height, fixedSampleLocations)
   }
 
   final def color4f(r: Float, g: Float, b: Float, a: Float) {
@@ -117,15 +133,18 @@ class Macroglex private[macrogl] () extends Macrogl() {
     GL11.glLoadIdentity()
   }
 
-  final def frustum(left: Double, right: Double, bottom: Double, top: Double, nearPlane: Double, farPlane: Double) {
+  final def frustum(left: Double, right: Double, bottom: Double, top: Double,
+    nearPlane: Double, farPlane: Double) {
     GL11.glFrustum(left, right, bottom, top, nearPlane, farPlane)
   }
 
-  final def ortho(left: Double, right: Double, bottom: Double, top: Double, nearPlane: Double, farPlane: Double) {
+  final def ortho(left: Double, right: Double, bottom: Double, top: Double,
+    nearPlane: Double, farPlane: Double) {
     GL11.glOrtho(left, right, bottom, top, nearPlane, farPlane)
   }
 
-  final def lookAt(xfrom: Float, yfrom: Float, zfrom: Float, xto: Float, yto: Float, zto: Float, xup: Float, yup: Float, zup: Float) {
+  final def lookAt(xfrom: Float, yfrom: Float, zfrom: Float, xto: Float, yto: Float,
+    zto: Float, xup: Float, yup: Float, zup: Float) {
     GLU.gluLookAt(xfrom, yfrom, zfrom, xto, yto, zto, xup, yup, zup)
   }
 }
@@ -160,6 +179,9 @@ object Macroglex {
   val BLEND_SRC = GL11.GL_BLEND_SRC
   val BLEND_DST = GL11.GL_BLEND_DST
   val INFO_LOG_LENGTH = GL20.GL_INFO_LOG_LENGTH
+  val TEXTURE_2D_MULTISAMPLE = ARBTextureMultisample.GL_TEXTURE_2D_MULTISAMPLE
+  val TEXTURE_2D_MULTISAMPLE_ARRAY =
+    ARBTextureMultisample.GL_TEXTURE_2D_MULTISAMPLE_ARRAY
 
   /* public API - implicits */
 

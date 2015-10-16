@@ -27,7 +27,6 @@ extends Handle {
   }
 
   object param {
-
     def update(name: Int, v: Float) {
       gl.texParameterf(target, name, v)
     }
@@ -57,7 +56,8 @@ extends Handle {
 
   def wrapT_=(v: Int) = param(Macrogl.TEXTURE_WRAP_T) = v
 
-  def allocateImage2D(level: Int, internalFormat: Int, wdt: Int, hgt: Int, border: Int, format: Int, dataType: Int, data: Data = null) {
+  def allocateImage2D(level: Int, internalFormat: Int, wdt: Int, hgt: Int, border: Int,
+    format: Int, dataType: Int, data: Data = null) {
     target match {
       case Macrogl.TEXTURE_2D => data match {
         case null =>

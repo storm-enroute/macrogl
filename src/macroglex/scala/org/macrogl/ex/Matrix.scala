@@ -69,7 +69,6 @@ object Matrix {
     } finally {
       glex.popMatrix()
       glex.matrixMode(oldmode)
-      Macrogl.default.checkError()
     }
   }
 
@@ -86,7 +85,6 @@ object Matrix {
     } finally {
       glex.popMatrix()
       glex.matrixMode(oldmode)
-      Macrogl.default.checkError()
     }
   }
 
@@ -103,7 +101,6 @@ object Matrix {
     } finally {
       glex.popMatrix()
       glex.matrixMode(oldmode)
-      Macrogl.default.checkError()
     }
   }
 }
