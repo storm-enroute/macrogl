@@ -261,5 +261,3 @@ object MacroGLBuild extends MechaRepoBuild {
   ) dependsOn (macrogl)
   
 }
-
-
