@@ -1,12 +1,14 @@
 package org.macrogl.examples
 
-import org.{ macrogl => gl }
-import org.macrogl.ex._
+import org.macrogl._
 
 object Utils {
-  def readResource(path: String) = io.Source.fromURL(getClass.getResource(path)).mkString
+  def readResource(path: String) =
+    io.Source.fromURL(getClass.getResource(path)).mkString
 
-  def perspectiveProjection(fovDegrees: Double, aspectRatio: Double, nearZ: Double, farZ: Double): Matrix.Plain = {
+  def perspectiveProjection(
+    fovDegrees: Double, aspectRatio: Double, nearZ: Double, farZ: Double
+  ): Matrix.Plain = {
     val rad = scala.math.toRadians(fovDegrees)
 
     val y = 1.0 / scala.math.tan(rad / 2.0)
@@ -23,7 +25,9 @@ object Utils {
     new Matrix.Plain(arr)
   }
 
-  def orthoProjection(left: Double, right: Double, bottom: Double, top: Double, near: Double, far: Double): Matrix.Plain = {
+  def orthoProjection(
+    left: Double, right: Double, bottom: Double, top: Double, near: Double, far: Double
+  ): Matrix.Plain = {
     val x = 2 / (right - left)
     val y = 2 / (top - bottom)
     val z = -2 / (far - near)
@@ -63,10 +67,12 @@ object Utils {
         -sh, 0, ch, 0,
         0, 0, 0, 1)
 
-      gl.Matrix.multiply[Matrix.Plain](new Matrix.Plain(vRotate), new Matrix.Plain(hRotate))
+      Matrix.multiply[Matrix.Plain](
+        new Matrix.Plain(vRotate), new Matrix.Plain(hRotate))
     }
 
-    def invertedOrientation = new Matrix.Plain(orientation.array.grouped(4).toArray.transpose.flatten)
+    def invertedOrientation =
+      new Matrix.Plain(orientation.array.grouped(4).toArray.transpose.flatten)
 
     def forwardDirection = {
       val inv = invertedOrientation
@@ -107,7 +113,7 @@ object Utils {
           0, 1, 0, 0,
           0, 0, 1, 0,
           -position(0), -position(1), -position(2), 1))
-      gl.Matrix.multiply[Matrix.Plain](orientation, translation)
+      Matrix.multiply[Matrix.Plain](orientation, translation)
     }
 
     def offsetOrientation(h: Double, v: Double): Unit = {

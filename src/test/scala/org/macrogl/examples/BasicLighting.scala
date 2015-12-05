@@ -50,14 +50,14 @@ object BasicLighting {
     var dtSeconds = 0.0
     var prevTime = System.currentTimeMillis
 
-    val leftTransform = new macrogl.ex.Matrix.Plain(
+    val leftTransform = new macrogl.Matrix.Plain(
       Array[Double](
         1, 0, 0, 0,
         0, 1, 0, 0,
         0, 0, 1, 0,
         -3, 0, -5, 1))
 
-    val rightTransform = new macrogl.ex.Matrix.Plain(
+    val rightTransform = new macrogl.Matrix.Plain(
       Array[Double](
         1, 0, 0, 0,
         0, 1, 0, 0,
