@@ -37,6 +37,16 @@
   Your browser doesn't appear to support the HTML5 canvas element.
 </canvas>
 
+<h2>Basic square shape from triangles</h2>
+
+<p>
+  You should see a pulsating square created by joining triangles on a red background.
+</p>
+
+<canvas id="canvas-shape" height="600px" width="1400px">
+  Your browser doesn't appear to support the HTML5 canvas element.
+</canvas>
+
 <script
   type="text/javascript"
   src="./target/scala-2.11/backend-examples-webgl-fastopt.js">
@@ -48,6 +58,10 @@ WebglExamples().main();
 
 <script type="text/javascript">
 WebglExamples().mainBanner("canvas-main-banner");
+</script>
+
+<script type="text/javascript">
+WebglExamples().shapeExample();
 </script>
 
 </body>
