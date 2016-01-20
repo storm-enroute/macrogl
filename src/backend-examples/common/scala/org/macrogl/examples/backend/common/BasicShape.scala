@@ -84,10 +84,11 @@ class BasicShape(
       vertexBuffer.acquire()
       vertexBuffer.send(0, vertexBufferData)
       
-      val camera = new Matrix.Camera(-0.5f ,0,0);
+      val camera = new Matrix.Camera(-0.25f, 0, 0);
       
       var continueCondition: Boolean = true
-
+      var direction: Int = 0
+      
       def continue(): Boolean = {
         continueCondition
       }
@@ -107,9 +108,15 @@ class BasicShape(
 
         color += 0.01
         shapeColor(2) = math.abs(color % 2.0 - 1.0).toFloat
-        println(camera.position(0) , " " , camera.position(1) , " " , camera.position(2))
-        camera.moveRight(0.0001)
-        println("moving right ...")
+//        println(camera.position(0) , " " , camera.position(1) , " " , camera.position(2))
+        if(direction == 0){
+          camera.moveRight(0.5f)
+          direction = 1
+        }
+        else{
+          camera.moveLeft(0.5f)
+          direction = 0
+        }
         continueCondition = systemUpdate()
       }
 
