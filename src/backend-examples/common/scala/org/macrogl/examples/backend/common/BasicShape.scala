@@ -108,15 +108,21 @@ class BasicShape(
 
         color += 0.01
         shapeColor(2) = math.abs(color % 2.0 - 1.0).toFloat
-//        println(camera.position(0) , " " , camera.position(1) , " " , camera.position(2))
-        if(direction == 0){
-          camera.moveRight(0.5f)
+        // println(camera.position(0) , " " , camera.position(1) , " " , camera.position(2))
+        
+        if (direction == 0) {
+          camera.moveRight(0.0003f)
+        } else {
+          camera.moveLeft(0.0003f)
+        }
+
+        if (camera.position(0) >= 0.5f) {
           direction = 1
         }
-        else{
-          camera.moveLeft(0.5f)
+        if (camera.position(0) <= -0.5f) {
           direction = 0
         }
+        
         continueCondition = systemUpdate()
       }
 
