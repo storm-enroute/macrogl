@@ -71,7 +71,7 @@ class BasicShape(
       
       // General OpenGL
       mgl.viewport(0, 0, width, height)
-      mgl.clearColor(1, 0, 0, 1) // red background
+      mgl.clearColor(0.5f, 0.5f, 0.5f, 1) // gray background
 
       // Setup
       val pp = new Program("BasicShape")(
