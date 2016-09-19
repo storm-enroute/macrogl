@@ -102,7 +102,7 @@ object MacroGLBuild extends MechaRepoBuild {
   
   /* macro-gl with WebGL back-end */
   
-  val macroglWebglSettings = Defaults.defaultSettings ++ Seq(
+  val macroglWebglSettings = Seq(
     name := "macrogl-webgl",
     version <<= frameworkVersion,
     scalaVersion := macroglScalaVersion,
@@ -121,9 +121,7 @@ object MacroGLBuild extends MechaRepoBuild {
       "org.scala-lang" % "scala-compiler" % sv
     },
     libraryDependencies ++= Seq(
-      "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" %
-        scalaJSVersion % "test",
-      "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6"
+      "org.scala-js" %%% "scalajs-dom" % "0.9.0"
     ),
     ivyLoggingLevel in ThisBuild := UpdateLogging.Quiet
   )
@@ -136,7 +134,7 @@ object MacroGLBuild extends MechaRepoBuild {
 
   /* java.nio.Buffer's variant for macro-gl */
 
-  val macroglBufferSettings = Defaults.defaultSettings ++ Seq(
+  val macroglBufferSettings = Seq(
     name := "macrogl-buffer",
     version <<= frameworkVersion,
     scalaVersion := macroglScalaVersion,
@@ -150,9 +148,7 @@ object MacroGLBuild extends MechaRepoBuild {
     ),
     scalaSource in Compile := baseDirectory.value / ".." / "src" / "buffer" / "scala",
     libraryDependencies ++= Seq(
-      "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" %
-        scalaJSVersion % "test",
-      "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6"
+      "org.scala-js" %%% "scalajs-dom" % "0.9.0"
     ),
     ivyLoggingLevel in ThisBuild := UpdateLogging.Quiet
   )
@@ -193,8 +189,7 @@ object MacroGLBuild extends MechaRepoBuild {
 
   /* back-end examples using WebGL */
 
-  val backendExamplesWebglSettings = Defaults.defaultSettings ++
-    MechaRepoPlugin.defaultSettings ++ Seq(
+  val backendExamplesWebglSettings = MechaRepoPlugin.defaultSettings ++ Seq(
     name := "backend-examples-webgl",
     version <<= frameworkVersion,
     scalaVersion := macroglScalaVersion,
@@ -213,9 +208,7 @@ object MacroGLBuild extends MechaRepoBuild {
     resourceDirectory in Compile :=
       baseDirectory.value / ".." / "src" / "backend-examples" / "common" / "resources",
     libraryDependencies ++= Seq(
-      "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" %
-        scalaJSVersion % "test",
-      "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6"
+      "org.scala-js" %%% "scalajs-dom" % "0.9.0"
     ),
     mechaBuildOutputRepoKey := "git@github.com:storm-enroute/builds.git",
     mechaBuildOutputBranchKey := "gh-pages",
@@ -262,5 +255,5 @@ object MacroGLBuild extends MechaRepoBuild {
     file("backend-examples-lwjgl"),
     settings = backendExamplesLwjglSettings
   ) dependsOn (macrogl)
-  
+
 }
