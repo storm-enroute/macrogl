@@ -5,8 +5,8 @@ import sbt._
 import Keys._
 import Process._
 import java.io._
-import scala.scalajs.sbtplugin.ScalaJSPlugin._
-import ScalaJSKeys._
+import org.scalajs.sbtplugin.ScalaJSPlugin
+import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 import org.stormenroute.mecha._
 
 
@@ -102,7 +102,7 @@ object MacroGLBuild extends MechaRepoBuild {
   
   /* macro-gl with WebGL back-end */
   
-  val macroglWebglSettings = Defaults.defaultSettings ++ scalaJSSettings ++ Seq(
+  val macroglWebglSettings = Defaults.defaultSettings ++ Seq(
     name := "macrogl-webgl",
     version <<= frameworkVersion,
     scalaVersion := macroglScalaVersion,
@@ -132,11 +132,11 @@ object MacroGLBuild extends MechaRepoBuild {
     "macroglWebgl",
     file("macrogl-webgl"),
     settings = macroglWebglSettings
-  ) dependsOn(macroglBuffer)
+  ) dependsOn(macroglBuffer) enablePlugins(ScalaJSPlugin)
 
   /* java.nio.Buffer's variant for macro-gl */
 
-  val macroglBufferSettings = Defaults.defaultSettings ++ scalaJSSettings ++ Seq(
+  val macroglBufferSettings = Defaults.defaultSettings ++ Seq(
     name := "macrogl-buffer",
     version <<= frameworkVersion,
     scalaVersion := macroglScalaVersion,
@@ -161,7 +161,7 @@ object MacroGLBuild extends MechaRepoBuild {
     "macroglBuffer",
     file("macrogl-buffer"),
     settings = macroglBufferSettings
-  )
+  ) enablePlugins(ScalaJSPlugin)
 
   /* examples */
   
@@ -193,7 +193,7 @@ object MacroGLBuild extends MechaRepoBuild {
 
   /* back-end examples using WebGL */
 
-  val backendExamplesWebglSettings = Defaults.defaultSettings ++ scalaJSSettings ++
+  val backendExamplesWebglSettings = Defaults.defaultSettings ++
     MechaRepoPlugin.defaultSettings ++ Seq(
     name := "backend-examples-webgl",
     version <<= frameworkVersion,
@@ -232,7 +232,7 @@ object MacroGLBuild extends MechaRepoBuild {
     "backendExamplesWebgl",
     file("backend-examples-webgl"),
     settings = backendExamplesWebglSettings
-  ) dependsOn (macroglWebgl)
+  ) dependsOn (macroglWebgl) enablePlugins(ScalaJSPlugin)
 
   /* back-end examples using LWJGL */
 
