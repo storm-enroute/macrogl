@@ -89,9 +89,7 @@ object MacroGLBuild extends MechaRepoBuild {
     mechaPublishKey := { publish.value },
     mechaDocsRepoKey := "git@github.com:storm-enroute/apidocs.git",
     mechaDocsBranchKey := "gh-pages",
-    mechaDocsPathKey := "macrogl",
-    mechaNightlyKey <<=
-      mechaNightlyKey.dependsOn(mechaNightlyKey in backendExamplesWebgl)
+    mechaDocsPathKey := "macrogl"
   )
   
   lazy val macrogl: Project = Project(
