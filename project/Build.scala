@@ -23,7 +23,7 @@ object MacroGLBuild extends MechaRepoBuild {
       List("macrogl_major", "macrogl_minor"))
   }
 
-  val macroglScalaVersion = "2.11.4"
+  val macroglScalaVersion = "2.11.8"
 
   val lwjglVersion = "2.9.0"
 
