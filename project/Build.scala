@@ -27,72 +27,72 @@ object MacroGLBuild extends MechaRepoBuild {
 
   val lwjglVersion = "2.9.0"
 
-  val macroglSettings = Defaults.defaultSettings ++
+  val macroglSettings =
     MechaRepoPlugin.defaultSettings ++ LWJGLPlugin.lwjglSettings ++ Seq(
-    name := "macrogl",
-    organization := "com.storm-enroute",
-    version <<= frameworkVersion,
-    scalaVersion := macroglScalaVersion,
-    LWJGLPlugin.lwjgl.version := lwjglVersion,
-    scalacOptions ++= Seq(
-      "-deprecation",
-      "-unchecked",
-      "-Xexperimental",
-      "-optimise",
-      "-feature"
-    ),
-    scalaSource in Compile := baseDirectory.value / "src" / "macrogl" / "scala",
-    unmanagedSourceDirectories in Compile +=
-      baseDirectory.value / "src" / "api-opengl" / "scala",
-    unmanagedSourceDirectories in Compile +=
-      baseDirectory.value / "src" / "macroglex" / "scala",
-    libraryDependencies <+= scalaVersion { sv =>
-      "org.scala-lang" % "scala-compiler" % sv
-    },
-    resolvers ++= Seq(
-      "Sonatype OSS Snapshots" at
-        "https://oss.sonatype.org/content/repositories/snapshots",
-      "Sonatype OSS Releases" at
-        "https://oss.sonatype.org/content/repositories/releases"
-    ),
-    ivyLoggingLevel in ThisBuild := UpdateLogging.Quiet,
-    publishMavenStyle := true,
-    publishTo <<= version { (v: String) =>
-      val nexus = "https://oss.sonatype.org/"
-      if (v.trim.endsWith("SNAPSHOT"))
-        Some("snapshots" at nexus + "content/repositories/snapshots")
-      else
-        Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-    },
-    publishArtifact in Test := false,
-    pomIncludeRepository := { _ => false },
-    pomExtra :=
-      <url>http://storm-enroute.com/</url>
-      <licenses>
-        <license>
-          <name>BSD-style</name>
-          <url>http://opensource.org/licenses/BSD-3-Clause</url>
-          <distribution>repo</distribution>
-        </license>
-      </licenses>
-      <scm>
-        <url>git@github.com:storm-enroute/macrogl.git</url>
-        <connection>scm:git:git@github.com:storm-enroute/macrogl.git</connection>
-      </scm>
-      <developers>
-        <developer>
-          <id>axel22</id>
-          <name>Aleksandar Prokopec</name>
-          <url>http://axel22.github.com/</url>
-        </developer>
-      </developers>,
-    mechaPublishKey := { publish.value },
-    mechaDocsRepoKey := "git@github.com:storm-enroute/apidocs.git",
-    mechaDocsBranchKey := "gh-pages",
-    mechaDocsPathKey := "macrogl",
-    mechaNightlyKey <<=
-      mechaNightlyKey.dependsOn(compile in Compile)
-  )
+      name := "macrogl",
+      organization := "com.storm-enroute",
+      version <<= frameworkVersion,
+      scalaVersion := macroglScalaVersion,
+      LWJGLPlugin.lwjgl.version := lwjglVersion,
+      scalacOptions ++= Seq(
+        "-deprecation",
+        "-unchecked",
+        "-Xexperimental",
+        "-optimise",
+        "-feature"
+      ),
+      scalaSource in Compile := baseDirectory.value / "src" / "macrogl" / "scala",
+      unmanagedSourceDirectories in Compile +=
+        baseDirectory.value / "src" / "api-opengl" / "scala",
+      unmanagedSourceDirectories in Compile +=
+        baseDirectory.value / "src" / "macroglex" / "scala",
+      libraryDependencies <+= scalaVersion { sv =>
+        "org.scala-lang" % "scala-compiler" % sv
+      },
+      resolvers ++= Seq(
+        "Sonatype OSS Snapshots" at
+          "https://oss.sonatype.org/content/repositories/snapshots",
+        "Sonatype OSS Releases" at
+          "https://oss.sonatype.org/content/repositories/releases"
+      ),
+      ivyLoggingLevel in ThisBuild := UpdateLogging.Quiet,
+      publishMavenStyle := true,
+      publishTo <<= version { (v: String) =>
+        val nexus = "https://oss.sonatype.org/"
+        if (v.trim.endsWith("SNAPSHOT"))
+          Some("snapshots" at nexus + "content/repositories/snapshots")
+        else
+          Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+      },
+      publishArtifact in Test := false,
+      pomIncludeRepository := { _ => false },
+      pomExtra :=
+        <url>http://storm-enroute.com/</url>
+        <licenses>
+          <license>
+            <name>BSD-style</name>
+            <url>http://opensource.org/licenses/BSD-3-Clause</url>
+            <distribution>repo</distribution>
+          </license>
+        </licenses>
+        <scm>
+          <url>git@github.com:storm-enroute/macrogl.git</url>
+          <connection>scm:git:git@github.com:storm-enroute/macrogl.git</connection>
+        </scm>
+        <developers>
+          <developer>
+            <id>axel22</id>
+            <name>Aleksandar Prokopec</name>
+            <url>http://axel22.github.com/</url>
+          </developer>
+        </developers>,
+      mechaPublishKey := { publish.value },
+      mechaDocsRepoKey := "git@github.com:storm-enroute/apidocs.git",
+      mechaDocsBranchKey := "gh-pages",
+      mechaDocsPathKey := "macrogl",
+      mechaNightlyKey <<=
+        mechaNightlyKey.dependsOn(compile in Compile)
+    )
   
   lazy val macrogl: Project = Project(
     "macrogl",
@@ -161,8 +161,7 @@ object MacroGLBuild extends MechaRepoBuild {
 
   /* examples */
   
-  val macroglExamplesSettings = Defaults.defaultSettings ++ LWJGLPlugin.lwjglSettings ++
-    Seq(
+  val macroglExamplesSettings = LWJGLPlugin.lwjglSettings ++ Seq(
     name := "macrogl-examples",
     version <<= frameworkVersion,
     scalaVersion := macroglScalaVersion,
