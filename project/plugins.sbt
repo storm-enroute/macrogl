@@ -1,4 +1,6 @@
 
+resolvers += Resolver.sonatypeRepo("public")
+
 addSbtPlugin("com.typesafe.sbt" % "sbt-pgp" % "0.8.1")
 
 addSbtPlugin("com.storm-enroute" % "sbt-lwjgl-plugin" % "3.1.6")
