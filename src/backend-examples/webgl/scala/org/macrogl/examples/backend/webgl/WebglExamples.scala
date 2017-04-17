@@ -77,6 +77,35 @@ object WebglExamples {
 
 
   @JSExport
+  def shapeExample(): Unit = {
+    val width = 640
+    val height = 360
+
+    def myPrint(msg: String): Unit = js.Dynamic.global.console.log(msg)
+    def myUpdate(): Boolean = true
+    def myClose(): Unit = {
+      // Nothing to do
+    }
+    def customInit(canvasName: String): () => Macrogl = {
+      def myInit(): Macrogl = {
+        val canvas = js.Dynamic.global.document.getElementById(canvasName)
+        canvas.width = width
+        canvas.height = height
+        var gl = canvas.getContext("webgl")
+        if (gl == null) gl = canvas.getContext("experimental-webgl")
+        if (gl == null) throw new RuntimeException("WebGL not supported")
+        new Macrogl()(gl.asInstanceOf[dom.WebGLRenderingContext])
+      }
+
+      myInit _
+    }
+
+    new BasicShape(width, height, myPrint, myUpdate, customInit("canvas-shape"),
+      myClose).start()
+  }
+  
+
+  @JSExport
   def mainBanner(bannerId: String): Unit = {
     val width = 1400
     val height = 520
