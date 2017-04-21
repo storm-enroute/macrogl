@@ -23,9 +23,9 @@ object MacroGLBuild extends MechaRepoBuild {
       List("macrogl_major", "macrogl_minor"))
   }
 
-  val macroglScalaVersion = "2.11.8"
+  val macroglScalaVersion = "2.12.2"
 
-  val lwjglVersion = "2.9.0"
+  val lwjglVersion = "2.9.3"
 
   val macroglSettings =
     MechaRepoPlugin.defaultSettings ++ LWJGLPlugin.lwjglSettings ++ Seq(
@@ -121,7 +121,7 @@ object MacroGLBuild extends MechaRepoBuild {
       "org.scala-lang" % "scala-compiler" % sv
     },
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "0.9.0"
+      "org.scala-js" %%% "scalajs-dom" % "0.9.1"
     ),
     ivyLoggingLevel in ThisBuild := UpdateLogging.Quiet
   )
@@ -148,7 +148,7 @@ object MacroGLBuild extends MechaRepoBuild {
     ),
     scalaSource in Compile := baseDirectory.value / ".." / "src" / "buffer" / "scala",
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "0.9.0"
+      "org.scala-js" %%% "scalajs-dom" % "0.9.1"
     ),
     ivyLoggingLevel in ThisBuild := UpdateLogging.Quiet
   )
@@ -172,6 +172,10 @@ object MacroGLBuild extends MechaRepoBuild {
       "-Xexperimental",
       "-optimise",
       "-feature"
+    ),
+    libraryDependencies ++= Seq(
+      "org.lwjgl.lwjgl" % "lwjgl-platform" % lwjglVersion,
+      "org.lwjgl.lwjgl" % "lwjgl_util" % lwjglVersion //FIXME; shouldn't need
     ),
     scalaSource in Compile := baseDirectory.value / ".." / "src" / "test" / "scala",
     resourceDirectory in Compile :=
