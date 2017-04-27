@@ -2,11 +2,12 @@
 
 
 import sbt._
-import Keys._
+import sbt.Keys._
 import Process._
 import java.io._
 import org.scalajs.sbtplugin.ScalaJSPlugin
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
+import org.scalajs.sbtplugin.cross.CrossProject
 import org.stormenroute.mecha._
 
 
@@ -23,9 +24,9 @@ object MacroGLBuild extends MechaRepoBuild {
       List("macrogl_major", "macrogl_minor"))
   }
 
-  val macroglScalaVersion = "2.12.2"
+  val macroglScalaVersion = "2.11.8"
 
-  val lwjglVersion = "2.9.3"
+  val lwjglVersion = "2.9.0"
 
   val macroglSettings =
     MechaRepoPlugin.defaultSettings ++ LWJGLPlugin.lwjglSettings ++ Seq(
@@ -33,6 +34,7 @@ object MacroGLBuild extends MechaRepoBuild {
       organization := "com.storm-enroute",
       version <<= frameworkVersion,
       scalaVersion := macroglScalaVersion,
+      crossScalaVersions := Seq(macroglScalaVersion, "2.12.2"),
       LWJGLPlugin.lwjgl.version := lwjglVersion,
       scalacOptions ++= Seq(
         "-deprecation",
@@ -93,7 +95,7 @@ object MacroGLBuild extends MechaRepoBuild {
       mechaNightlyKey <<=
         mechaNightlyKey.dependsOn(compile in Compile)
     )
-  
+
   lazy val macrogl: Project = Project(
     "macrogl",
     file("."),
@@ -172,10 +174,6 @@ object MacroGLBuild extends MechaRepoBuild {
       "-Xexperimental",
       "-optimise",
       "-feature"
-    ),
-    libraryDependencies ++= Seq(
-      "org.lwjgl.lwjgl" % "lwjgl-platform" % lwjglVersion,
-      "org.lwjgl.lwjgl" % "lwjgl_util" % lwjglVersion //FIXME; shouldn't need
     ),
     scalaSource in Compile := baseDirectory.value / ".." / "src" / "test" / "scala",
     resourceDirectory in Compile :=
