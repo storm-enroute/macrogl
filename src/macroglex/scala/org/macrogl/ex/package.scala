@@ -12,10 +12,12 @@ package object ex {
 
   object computing {
     object MeshBufferObject {
-      def foreach[U](f: Unit => U)(implicit glex: Macroglex): Unit = macro ex.MeshBuffer.computing[U]
+      def foreach[U](f: Unit => U)(implicit glex: Macroglex): Unit =
+        macro ex.MeshBuffer.computing[U]
     }
     object AttributeBufferObject {
-      def foreach[U](f: Unit => U)(implicit glex: Macroglex): Unit = macro ex.AttributeBuffer.computing[U]
+      def foreach[U](f: Unit => U)(implicit glex: Macroglex): Unit =
+        macro ex.AttributeBuffer.computing[U]
     }
 
     def meshbuffer(layoutIndex: Int, mesh: MeshBuffer) = MeshBufferObject
